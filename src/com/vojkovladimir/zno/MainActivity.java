@@ -6,11 +6,13 @@ import android.view.View;
 
 public class MainActivity extends Activity {
 
+	Api api;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+		api = new Api(this);
 	}
 
 	protected void onStart() {
@@ -46,7 +48,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void beginTesting(View v) {
-		
+
 	}
 
 	public void lastPassedTests(View v) {
@@ -61,4 +63,7 @@ public class MainActivity extends Activity {
 
 	}
 
+	public void loadTests() {
+
+	}
 }
