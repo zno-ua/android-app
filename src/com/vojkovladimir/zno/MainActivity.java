@@ -4,15 +4,18 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.vojkovladimir.zno.api.Api;
+
 public class MainActivity extends Activity {
 
-	Api api;
+	public static String LOG_TAG = "MyLogs";
+	private ZNOApplication app = ZNOApplication.getInstance();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		api = new Api(this);
+
 	}
 
 	protected void onStart() {
@@ -48,7 +51,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void beginTesting(View v) {
-
+		
 	}
 
 	public void lastPassedTests(View v) {
@@ -60,10 +63,6 @@ public class MainActivity extends Activity {
 	}
 
 	public void settings(View v) {
-
-	}
-
-	public void loadTests() {
-
+		
 	}
 }
