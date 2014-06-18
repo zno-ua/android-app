@@ -21,6 +21,11 @@ public class ZNOApplication extends Application {
 	private static ZNOApplication mInstance;
 	private RequestQueue mRequestQueue;
 	private ZNODataBaseHelper znoDBHelper;
+	
+	public interface ExtrasKeys{
+		String TABLE_NAME = "table_name";
+		String ID_LESSON = "id";
+	}
 
 	@Override
 	public void onCreate() {
