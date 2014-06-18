@@ -20,34 +20,34 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 1;
 
 	// Table names
-	private static final String TABLE_LESSONS_LIST = "lessons_list";
-	private static final String TABLE_TESTS_LIST = "tests_list";
+	public static final String TABLE_LESSONS_LIST = "lessons_list";
+	public static final String TABLE_TESTS_LIST = "tests_list";
 
 	// Column names
-	private static final String KEY_ID = "id";
-	private static final String KEY_ID_QUEST = "id_quest";
-	private static final String KEY_ID_LESSON = "id_lesson";
-	private static final String KEY_LINK = "link";
-	private static final String KEY_NAME = "name";
-	private static final String KEY_NAME_ROD = "name_rod";
-	private static final String KEY_DB_NAME = "db_name";
-	private static final String KEY_NAME_LESSON = "name_lesson";
-	private static final String KEY_LINK_LESSON = "link_lesson";
-	private static final String KEY_NAME_TEST = "name_test";
-	private static final String KEY_YEAR = "year";
-	private static final String KEY_TIME = "time";
-	private static final String KEY_TASK_BLOCKS = "task_blocks";
-	private static final String KEY_TASKS_NUM = "tasks_num";
-	private static final String KEY_TASK_TEST = "task_test";
-	private static final String KEY_TASK_TEXTS = "task_texts";
-	private static final String KEY_TASK_VIDPOV = "task_vidpov";
-	private static final String KEY_TASK_VARS = "task_vars";
-	private static final String KEY_TASK_ANS = "task_ans";
-	private static final String KEY_TYPE = "type";
-	private static final String KEY_TEXT = "text";
-	private static final String KEY_ANSWERS = "answers";
-	private static final String KEY_CORRECT = "correct";
-	private static final String KEY_BALL = "ball";
+	public static final String KEY_ID = "id";
+	public static final String KEY_ID_QUEST = "id_quest";
+	public static final String KEY_ID_LESSON = "id_lesson";
+	public static final String KEY_LINK = "link";
+	public static final String KEY_NAME = "name";
+	public static final String KEY_NAME_ROD = "name_rod";
+	public static final String KEY_DB_NAME = "db_name";
+	public static final String KEY_NAME_LESSON = "name_lesson";
+	public static final String KEY_LINK_LESSON = "link_lesson";
+	public static final String KEY_NAME_TEST = "name_test";
+	public static final String KEY_YEAR = "year";
+	public static final String KEY_TIME = "time";
+	public static final String KEY_TASK_BLOCKS = "task_blocks";
+	public static final String KEY_TASKS_NUM = "tasks_num";
+	public static final String KEY_TASK_TEST = "task_test";
+	public static final String KEY_TASK_TEXTS = "task_texts";
+	public static final String KEY_TASK_VIDPOV = "task_vidpov";
+	public static final String KEY_TASK_VARS = "task_vars";
+	public static final String KEY_TASK_ANS = "task_ans";
+	public static final String KEY_TYPE = "type";
+	public static final String KEY_TEXT = "text";
+	public static final String KEY_ANSWERS = "answers";
+	public static final String KEY_CORRECT = "correct";
+	public static final String KEY_BALL = "ball";
 
 	// Table Create Statements
 	private static final String CREATE_TABLE_LESSONS_LIST = "CREATE TABLE "
