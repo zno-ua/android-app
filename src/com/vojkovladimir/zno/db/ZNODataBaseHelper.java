@@ -64,12 +64,13 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			+ " INTEGER, " + KEY_TASK_VIDPOV + " INTEGER, " + KEY_TASK_VARS
 			+ " INTEGER, " + KEY_TASK_ANS + " INTEGER);";
 
-	private static String createTableForTest(String testName) {
-		return "CREATE TABLE " + testName + " (" + KEY_ID
+	private void createTableTest(String testName) {
+		SQLiteDatabase db = getWritableDatabase();
+		db.execSQL("CREATE TABLE " + testName + " (" + KEY_ID
 				+ " INTEGER PRIMARY KEY, " + KEY_ID_QUEST + " INTEGER, "
 				+ KEY_TYPE + " INTEGER, " + KEY_TEXT + " TEXT, " + KEY_ANSWERS
 				+ " TEXT, " + KEY_CORRECT + " TEXT, " + KEY_BALL + " INTEGER"
-				+ ");";
+				+ ");");
 	}
 
 	public ZNODataBaseHelper(Context context) {
@@ -107,9 +108,9 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	}
 
 	public void fillTableLessonsList(JSONArray jsonArray) {
-		SQLiteDatabase db = getWritableDatabase();
-
 		clearTableLessonsList();
+
+		SQLiteDatabase db = getWritableDatabase();
 
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
@@ -122,8 +123,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				lesson = jsonArray.getJSONObject(i);
 				values.put(KEY_LINK, lesson.getString(Api.Keys.LINK));
 				values.put(KEY_NAME, lesson.getString(Api.Keys.NAME));
-				values.put(KEY_NAME_ROD,
-						lesson.getString(Api.Keys.NAME_ROD));
+				values.put(KEY_NAME_ROD, lesson.getString(Api.Keys.NAME_ROD));
 
 				Log.i(LOG_TAG,
 						lesson.getString(Api.Keys.NAME)
@@ -138,8 +138,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	}
 
 	public void fillTableTestsList(JSONArray jsonArray) {
-		SQLiteDatabase db = getWritableDatabase();
 		clearTableTestsList();
+		SQLiteDatabase db = getWritableDatabase();
 
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
@@ -156,18 +156,14 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 						lesson.getString(Api.Keys.NAME_LESSON));
 				values.put(KEY_LINK_LESSON,
 						lesson.getString(Api.Keys.LINK_LESSON));
-				values.put(KEY_NAME_TEST,
-						lesson.getString(Api.Keys.NAME_TEST));
+				values.put(KEY_NAME_TEST, lesson.getString(Api.Keys.NAME_TEST));
 				values.put(KEY_YEAR, lesson.getInt(Api.Keys.YEAR));
 				values.put(KEY_TIME, lesson.getInt(Api.Keys.TIME));
-				values.put(KEY_TASK_BLOCKS,
-						lesson.getInt(Api.Keys.TASK_BLOCKS));
+				values.put(KEY_TASK_BLOCKS, lesson.getInt(Api.Keys.TASK_BLOCKS));
 				values.put(KEY_TASKS_NUM, lesson.getInt(Api.Keys.TASKS_NUM));
 				values.put(KEY_TASK_TEST, lesson.getInt(Api.Keys.TASK_TEST));
-				values.put(KEY_TASK_TEXTS,
-						lesson.getInt(Api.Keys.TASK_TEXTS));
-				values.put(KEY_TASK_VIDPOV,
-						lesson.getInt(Api.Keys.TASK_VIDPOV));
+				values.put(KEY_TASK_TEXTS, lesson.getInt(Api.Keys.TASK_TEXTS));
+				values.put(KEY_TASK_VIDPOV, lesson.getInt(Api.Keys.TASK_VIDPOV));
 				values.put(KEY_TASK_VARS, lesson.getInt(Api.Keys.TASK_VARS));
 				values.put(KEY_TASK_ANS, lesson.getInt(Api.Keys.TASK_ANS));
 
@@ -184,11 +180,41 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		closeDataBase();
 	}
 
+	public void fillTableTest(String testTableName,JSONArray jsonArray){
+		clearTableTest(testTableName);
+		SQLiteDatabase db = getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+		JSONObject lesson;
+
+		Log.i(LOG_TAG,
+				"\tfillTableTest(), "+testTableName+" Tests count = " + jsonArray.length());
+		
+		for (int i = 0; i < jsonArray.length(); i++){
+			try {
+				lesson = jsonArray.getJSONObject(i);
+				values.put(KEY_ID, lesson.getInt(Api.Keys.ID));
+				values.put(KEY_ID_QUEST, lesson.getInt(Api.Keys.ID_QUEST));
+				values.put(KEY_TYPE, lesson.getInt(Api.Keys.TYPE));
+				values.put(KEY_TEXT, lesson.getString(Api.Keys.TEXT));
+				values.put(KEY_ANSWERS, lesson.getString(Api.Keys.ANSWERS));
+				values.put(KEY_CORRECT, lesson.getString(Api.Keys.CORRECT));
+				values.put(KEY_BALL, lesson.getInt(Api.Keys.BALL));
+				
+				db.insert(testTableName, null, values);
+			} catch (JSONException e) {
+				Log.e(LOG_TAG, e.getMessage());
+			}
+		}
+		closeDataBase();
+	}
 	public void clearTableLessonsList() {
 		SQLiteDatabase db = getWritableDatabase();
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_LESSONS_LIST);
 		db.execSQL(CREATE_TABLE_LESSONS_LIST);
 		Log.i(LOG_TAG, "Table " + TABLE_LESSONS_LIST + " cleard.");
+		// /
+		closeDataBase();
 	}
 
 	public void clearTableTestsList() {
@@ -196,15 +222,16 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TESTS_LIST);
 		db.execSQL(CREATE_TABLE_TESTS_LIST);
 		Log.i(LOG_TAG, "Table " + TABLE_TESTS_LIST + " cleard.");
+		// /
+		closeDataBase();
 	}
 
-	public void clearDB() {
+	public void clearTableTest(String testTableName) {
 		SQLiteDatabase db = getWritableDatabase();
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_LESSONS_LIST);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TESTS_LIST);
-		db.execSQL(CREATE_TABLE_LESSONS_LIST);
-		db.execSQL(CREATE_TABLE_TESTS_LIST);
-		Log.i(LOG_TAG, "All tables cleard.");
+		db.execSQL("DROP TABLE IF EXISTS " + testTableName);
+		Log.i(LOG_TAG, "Table " + testTableName + " cleard.");
+		// /
+		closeDataBase();
 	}
 
 	public void closeDataBase() {

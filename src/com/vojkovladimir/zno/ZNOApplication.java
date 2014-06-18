@@ -26,6 +26,7 @@ public class ZNOApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		mInstance = this;
+		Log.d(LOG_TAG, "App Instance created.");
 	}
 
 	public static synchronized ZNOApplication getInstance() {
@@ -66,6 +67,7 @@ public class ZNOApplication extends Application {
 
 	public void onLessonsListRespose(JSONObject responseObject) {
 		try {
+			Log.i(LOG_TAG, "ZNOApplication received LessonsListRespose");
 			getZnoDataBaseHelper().fillTableLessonsList(
 					responseObject.getJSONArray(Api.RESPONSE));
 		} catch (JSONException e) {
@@ -77,11 +79,25 @@ public class ZNOApplication extends Application {
 
 	public void onTestsListRespose(JSONObject responseObject) {
 		try {
+			Log.i(LOG_TAG, "ZNOApplication received TestListRespose");
 			getZnoDataBaseHelper().fillTableTestsList(
 					responseObject.getJSONArray(Api.RESPONSE));
 		} catch (JSONException e) {
 			Log.e(LOG_TAG,
-					"Can't get LessonsListResposne from JSON:\n"
+					"Can't get TestListResposne from JSON:\n"
+							+ e.getMessage());
+		}
+	}
+
+	public void onTestRespose(String testTableName, JSONObject responseObject) {
+		try {
+			Log.i(LOG_TAG,
+					"ZNOApplication received Test "
+							+ testTableName);
+			getZnoDataBaseHelper().fillTableTest(testTableName, responseObject.getJSONArray(Api.RESPONSE));
+		} catch (JSONException e) {
+			Log.e(LOG_TAG,
+					"Can't get TestResposne from JSON:\n"
 							+ e.getMessage());
 		}
 	}
