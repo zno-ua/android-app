@@ -32,6 +32,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity
+            android:name="LessonTestsActivity"
+            android:parentActivityName=".TestingActivity" >
+
+            <!--
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+            -->
+        </activity>
     </application>
 
 </manifest>
