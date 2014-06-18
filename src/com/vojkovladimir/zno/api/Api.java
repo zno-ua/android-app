@@ -1,5 +1,6 @@
 package com.vojkovladimir.zno.api;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
@@ -94,26 +95,31 @@ public class Api {
 	}
 	
 	
-	//Need edit...
-//	public static JsonObjectRequest getTestRequest(String testName) {
-//		JsonObjectRequest request = new JsonObjectRequest(API_URL
-//				+ GET_TEST + testName, null, new Listener<JSONObject>() {
-//
-//			@Override
-//			public void onResponse(JSONObject json) {
-//				Log.i(LOG_TAG, "Good Response. Tests successfully loaded.");
-////				ZNOApplication.getInstance().onLessonsListRespose(json);
-//			}
-//		}, new ErrorListener() {
-//
-//			@Override
-//			public void onErrorResponse(VolleyError error) {
-//				Log.e(LOG_TAG, "Bad response. " + error.getMessage());
-//				Toast.makeText(
-//						ZNOApplication.getInstance().getApplicationContext(),
-//						"Bad response.", Toast.LENGTH_SHORT).show();
-//			}
-//		});
-//		return request;
-//	}
+	public static JsonObjectRequest getTestRequest(String testName) {
+		JsonObjectRequest request = new JsonObjectRequest(API_URL
+				+ GET_TEST + testName, null, new Listener<JSONObject>() {
+
+			@Override
+			public void onResponse(JSONObject json) {
+				String testTableName;
+				try {
+					testTableName = json.getJSONObject(Api.INFO).getString(Api.Keys.DB_NAME);
+					Log.i(LOG_TAG, "Good Response. Test "+testTableName+" successfully loaded.");
+					ZNOApplication.getInstance().onTestRespose(testTableName,json);
+				} catch (JSONException e) {
+					Log.e(LOG_TAG, "Error in json: " + e.getMessage());
+				}
+			}
+		}, new ErrorListener() {
+
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				Log.e(LOG_TAG, "Bad response. " + error.getMessage());
+				Toast.makeText(
+						ZNOApplication.getInstance().getApplicationContext(),
+						"Bad response.", Toast.LENGTH_SHORT).show();
+			}
+		});
+		return request;
+	}
 }
