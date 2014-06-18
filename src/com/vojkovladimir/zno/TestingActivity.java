@@ -1,6 +1,7 @@
 package com.vojkovladimir.zno;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -25,6 +26,12 @@ public class TestingActivity extends ListActivity {
 				long id) {
 			try{
 				Log.d(LOG_TAG, "You select lesson with id: "+lessonsIds[position]);
+				
+				Intent testsList = new Intent(getApplicationContext(),LessonTestsActivity.class);
+				testsList.putExtra(ZNOApplication.ExtrasKeys.ID_LESSON, lessonsIds[position]);
+				testsList.putExtra(ZNOApplication.ExtrasKeys.TABLE_NAME, lessonsListAdapter.getItem(position));
+				
+				startActivity(testsList);
 			}catch(ArrayIndexOutOfBoundsException e){
 				Log.e(LOG_TAG, "You try to select lesson #"+position+" from list.");
 			}
