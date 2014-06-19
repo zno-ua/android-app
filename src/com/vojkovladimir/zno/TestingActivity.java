@@ -24,16 +24,21 @@ public class TestingActivity extends ListActivity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position,
 				long id) {
-			try{
-				Log.d(LOG_TAG, "You select lesson with id: "+lessonsIds[position]);
-				
-				Intent testsList = new Intent(getApplicationContext(),LessonTestsActivity.class);
-				testsList.putExtra(ZNOApplication.ExtrasKeys.ID_LESSON, lessonsIds[position]);
-				testsList.putExtra(ZNOApplication.ExtrasKeys.TABLE_NAME, lessonsListAdapter.getItem(position));
-				
+			try {
+				Log.d(LOG_TAG, "You select lesson with id: "
+						+ lessonsIds[position]);
+
+				Intent testsList = new Intent(getApplicationContext(),
+						LessonTestsActivity.class);
+				testsList.putExtra(ZNOApplication.ExtrasKeys.ID_LESSON,
+						lessonsIds[position]);
+				testsList.putExtra(ZNOApplication.ExtrasKeys.TABLE_NAME,
+						lessonsListAdapter.getItem(position));
+
 				startActivity(testsList);
-			}catch(ArrayIndexOutOfBoundsException e){
-				Log.e(LOG_TAG, "You try to select lesson #"+position+" from list.");
+			} catch (ArrayIndexOutOfBoundsException e) {
+				Log.e(LOG_TAG, "You try to select lesson #" + position
+						+ " from list.");
 			}
 		}
 	};
@@ -51,8 +56,11 @@ public class TestingActivity extends ListActivity {
 		SQLiteDatabase db = ZNOApplication.getInstance().getZnoDataBaseHelper()
 				.getReadableDatabase();
 
-		Cursor c = db.query(ZNODataBaseHelper.TABLE_LESSONS_LIST, null, null,
-				null, null, null, null);
+		Cursor c = db
+				.query("lessons_list  inner join tests_list on lessons_list.id = tests_list.id_lesson",
+						new String[] { "lessons_list.id", "name" }, null, null,
+						"lessons_list.id", null, null);
+
 		lessonsIds = new int[c.getCount()];
 
 		if (c.moveToFirst()) {
