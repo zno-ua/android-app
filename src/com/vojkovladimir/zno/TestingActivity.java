@@ -57,9 +57,9 @@ public class TestingActivity extends ListActivity {
 				.getReadableDatabase();
 
 		Cursor c = db
-				.query("lessons_list  inner join tests_list on lessons_list.id = tests_list.id_lesson",
-						new String[] { "lessons_list.id", "name" }, null, null,
-						"lessons_list.id", null, null);
+				.query(ZNODataBaseHelper.TABLE_LESSONS_LIST,
+						new String[] { ZNODataBaseHelper.KEY_ID, ZNODataBaseHelper.KEY_NAME }, null, null,
+						null, null, null);
 
 		lessonsIds = new int[c.getCount()];
 
