@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp" >
+
+    <TextView
+        android:id="@+id/title_label"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:textColor="@android:color/darker_gray"
+        android:text="@string/choose_lesson_view_text"/>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1.7dp"
+        android:background="@android:color/darker_gray"
+        android:visibility="visible" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+</ListView>
+
+</LinearLayout>
