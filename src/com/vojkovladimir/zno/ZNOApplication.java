@@ -70,18 +70,6 @@ public class ZNOApplication extends Application {
 		}
 	}
 
-	public void onLessonsListRespose(JSONObject responseObject) {
-		try {
-			Log.i(LOG_TAG, "ZNOApplication received LessonsListRespose");
-			getZnoDataBaseHelper().fillTableLessonsList(
-					responseObject.getJSONArray(Api.RESPONSE));
-		} catch (JSONException e) {
-			Log.e(LOG_TAG,
-					"Can't get LessonsListResposne from JSON:\n"
-							+ e.getMessage());
-		}
-	}
-
 	public void onTestsListRespose(JSONObject responseObject) {
 		try {
 			Log.i(LOG_TAG, "ZNOApplication received TestListRespose");

@@ -50,27 +50,6 @@ public class Api {
 		String BALL = "ball";
 	}
 
-	public static JsonObjectRequest getLessonsListRequest() {
-		JsonObjectRequest request = new JsonObjectRequest(API_URL
-				+ GET_LESSONS_LIST, null, new Listener<JSONObject>() {
-
-			@Override
-			public void onResponse(JSONObject json) {
-				Log.i(LOG_TAG, "Good Response. Lessons successfully loaded.");
-				ZNOApplication.getInstance().onLessonsListRespose(json);
-			}
-		}, new ErrorListener() {
-
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				Log.e(LOG_TAG, "Bad response. " + error.getMessage());
-				Toast.makeText(
-						ZNOApplication.getInstance().getApplicationContext(),
-						"Bad response.", Toast.LENGTH_SHORT).show();
-			}
-		});
-		return request;
-	}
 	
 	public static JsonObjectRequest getTestsListRequest() {
 		JsonObjectRequest request = new JsonObjectRequest(API_URL

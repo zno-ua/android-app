@@ -82,6 +82,28 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		try {
 			db.execSQL(CREATE_TABLE_LESSONS_LIST);
 			db.execSQL(CREATE_TABLE_TESTS_LIST);
+
+			ContentValues values = new ContentValues();
+			String[] links = { "ukrainian", "history-ukr", "history-world",
+					"math", "biology", "geography", "english", "physics",
+					"chemistry" };
+			String[] names = { "Українська мова та література",
+					"Історія України", "Всесвітня історія", "Математика",
+					"Біологія", "Географія", "Англійська мова", "Фізика",
+					"Хімія" };
+			String[] names_rod = { "української мови та літератури",
+					"історії України", "всесвітньої історії", "математики",
+					"біології", "географії", "англійської мови", "фізики",
+					"хімії" };
+			for (int i = 0; i < links.length; i++) {
+				values.put(KEY_LINK, links[i]);
+				values.put(KEY_NAME, names[i]);
+				values.put(KEY_NAME_ROD, names_rod[i]);
+				if (db.insert(TABLE_LESSONS_LIST, null, values) < 0) {
+					Log.e(LOG_TAG, "Error while inserting " + values.toString());
+				}
+			}
+
 		} catch (SQLException e) {
 			Log.e(LOG_TAG,
 					"Error in creating " + DATABASE_NAME + ":\n"
@@ -92,49 +114,11 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-		// here would be dropping statements for all tests !!!
-
-		// ArrayList<String> testsTableNames = new ArrayList<String>();
-		//
-		// for (String testTableName : testsTableNames) {
-		// db.execSQL("DROP TABLE IF EXISTS " + testTableName);
-		// }
-
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_LESSONS_LIST);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TESTS_LIST);
 		onCreate(db);
 
 		Log.i(LOG_TAG, DATABASE_NAME + " upgraded!");
-	}
-
-	public void fillTableLessonsList(JSONArray jsonArray) {
-		clearTableLessonsList();
-
-		SQLiteDatabase db = getWritableDatabase();
-
-		ContentValues values = new ContentValues();
-		JSONObject lesson;
-
-		Log.i(LOG_TAG,
-				"\tfillTableLessonsList(), Tests count = " + jsonArray.length());
-
-		for (int i = 0; i < jsonArray.length(); i++) {
-			try {
-				lesson = jsonArray.getJSONObject(i);
-				values.put(KEY_LINK, lesson.getString(Api.Keys.LINK));
-				values.put(KEY_NAME, lesson.getString(Api.Keys.NAME));
-				values.put(KEY_NAME_ROD, lesson.getString(Api.Keys.NAME_ROD));
-
-				Log.i(LOG_TAG,
-						lesson.getString(Api.Keys.NAME)
-								+ "inserted with status = "
-								+ db.insert(TABLE_LESSONS_LIST, null, values));
-			} catch (JSONException e) {
-				Log.e(LOG_TAG, e.getMessage());
-			}
-
-		}
-		closeDataBase();
 	}
 
 	public void fillTableTestsList(JSONArray jsonArray) {
@@ -180,17 +164,17 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		closeDataBase();
 	}
 
-	public void fillTableTest(String testTableName,JSONArray jsonArray){
+	public void fillTableTest(String testTableName, JSONArray jsonArray) {
 		clearTableTest(testTableName);
 		SQLiteDatabase db = getWritableDatabase();
-		
+
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
 
-		Log.i(LOG_TAG,
-				"\tfillTableTest(), "+testTableName+" Tests count = " + jsonArray.length());
-		
-		for (int i = 0; i < jsonArray.length(); i++){
+		Log.i(LOG_TAG, "\tfillTableTest(), " + testTableName
+				+ " Tests count = " + jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
 			try {
 				lesson = jsonArray.getJSONObject(i);
 				values.put(KEY_ID, lesson.getInt(Api.Keys.ID));
@@ -200,7 +184,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				values.put(KEY_ANSWERS, lesson.getString(Api.Keys.ANSWERS));
 				values.put(KEY_CORRECT, lesson.getString(Api.Keys.CORRECT));
 				values.put(KEY_BALL, lesson.getInt(Api.Keys.BALL));
-				
+
 				db.insert(testTableName, null, values);
 			} catch (JSONException e) {
 				Log.e(LOG_TAG, e.getMessage());
@@ -208,6 +192,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		}
 		closeDataBase();
 	}
+
 	public void clearTableLessonsList() {
 		SQLiteDatabase db = getWritableDatabase();
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_LESSONS_LIST);
