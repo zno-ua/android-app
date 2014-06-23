@@ -9,4 +9,6 @@
     <string name="last_passed_tests_btn_text">Останні пройдені тести</string>
     <string name="records_btn_text">Рекорди</string>
     <string name="settings_btn_text">Налаштування</string>
+    
+    <string name="choose_lesson_view_text">ОБЕРІТЬ ПРЕДМЕТ:</string>
 </resources>
