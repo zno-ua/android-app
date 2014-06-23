@@ -11,4 +11,11 @@
     <string name="settings_btn_text">Налаштування</string>
     
     <string name="choose_lesson_view_text">ОБЕРІТЬ ПРЕДМЕТ:</string>
+    
+    <string name="tests_one">тест</string>
+    <string name="tests_two_four">тести</string>
+    <string name="tests_over_five">тестів</string>
+    
+    <string name="lesson_image_desription">Lesson Image</string>
+    <string name="loren_ipsum_text">Lorem Ipsum - це текст-"риба", що використовується</string>
 </resources>
