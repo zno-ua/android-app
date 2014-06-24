@@ -10,5 +10,6 @@ public class TestInfo {
 		this.name = name;
 		this.year = year;
 		this.tasksNum = taskNum;
+		this.dbName = dbName;
 	}
 }
