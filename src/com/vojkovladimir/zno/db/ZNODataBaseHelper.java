@@ -27,6 +27,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	// Table names
 	public static final String TABLE_LESSONS_LIST = "lessons_list";
 	public static final String TABLE_TESTS_LIST = "tests_list";
+	public static final String TABLE_SQLITE_MASTER = "sqlite_master";
 
 	// Column names
 	public static final String KEY_ID = "id";
@@ -53,6 +54,9 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	public static final String KEY_ANSWERS = "answers";
 	public static final String KEY_CORRECT = "correct";
 	public static final String KEY_BALL = "ball";
+	public static final String KEY_TBL_NAME = "tbl_name";
+	public static final String KEY_ROOT_PAGE = "rootpage";
+	public static final String KEY_SQL = "sql";
 
 	// Table Create Statements
 	private static final String CREATE_TABLE_LESSONS_LIST = "CREATE TABLE "
