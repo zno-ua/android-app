@@ -186,7 +186,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			try {
 				lesson = jsonArray.getJSONObject(i);
 				values.put(KEY_ID_LESSON, lesson.getInt(Api.Keys.ID_LESSON));
-				values.put(KEY_DB_NAME, lesson.getString(Api.Keys.DB_NAME));
+				values.put(KEY_DB_NAME, lesson.getString(Api.Keys.DB_NAME).replace("-", "_"));
 				values.put(KEY_NAME_LESSON,
 						lesson.getString(Api.Keys.NAME_LESSON));
 				values.put(KEY_LINK_LESSON,
