@@ -17,6 +17,15 @@
     <string name="session_text">сессія</string>
     <string name="tasks_text">завдань</string>
     
+    <string name="check_zno_full">Зовнішнє незалежне оцінювання</string>
+    <string name="check_zno_lite">Офіційний тест ЗНО</string>
+    <string name="exp_zno">Пробне тестування ЗНО</string>
+    
+    <string name="for_year">за</string>
+    <string name="year">рік</string>
+    <string name="zno">ЗНО</string>
+    
+    
     <string name="tests_one">тест</string>
     <string name="tests_two_four">тести</string>
     <string name="tests_over_five">тестів</string>
