@@ -108,13 +108,13 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			InputStream testsListIS = ZNOApplication.getInstance()
 					.getResources().openRawResource(R.raw.tests_list);
 			try {
-				byte [] buf = new byte[lessonsListIS.available()];
+				byte [] buf = new byte[testsListIS.available()];
 				testsListIS.read(buf);
 				testsListIS.close();
 				
-				JSONArray lessonsList = new JSONArray(new String(buf));
-				
-				fillTableTestsList(db,lessonsList);
+				JSONArray testsList = new JSONArray(new String(buf));
+
+				fillTableTestsList(db,testsList);
 				
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -127,6 +127,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 					"Error in creating " + DATABASE_NAME + ":\n"
 							+ e.getMessage());
 		}
+		
+		Log.i(LOG_TAG, "DB created!");
 	}
 
 	@Override
@@ -176,9 +178,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
 
-		Log.i(LOG_TAG,
-				"\tfillTableTestsList(), Tests count = " + jsonArray.length());
-
 		for (int i = 0; i < jsonArray.length(); i++) {
 			try {
 				lesson = jsonArray.getJSONObject(i);
@@ -198,9 +197,9 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				values.put(KEY_TASK_VIDPOV, lesson.getInt(Api.Keys.TASK_VIDPOV));
 				values.put(KEY_TASK_VARS, lesson.getInt(Api.Keys.TASK_VARS));
 				values.put(KEY_TASK_ANS, lesson.getInt(Api.Keys.TASK_ANS));
-
+				
 				Log.i(LOG_TAG,
-						lesson.getString(Api.Keys.DB_NAME)
+						lesson.getString(Api.Keys.NAME_LESSON)
 								+ "inserted with status = "
 								+ db.insert(TABLE_TESTS_LIST, null, values));
 			} catch (JSONException e) {
