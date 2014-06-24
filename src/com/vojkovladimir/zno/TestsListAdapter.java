@@ -3,6 +3,7 @@ package com.vojkovladimir.zno;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 import com.vojkovladimir.zno.models.TestInfo;
 
 public class TestsListAdapter extends BaseAdapter {
+
+	public static String LOG_TAG = "MyLogs";
 
 	private Context context;
 	private LayoutInflater lInflater;
@@ -73,23 +76,19 @@ public class TestsListAdapter extends BaseAdapter {
 				+ " " + testInfo.year + " "
 				+ context.getResources().getString(R.string.year);
 
-		if (testNameFull.contains("(I" + session + ")")) {
-			testProperties = "I" + session + ", ";
+		Log.i(LOG_TAG, testNameFull);
+
+		if (testNameFull.contains("(I " + session + ")")) {
+			testProperties = "I " + session + ", ";
+		} else if (testNameFull.contains("(II " + session + ")")) {
+			testProperties = "II " + session + ", ";
 		}
-		
-		if (testNameFull.contains("(II" + session + ")")) {
-			testProperties = "II" + session + ", ";
-		}
-		
-		if(testInfo.tasksNum<0){
-			testProperties += context.getResources().getString(R.string.needed_to_load_text);
-		}else{
-			testProperties += testInfo.tasksNum + " "+context.getResources().getString(R.string.tasks_text);
-		}
- 
+		testProperties += testInfo.tasksNum + " "
+				+ context.getResources().getString(R.string.tasks_text);
+
 		testNameView.setText(testName);
 		testPropertiesView.setText(testProperties);
-		
+
 		return lessonItem;
 	}
 

@@ -59,8 +59,9 @@ public class LessonTestsActivity extends Activity {
 
 		Cursor c = db.query(ZNODataBaseHelper.TABLE_TESTS_LIST,
 				new String[] { ZNODataBaseHelper.KEY_NAME_TEST,ZNODataBaseHelper.KEY_YEAR,ZNODataBaseHelper.KEY_TASKS_NUM },
-				ZNODataBaseHelper.KEY_ID_LESSON + "=" + idLesson, null, ZNODataBaseHelper.KEY_YEAR,
-				null, null);
+				ZNODataBaseHelper.KEY_ID_LESSON + "=" + idLesson, null, null,
+				null, ZNODataBaseHelper.KEY_YEAR+" DESC");
+
 		TestInfo testInfo;
 		if (c.moveToFirst()) {
 			int nameTestIndex = c
@@ -74,5 +75,7 @@ public class LessonTestsActivity extends Activity {
 				testsList.add(testInfo);
 			} while (c.moveToNext());
 		}
+		
+		Log.i(LOG_TAG, getTitle()+" has "+testsList.size()+" tests");
 	}
 }
