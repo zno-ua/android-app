@@ -57,25 +57,27 @@ public class LessonTestsActivity extends Activity {
 
 		testsListView.setAdapter(testsListAdapter);
 
-		Cursor c = db.query(ZNODataBaseHelper.TABLE_TESTS_LIST,
-				new String[] { ZNODataBaseHelper.KEY_NAME_TEST,ZNODataBaseHelper.KEY_YEAR,ZNODataBaseHelper.KEY_TASKS_NUM },
+		Cursor c = db.query(ZNODataBaseHelper.TABLE_TESTS_LIST, new String[] {
+				ZNODataBaseHelper.KEY_DB_NAME, ZNODataBaseHelper.KEY_NAME_TEST,
+				ZNODataBaseHelper.KEY_YEAR, ZNODataBaseHelper.KEY_TASKS_NUM },
 				ZNODataBaseHelper.KEY_ID_LESSON + "=" + idLesson, null, null,
-				null, ZNODataBaseHelper.KEY_YEAR+" DESC");
+				null, ZNODataBaseHelper.KEY_YEAR + " DESC");
 
 		TestInfo testInfo;
 		if (c.moveToFirst()) {
+			int dbNameIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_DB_NAME);
 			int nameTestIndex = c
 					.getColumnIndex(ZNODataBaseHelper.KEY_NAME_TEST);
-			int yearIndex = c
-					.getColumnIndex(ZNODataBaseHelper.KEY_YEAR);
+			int yearIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_YEAR);
 			int tastsNumIndex = c
 					.getColumnIndex(ZNODataBaseHelper.KEY_TASKS_NUM);
 			do {
-				testInfo = new TestInfo(c.getString(nameTestIndex), c.getInt(yearIndex), c.getInt(tastsNumIndex));
+				testInfo = new TestInfo(c.getString(dbNameIndex),c.getString(nameTestIndex),
+						c.getInt(yearIndex), c.getInt(tastsNumIndex));
 				testsList.add(testInfo);
 			} while (c.moveToNext());
 		}
-		
-		Log.i(LOG_TAG, getTitle()+" has "+testsList.size()+" tests");
+
+		Log.i(LOG_TAG, getTitle() + " has " + testsList.size() + " tests");
 	}
 }
