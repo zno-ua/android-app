@@ -3,6 +3,8 @@ package com.vojkovladimir.zno;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.models.TestInfo;
 
 public class TestsListAdapter extends BaseAdapter {
@@ -52,8 +55,8 @@ public class TestsListAdapter extends BaseAdapter {
 		TextView testPropertiesView = (TextView) lessonItem
 				.findViewById(R.id.tests_list_test_properties);
 
-		// View downloadFrame =
-		// (View)lessonItem.findViewById(R.id.tests_list_download_icon);
+		View downloadFrame = (View) lessonItem
+				.findViewById(R.id.tests_list_download_icon);
 
 		TestInfo testInfo = list.get(position);
 
@@ -83,13 +86,26 @@ public class TestsListAdapter extends BaseAdapter {
 		} else if (testNameFull.contains("(II " + session + ")")) {
 			testProperties = "II " + session + ", ";
 		}
-		testProperties += testInfo.tasksNum + " "
-				+ context.getResources().getString(R.string.tasks_text);
+
+		SQLiteDatabase db = ZNOApplication.getInstance().getZnoDataBaseHelper()
+				.getReadableDatabase();
+		
+		Cursor c = db.rawQuery("SELECT "+ ZNODataBaseHelper.KEY_NAME+" FROM "+ZNODataBaseHelper.TABLE_SQLITE_MASTER+
+				" WHERE "+ZNODataBaseHelper.KEY_NAME+"=?;",new String [] {testInfo.dbName});
+
+		if (c.getCount() == 1) {
+			testProperties += testInfo.tasksNum + " "
+					+ context.getResources().getString(R.string.tasks_text);
+			downloadFrame.setVisibility(View.GONE);
+		} else {
+			testProperties += context.getResources().getString(
+					R.string.needed_to_load_text);
+			downloadFrame.setVisibility(View.VISIBLE);
+		}
 
 		testNameView.setText(testName);
 		testPropertiesView.setText(testProperties);
 
 		return lessonItem;
 	}
-
 }
