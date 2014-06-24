@@ -1,13 +1,13 @@
 package com.vojkovladimir.zno.models;
 
 public class TestInfo {
-	String name;
-	int year;
-	int taskNum;
+	public String name;
+	public int year;
+	public int tasksNum;
 
 	public TestInfo(String name, int year, int taskNum) {
 		this.name = name;
 		this.year = year;
-		this.taskNum = taskNum;
+		this.tasksNum = taskNum;
 	}
 }
