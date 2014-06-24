@@ -24,7 +24,7 @@ public class ZNOApplication extends Application {
 	
 	public interface ExtrasKeys{
 		String TABLE_NAME = "table_name";
-		String ID_LESSON = "id";
+		String ID_LESSON = "id-lesson";
 	}
 
 	@Override
