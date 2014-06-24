@@ -1,10 +1,11 @@
 package com.vojkovladimir.zno.db;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.vojkovladimir.zno.api.Api;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,6 +13,10 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.vojkovladimir.zno.ZNOApplication;
+import com.vojkovladimir.zno.api.Api;
+import com.vojkovladimir.zno.R;
 
 public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
@@ -83,25 +88,39 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			db.execSQL(CREATE_TABLE_LESSONS_LIST);
 			db.execSQL(CREATE_TABLE_TESTS_LIST);
 
-			ContentValues values = new ContentValues();
-			String[] links = { "ukrainian", "history-ukr", "history-world",
-					"math", "biology", "geography", "english", "physics",
-					"chemistry" };
-			String[] names = { "Українська мова та література",
-					"Історія України", "Всесвітня історія", "Математика",
-					"Біологія", "Географія", "Англійська мова", "Фізика",
-					"Хімія" };
-			String[] names_rod = { "української мови та літератури",
-					"історії України", "всесвітньої історії", "математики",
-					"біології", "географії", "англійської мови", "фізики",
-					"хімії" };
-			for (int i = 0; i < links.length; i++) {
-				values.put(KEY_LINK, links[i]);
-				values.put(KEY_NAME, names[i]);
-				values.put(KEY_NAME_ROD, names_rod[i]);
-				if (db.insert(TABLE_LESSONS_LIST, null, values) < 0) {
-					Log.e(LOG_TAG, "Error while inserting " + values.toString());
+			InputStream lessonsListIS = ZNOApplication.getInstance()
+					.getResources().openRawResource(R.raw.lessons_list);
+			try {
+				byte [] buf = new byte[lessonsListIS.available()];
+				lessonsListIS.read(buf);
+				lessonsListIS.close();
+				
+				JSONArray lessonsList = new JSONArray(new String(buf));
+				
+				ContentValues values = new ContentValues();
+				JSONObject lesson;
+
+				for (int i = 0; i < lessonsList.length(); i++) {
+					try {
+						lesson = lessonsList.getJSONObject(i);
+						values.put(KEY_LINK, lesson.getString(Api.Keys.LINK));
+						values.put(KEY_NAME, lesson.getString(Api.Keys.NAME));
+						values.put(KEY_NAME_ROD, lesson.getString(Api.Keys.NAME_ROD));
+
+						Log.i(LOG_TAG,
+								lesson.getString(Api.Keys.NAME)
+										+ "inserted with status = "
+										+ db.insert(TABLE_LESSONS_LIST, null, values));
+					} catch (JSONException e) {
+						Log.e(LOG_TAG, e.getMessage());
+					}
+
 				}
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
 
 		} catch (SQLException e) {
@@ -119,6 +138,31 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		onCreate(db);
 
 		Log.i(LOG_TAG, DATABASE_NAME + " upgraded!");
+	}
+
+	public void fillTableLessonsList(SQLiteDatabase db,JSONArray jsonArray) {
+		clearTableLessonsList();
+
+		ContentValues values = new ContentValues();
+		JSONObject lesson;
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			try {
+				lesson = jsonArray.getJSONObject(i);
+				values.put(KEY_LINK, lesson.getString(Api.Keys.LINK));
+				values.put(KEY_NAME, lesson.getString(Api.Keys.NAME));
+				values.put(KEY_NAME_ROD, lesson.getString(Api.Keys.NAME_ROD));
+
+				Log.i(LOG_TAG,
+						lesson.getString(Api.Keys.NAME)
+								+ "inserted with status = "
+								+ db.insert(TABLE_LESSONS_LIST, null, values));
+			} catch (JSONException e) {
+				Log.e(LOG_TAG, e.getMessage());
+			}
+
+		}
+		closeDataBase();
 	}
 
 	public void fillTableTestsList(JSONArray jsonArray) {
