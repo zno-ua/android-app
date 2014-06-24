@@ -97,25 +97,24 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				
 				JSONArray lessonsList = new JSONArray(new String(buf));
 				
-				ContentValues values = new ContentValues();
-				JSONObject lesson;
-
-				for (int i = 0; i < lessonsList.length(); i++) {
-					try {
-						lesson = lessonsList.getJSONObject(i);
-						values.put(KEY_LINK, lesson.getString(Api.Keys.LINK));
-						values.put(KEY_NAME, lesson.getString(Api.Keys.NAME));
-						values.put(KEY_NAME_ROD, lesson.getString(Api.Keys.NAME_ROD));
-
-						Log.i(LOG_TAG,
-								lesson.getString(Api.Keys.NAME)
-										+ "inserted with status = "
-										+ db.insert(TABLE_LESSONS_LIST, null, values));
-					} catch (JSONException e) {
-						Log.e(LOG_TAG, e.getMessage());
-					}
-
-				}
+				fillTableLessonsList(db,lessonsList);
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			
+			InputStream testsListIS = ZNOApplication.getInstance()
+					.getResources().openRawResource(R.raw.tests_list);
+			try {
+				byte [] buf = new byte[lessonsListIS.available()];
+				testsListIS.read(buf);
+				testsListIS.close();
+				
+				JSONArray lessonsList = new JSONArray(new String(buf));
+				
+				fillTableTestsList(db,lessonsList);
 				
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -139,12 +138,14 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		Log.i(LOG_TAG, DATABASE_NAME + " upgraded!");
 	}
-
-	public void fillTableLessonsList(SQLiteDatabase db,JSONArray jsonArray) {
-		clearTableLessonsList();
-
+	
+	private void fillTableLessonsList(SQLiteDatabase db,JSONArray jsonArray) {
+		
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
+
+		Log.i(LOG_TAG,
+				"\tfillTableLessonsList(), Tests count = " + jsonArray.length());
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			try {
@@ -162,13 +163,16 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			}
 
 		}
-		closeDataBase();
 	}
-
-	public void fillTableTestsList(JSONArray jsonArray) {
-		clearTableTestsList();
+	
+	public void fillTableLessonsList(JSONArray jsonArray) {
 		SQLiteDatabase db = getWritableDatabase();
-
+		
+		clearTableLessonsList(db);
+		fillTableLessonsList(db, jsonArray);
+	}
+	
+	private void fillTableTestsList(SQLiteDatabase db,JSONArray jsonArray) {
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
 
@@ -204,14 +208,17 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			}
 
 		}
-
-		closeDataBase();
 	}
-
-	public void fillTableTest(String testTableName, JSONArray jsonArray) {
-		clearTableTest(testTableName);
+	
+	public void fillTableTestsList(JSONArray jsonArray) {
 		SQLiteDatabase db = getWritableDatabase();
+		
+		clearTableTestsList(db);
 
+		fillTableTestsList(db, jsonArray);
+	}
+	
+	private void fillTableTest(SQLiteDatabase db, String testTableName, JSONArray jsonArray) {
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
 
@@ -234,39 +241,30 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				Log.e(LOG_TAG, e.getMessage());
 			}
 		}
-		closeDataBase();
 	}
 
-	public void clearTableLessonsList() {
+	public void fillTableTest(String testTableName, JSONArray jsonArray) {
 		SQLiteDatabase db = getWritableDatabase();
+		
+		clearTableTest(db,testTableName);
+		fillTableTest(db, testTableName, jsonArray);
+	}
+
+	private void clearTableLessonsList(SQLiteDatabase db) {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_LESSONS_LIST);
 		db.execSQL(CREATE_TABLE_LESSONS_LIST);
 		Log.i(LOG_TAG, "Table " + TABLE_LESSONS_LIST + " cleard.");
-		// /
-		closeDataBase();
 	}
 
-	public void clearTableTestsList() {
-		SQLiteDatabase db = getWritableDatabase();
+	private void clearTableTestsList(SQLiteDatabase db) {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TESTS_LIST);
 		db.execSQL(CREATE_TABLE_TESTS_LIST);
 		Log.i(LOG_TAG, "Table " + TABLE_TESTS_LIST + " cleard.");
-		// /
-		closeDataBase();
 	}
 
-	public void clearTableTest(String testTableName) {
-		SQLiteDatabase db = getWritableDatabase();
+	private void clearTableTest(SQLiteDatabase db,String testTableName) {
 		db.execSQL("DROP TABLE IF EXISTS " + testTableName);
 		Log.i(LOG_TAG, "Table " + testTableName + " cleard.");
-		// /
-		closeDataBase();
-	}
-
-	public void closeDataBase() {
-		SQLiteDatabase db = this.getReadableDatabase();
-		if (db != null && db.isOpen())
-			db.close();
 	}
 
 }
