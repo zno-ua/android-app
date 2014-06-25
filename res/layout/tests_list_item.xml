@@ -56,7 +56,7 @@
             android:layout_height="48dp"
             android:alpha="0.3"
             android:layout_marginLeft="4dp"
-            android:contentDescription="@string/lesson_image_desription"
+            android:contentDescription="@string/image_desription"
             android:src="@drawable/ic_action_download" />
     </FrameLayout>
 

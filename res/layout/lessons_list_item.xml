@@ -8,7 +8,7 @@
         android:id="@+id/lessons_list_lesson_icon"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:contentDescription="@string/lesson_image_desription"
+        android:contentDescription="@string/image_desription"
         android:src="@drawable/ic_launcher" />
 
     <LinearLayout
