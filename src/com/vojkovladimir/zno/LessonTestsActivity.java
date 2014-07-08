@@ -3,11 +3,16 @@ package com.vojkovladimir.zno;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -19,16 +24,30 @@ import com.vojkovladimir.zno.models.TestInfo;
 public class LessonTestsActivity extends Activity {
 
 	public static String LOG_TAG = "MyLogs";
+	final int DIALOG_TEST_LOAD = 1;
 
 	ListView testsListView;
 	TestsListAdapter testsListAdapter;
 	ArrayList<TestInfo> testsList;
 
+	OnClickListener dialogListener = new OnClickListener() {
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			switch (which) {
+			case Dialog.BUTTON_POSITIVE:
+				break;
+			case Dialog.BUTTON_NEGATIVE:
+				break;
+			}
+		}
+	};
+
 	OnItemClickListener itemListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position,
 				long id) {
-			Log.d(LOG_TAG, "You select test #: " + position);
+			onDialogCreate(DIALOG_TEST_LOAD).show();
 		}
 	};
 
@@ -56,6 +75,7 @@ public class LessonTestsActivity extends Activity {
 		testsListView = (ListView) findViewById(R.id.tests_list_view);
 
 		testsListView.setAdapter(testsListAdapter);
+		testsListView.setOnItemClickListener(itemListener);
 
 		Cursor c = db.query(ZNODataBaseHelper.TABLE_TESTS_LIST, new String[] {
 				ZNODataBaseHelper.KEY_DB_NAME, ZNODataBaseHelper.KEY_NAME_TEST,
@@ -72,12 +92,27 @@ public class LessonTestsActivity extends Activity {
 			int tastsNumIndex = c
 					.getColumnIndex(ZNODataBaseHelper.KEY_TASKS_NUM);
 			do {
-				testInfo = new TestInfo(c.getString(dbNameIndex),c.getString(nameTestIndex),
-						c.getInt(yearIndex), c.getInt(tastsNumIndex));
+				testInfo = new TestInfo(c.getString(dbNameIndex),
+						c.getString(nameTestIndex), c.getInt(yearIndex),
+						c.getInt(tastsNumIndex));
 				testsList.add(testInfo);
 			} while (c.moveToNext());
 		}
 
 		Log.i(LOG_TAG, getTitle() + " has " + testsList.size() + " tests");
 	}
+
+	private Dialog onDialogCreate(int id) {
+
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+		if (id == DIALOG_TEST_LOAD) {
+			dialogBuilder.setMessage(R.string.dialog_load_test_text);
+			dialogBuilder.setPositiveButton(R.string.dialog_positive_text,
+					dialogListener);
+			dialogBuilder.setNegativeButton(R.string.dialog_negative_text,
+					dialogListener);
+		}
+		return dialogBuilder.create();
+	}
+
 }
