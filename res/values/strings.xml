@@ -30,6 +30,10 @@
     <string name="tests_two_four">тести</string>
     <string name="tests_over_five">тестів</string>
     
+    <string name="dialog_load_test_text">Тест відсутній, завантажити?</string>
+    <string name="dialog_positive_text">Так</string>
+    <string name="dialog_negative_text">Ні</string>
+    
     <string name="image_desription">Image</string>
     <string name="loren_ipsum_text">Lorem Ipsum - це текст-"риба", що використовується</string>
 </resources>
