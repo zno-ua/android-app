@@ -11,13 +11,13 @@
         android:layout_marginLeft="10dp"
         android:textStyle="bold"
         android:gravity="center_vertical"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="@color/chooser_text_color"
         android:text="@string/choose_test_view_text"/>
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="1.7dp"
-        android:background="@android:color/darker_gray"
+        android:background="@color/chooser_divider_color"
         android:visibility="visible" />
 
     <ListView

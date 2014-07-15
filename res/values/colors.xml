@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="blue_light">#5f86b6</color>
-    <color name="blue">#007BDC</color>
+    <color name="blue">#2e7ad8</color>
     <color name="window_background_color">#f2f2f2</color>
     <color name="quote_color">#666666</color>
     <color name="quote_divider_color">#c1c1c1</color>
+    <color name="chooser_text_color">#999999</color>
+    <color name="chooser_divider_color">#a9a9a9</color>
+    <color name="item_text_color">#222222</color>
+    <color name="sub_item_text_color">#777777</color>
+    <color name="download_divider_color">#dbdbdb</color>
+    
+    
 </resources>
