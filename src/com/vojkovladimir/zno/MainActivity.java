@@ -1,31 +1,39 @@
 package com.vojkovladimir.zno;
 
+import java.util.Random;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
 	public static String LOG_TAG = "MyLogs";
+
+	String[] quotes;
+	String quoteTitle;
+	TextView quote;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		quote = (TextView) findViewById(R.id.quote);
+		quotes = getResources().getStringArray(R.array.quotes_2011);
+		quoteTitle = getResources().getString(R.string.quotes_2011_title);
 	}
 
 	protected void onStart() {
 		super.onStart();
+		refreshQuote();
 	}
 
 	protected void onStop() {
 		super.onStop();
-	}
-
-	protected void onRestart() {
-		super.onRestart();
 	}
 
 	protected void onPause() {
@@ -62,6 +70,15 @@ public class MainActivity extends Activity {
 	}
 
 	public void settings(View v) {
-		
+
+	}
+
+	public void refreshQuote() {
+		String text = quoteTitle + "<br>";
+		Random rand = new Random();
+		int num = rand.nextInt(quotes.length);
+		text += quotes[num];
+		quote.setText(Html.fromHtml(text));
+
 	}
 }
