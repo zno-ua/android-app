@@ -9,7 +9,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:contentDescription="@string/image_desription"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/tmp_lesson" />
 
     <LinearLayout
         android:layout_width="wrap_content"
