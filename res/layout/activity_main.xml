@@ -113,6 +113,8 @@
         android:paddingBottom="16dp"
         android:paddingTop="16dp"
         android:textSize="17sp"
+        android:onClick="refreshQuote"
+        android:clickable="true"
         android:textColor="@color/quote_color" />
 
 </RelativeLayout>

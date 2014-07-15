@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
 
 	protected void onStart() {
 		super.onStart();
-		refreshQuote();
+		refreshQuote(null);
 	}
 
 	protected void onStop() {
@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
 
 	}
 
-	public void refreshQuote() {
+	public void refreshQuote(View v) {
 		String text = quoteTitle + "<br>";
 		Random rand = new Random();
 		int num = rand.nextInt(quotes.length);
