@@ -4,7 +4,7 @@
     <style name="MainTheme" parent="@android:style/Theme.Holo.Light">
 
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowBackground">@color/window_background_color</item>
         <item name="android:actionBarStyle">@style/ActionBar</item>
         <item name="android:buttonStyle">@style/Button</item>
     </style>

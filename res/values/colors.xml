@@ -2,7 +2,7 @@
 <resources>
     <color name="blue_light">#5f86b6</color>
     <color name="blue">#007BDC</color>
-    <color name="background_color">#f2f2f2</color>
+    <color name="window_background_color">#f2f2f2</color>
     <color name="quote_color">#666666</color>
     <color name="quote_divider_color">#c1c1c1</color>
 </resources>
