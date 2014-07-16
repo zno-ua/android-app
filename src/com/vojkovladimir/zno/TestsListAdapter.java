@@ -3,8 +3,6 @@ package com.vojkovladimir.zno;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.models.TestInfo;
 
 public class TestsListAdapter extends BaseAdapter {
@@ -22,6 +19,12 @@ public class TestsListAdapter extends BaseAdapter {
 	private Context context;
 	private LayoutInflater lInflater;
 	private ArrayList<TestInfo> list;
+
+	static class ViewHolder {
+		public TextView testName;
+		public TextView testProperties;
+		public View downloadFrame;
+	}
 
 	public TestsListAdapter(Context context, ArrayList<TestInfo> list) {
 		this.context = context;
@@ -47,16 +50,24 @@ public class TestsListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View lessonItem = lInflater.inflate(R.layout.tests_list_item, parent,
-				false);
 
-		TextView testNameView = (TextView) lessonItem
-				.findViewById(R.id.tests_list_test_name);
-		TextView testPropertiesView = (TextView) lessonItem
-				.findViewById(R.id.tests_list_test_properties);
+		View testItem = convertView;
 
-		View downloadFrame = (View) lessonItem
-				.findViewById(R.id.tests_list_download_icon);
+		if (testItem == null) {
+			testItem = lInflater.inflate(R.layout.tests_list_item, parent,
+					false);
+			ViewHolder viewHolder = new ViewHolder();
+
+			viewHolder.testName = (TextView) testItem
+					.findViewById(R.id.tests_list_test_name);
+			viewHolder.testProperties = (TextView) testItem
+					.findViewById(R.id.tests_list_test_properties);
+			viewHolder.downloadFrame = (View) testItem
+					.findViewById(R.id.tests_list_download_icon);
+			testItem.setTag(viewHolder);
+		}
+
+		ViewHolder viewHolder = (ViewHolder) testItem.getTag();
 
 		TestInfo testInfo = list.get(position);
 
@@ -91,16 +102,16 @@ public class TestsListAdapter extends BaseAdapter {
 		if (loaded) {
 			testProperties += testInfo.tasksNum + " "
 					+ context.getResources().getString(R.string.tasks_text);
-			downloadFrame.setVisibility(View.GONE);
+			viewHolder.downloadFrame.setVisibility(View.GONE);
 		} else {
 			testProperties += context.getResources().getString(
 					R.string.needed_to_load_text);
-			downloadFrame.setVisibility(View.VISIBLE);
+			viewHolder.downloadFrame.setVisibility(View.VISIBLE);
 		}
 
-		testNameView.setText(testName);
-		testPropertiesView.setText(testProperties);
+		viewHolder.testName.setText(testName);
+		viewHolder.testProperties.setText(testProperties);
 
-		return lessonItem;
+		return testItem;
 	}
 }
