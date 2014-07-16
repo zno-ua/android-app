@@ -57,6 +57,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	public static final String KEY_TBL_NAME = "tbl_name";
 	public static final String KEY_ROOT_PAGE = "rootpage";
 	public static final String KEY_SQL = "sql";
+	public static final String KEY_LOADED = "loaded";
 
 	// Table Create Statements
 	private static final String CREATE_TABLE_LESSONS_LIST = "CREATE TABLE "
@@ -71,7 +72,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			+ " INTEGER, " + KEY_TASK_BLOCKS + " INTEGER, " + KEY_TASKS_NUM
 			+ " INTEGER, " + KEY_TASK_TEST + " INTEGER, " + KEY_TASK_TEXTS
 			+ " INTEGER, " + KEY_TASK_VIDPOV + " INTEGER, " + KEY_TASK_VARS
-			+ " INTEGER, " + KEY_TASK_ANS + " INTEGER);";
+			+ " INTEGER, " + KEY_TASK_ANS + " INTEGER, " + KEY_LOADED + " INTEGER);";
 
 	private void createTableTest(String testName) {
 		SQLiteDatabase db = getWritableDatabase();
@@ -145,6 +146,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		Log.i(LOG_TAG, DATABASE_NAME + " upgraded!");
 	}
 	
+	//Filling a table lessons list
+	
 	private void fillTableLessonsList(SQLiteDatabase db,JSONArray jsonArray) {
 		
 		ContentValues values = new ContentValues();
@@ -178,6 +181,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		fillTableLessonsList(db, jsonArray);
 	}
 	
+	//Filling a table tests list
+	
 	private void fillTableTestsList(SQLiteDatabase db,JSONArray jsonArray) {
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
@@ -201,6 +206,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				values.put(KEY_TASK_VIDPOV, lesson.getInt(Api.Keys.TASK_VIDPOV));
 				values.put(KEY_TASK_VARS, lesson.getInt(Api.Keys.TASK_VARS));
 				values.put(KEY_TASK_ANS, lesson.getInt(Api.Keys.TASK_ANS));
+				values.put(KEY_LOADED, lesson.getInt(Api.Keys.LOADED));
 				
 				Log.i(LOG_TAG,
 						lesson.getString(Api.Keys.NAME_LESSON)
@@ -220,6 +226,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		fillTableTestsList(db, jsonArray);
 	}
+	
+	//Filling a table test
 	
 	private void fillTableTest(SQLiteDatabase db, String testTableName, JSONArray jsonArray) {
 		ContentValues values = new ContentValues();
@@ -252,6 +260,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		clearTableTest(db,testTableName);
 		fillTableTest(db, testTableName, jsonArray);
 	}
+	
+	//Methods for cleaning tables
 
 	private void clearTableLessonsList(SQLiteDatabase db) {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_LESSONS_LIST);

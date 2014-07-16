@@ -14,7 +14,8 @@
     "task-texts": "7",
     "task-vidpov": "3",
     "task-vars": "0",
-    "task-ans": "1"
+    "task-ans": "1",
+    "loaded":"0"
   },
   {
     "id": "2",
@@ -31,7 +32,8 @@
     "task-texts": "5",
     "task-vidpov": "9",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "3",
@@ -48,7 +50,8 @@
     "task-texts": "5",
     "task-vidpov": "9",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "4",
@@ -65,7 +68,8 @@
     "task-texts": "5",
     "task-vidpov": "9",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "5",
@@ -82,7 +86,8 @@
     "task-texts": "5",
     "task-vidpov": "9",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "6",
@@ -99,7 +104,8 @@
     "task-texts": "0",
     "task-vidpov": "8",
     "task-vars": "4",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "7",
@@ -116,7 +122,8 @@
     "task-texts": "0",
     "task-vidpov": "8",
     "task-vars": "4",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "8",
@@ -133,7 +140,8 @@
     "task-texts": "0",
     "task-vidpov": "8",
     "task-vars": "4",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "9",
@@ -150,7 +158,8 @@
     "task-texts": "0",
     "task-vidpov": "3",
     "task-vars": "0",
-    "task-ans": "7"
+    "task-ans": "7",
+    "loaded":"0"
   },
   {
     "id": "10",
@@ -167,7 +176,8 @@
     "task-texts": "0",
     "task-vidpov": "4",
     "task-vars": "0",
-    "task-ans": "8"
+    "task-ans": "8",
+    "loaded":"0"
   },
   {
     "id": "11",
@@ -184,7 +194,8 @@
     "task-texts": "0",
     "task-vidpov": "4",
     "task-vars": "0",
-    "task-ans": "8"
+    "task-ans": "8",
+    "loaded":"0"
   },
   {
     "id": "12",
@@ -201,7 +212,8 @@
     "task-texts": "0",
     "task-vidpov": "8",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "13",
@@ -218,7 +230,8 @@
     "task-texts": "0",
     "task-vidpov": "8",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "14",
@@ -235,7 +248,8 @@
     "task-texts": "0",
     "task-vidpov": "11",
     "task-vars": "5",
-    "task-ans": "2"
+    "task-ans": "2",
+    "loaded":"0"
   },
   {
     "id": "15",
@@ -252,7 +266,8 @@
     "task-texts": "0",
     "task-vidpov": "7",
     "task-vars": "4",
-    "task-ans": "2"
+    "task-ans": "2",
+    "loaded":"0"
   },
   {
     "id": "16",
@@ -269,7 +284,8 @@
     "task-texts": "0",
     "task-vidpov": "4",
     "task-vars": "0",
-    "task-ans": "7"
+    "task-ans": "7",
+    "loaded":"0"
   },
   {
     "id": "17",
@@ -286,7 +302,8 @@
     "task-texts": "0",
     "task-vidpov": "4",
     "task-vars": "0",
-    "task-ans": "7"
+    "task-ans": "7",
+    "loaded":"0"
   },
   {
     "id": "18",
@@ -303,7 +320,8 @@
     "task-texts": "0",
     "task-vidpov": "15",
     "task-vars": "0",
-    "task-ans": "10"
+    "task-ans": "10",
+    "loaded":"0"
   },
   {
     "id": "19",
@@ -320,7 +338,8 @@
     "task-texts": "0",
     "task-vidpov": "10",
     "task-vars": "0",
-    "task-ans": "10"
+    "task-ans": "10",
+    "loaded":"0"
   },
   {
     "id": "21",
@@ -337,7 +356,8 @@
     "task-texts": "0",
     "task-vidpov": "9",
     "task-vars": "0",
-    "task-ans": "1"
+    "task-ans": "1",
+    "loaded":"0"
   },
   {
     "id": "22",
@@ -354,7 +374,8 @@
     "task-texts": "0",
     "task-vidpov": "0",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "23",
@@ -371,7 +392,8 @@
     "task-texts": "0",
     "task-vidpov": "0",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "24",
@@ -388,7 +410,8 @@
     "task-texts": "0",
     "task-vidpov": "0",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "25",
@@ -405,7 +428,8 @@
     "task-texts": "0",
     "task-vidpov": "0",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "26",
@@ -422,7 +446,8 @@
     "task-texts": "0",
     "task-vidpov": "0",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "27",
@@ -439,7 +464,8 @@
     "task-texts": "0",
     "task-vidpov": "6",
     "task-vars": "6",
-    "task-ans": "2"
+    "task-ans": "2",
+    "loaded":"0"
   },
   {
     "id": "28",
@@ -456,7 +482,8 @@
     "task-texts": "4",
     "task-vidpov": "9",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "29",
@@ -473,7 +500,8 @@
     "task-texts": "4",
     "task-vidpov": "9",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "30",
@@ -490,7 +518,8 @@
     "task-texts": "0",
     "task-vidpov": "9",
     "task-vars": "4",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "31",
@@ -507,7 +536,8 @@
     "task-texts": "0",
     "task-vidpov": "9",
     "task-vars": "4",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "32",
@@ -524,7 +554,8 @@
     "task-texts": "0",
     "task-vidpov": "4",
     "task-vars": "0",
-    "task-ans": "9"
+    "task-ans": "9",
+    "loaded":"0"
   },
   {
     "id": "33",
@@ -541,7 +572,8 @@
     "task-texts": "0",
     "task-vidpov": "4",
     "task-vars": "0",
-    "task-ans": "9"
+    "task-ans": "9",
+    "loaded":"0"
   },
   {
     "id": "34",
@@ -558,7 +590,8 @@
     "task-texts": "0",
     "task-vidpov": "6",
     "task-vars": "6",
-    "task-ans": "2"
+    "task-ans": "2",
+    "loaded":"0"
   },
   {
     "id": "35",
@@ -575,7 +608,8 @@
     "task-texts": "0",
     "task-vidpov": "0",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "36",
@@ -592,7 +626,8 @@
     "task-texts": "0",
     "task-vidpov": "0",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   },
   {
     "id": "37",
@@ -609,6 +644,7 @@
     "task-texts": "0",
     "task-vidpov": "0",
     "task-vars": "0",
-    "task-ans": "0"
+    "task-ans": "0",
+    "loaded":"0"
   }
 ]

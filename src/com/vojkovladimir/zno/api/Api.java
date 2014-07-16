@@ -48,6 +48,7 @@ public class Api {
 		String ANSWERS = "answers";
 		String CORRECT = "correct";
 		String BALL = "ball";
+		String LOADED = "loaded";
 	}
 
 	

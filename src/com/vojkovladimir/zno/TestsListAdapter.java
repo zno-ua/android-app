@@ -65,6 +65,7 @@ public class TestsListAdapter extends BaseAdapter {
 		String testProperties = "";
 		String session = context.getResources()
 				.getString(R.string.session_text);
+		boolean loaded = testInfo.loaded;
 
 		if (testNameFull.contains(context.getResources().getString(
 				R.string.check_zno_full))
@@ -87,13 +88,7 @@ public class TestsListAdapter extends BaseAdapter {
 			testProperties = "II " + session + ", ";
 		}
 
-		SQLiteDatabase db = ZNOApplication.getInstance().getZnoDataBaseHelper()
-				.getReadableDatabase();
-		
-		Cursor c = db.rawQuery("SELECT "+ ZNODataBaseHelper.KEY_NAME+" FROM "+ZNODataBaseHelper.TABLE_SQLITE_MASTER+
-				" WHERE "+ZNODataBaseHelper.KEY_NAME+"=?;",new String [] {testInfo.dbName});
-
-		if (c.getCount() == 1) {
+		if (loaded) {
 			testProperties += testInfo.tasksNum + " "
 					+ context.getResources().getString(R.string.tasks_text);
 			downloadFrame.setVisibility(View.GONE);
