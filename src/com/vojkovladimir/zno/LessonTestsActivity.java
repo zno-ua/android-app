@@ -46,7 +46,9 @@ public class LessonTestsActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position,
 				long id) {
-			onDialogCreate(DIALOG_TEST_LOAD).show();
+			if(!testsList.get(position).loaded){
+				onDialogCreate(DIALOG_TEST_LOAD).show();
+			}
 		}
 	};
 
