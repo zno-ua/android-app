@@ -2,6 +2,7 @@ package com.vojkovladimir.zno.db;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,14 +10,17 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.api.Api;
-import com.vojkovladimir.zno.R;
+import com.vojkovladimir.zno.models.Lesson;
+import com.vojkovladimir.zno.models.TestInfo;
 
 public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
@@ -72,7 +76,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			+ " INTEGER, " + KEY_TASK_BLOCKS + " INTEGER, " + KEY_TASKS_NUM
 			+ " INTEGER, " + KEY_TASK_TEST + " INTEGER, " + KEY_TASK_TEXTS
 			+ " INTEGER, " + KEY_TASK_VIDPOV + " INTEGER, " + KEY_TASK_VARS
-			+ " INTEGER, " + KEY_TASK_ANS + " INTEGER, " + KEY_LOADED + " INTEGER);";
+			+ " INTEGER, " + KEY_TASK_ANS + " INTEGER, " + KEY_LOADED
+			+ " INTEGER);";
 
 	private void createTableTest(String testName) {
 		SQLiteDatabase db = getWritableDatabase();
@@ -96,31 +101,31 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			InputStream lessonsListIS = ZNOApplication.getInstance()
 					.getResources().openRawResource(R.raw.lessons_list);
 			try {
-				byte [] buf = new byte[lessonsListIS.available()];
+				byte[] buf = new byte[lessonsListIS.available()];
 				lessonsListIS.read(buf);
 				lessonsListIS.close();
-				
+
 				JSONArray lessonsList = new JSONArray(new String(buf));
-				
-				fillTableLessonsList(db,lessonsList);
-				
+
+				fillTableLessonsList(db, lessonsList);
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-			
+
 			InputStream testsListIS = ZNOApplication.getInstance()
 					.getResources().openRawResource(R.raw.tests_list);
 			try {
-				byte [] buf = new byte[testsListIS.available()];
+				byte[] buf = new byte[testsListIS.available()];
 				testsListIS.read(buf);
 				testsListIS.close();
-				
+
 				JSONArray testsList = new JSONArray(new String(buf));
 
-				fillTableTestsList(db,testsList);
-				
+				fillTableTestsList(db, testsList);
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (JSONException e) {
@@ -132,7 +137,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 					"Error in creating " + DATABASE_NAME + ":\n"
 							+ e.getMessage());
 		}
-		
+
 		Log.i(LOG_TAG, "DB created!");
 	}
 
@@ -145,11 +150,11 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		Log.i(LOG_TAG, DATABASE_NAME + " upgraded!");
 	}
-	
-	//Filling a table lessons list
-	
-	private void fillTableLessonsList(SQLiteDatabase db,JSONArray jsonArray) {
-		
+
+	// Filling a table lessons list
+
+	private void fillTableLessonsList(SQLiteDatabase db, JSONArray jsonArray) {
+
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
 
@@ -173,17 +178,17 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		}
 	}
-	
+
 	public void fillTableLessonsList(JSONArray jsonArray) {
 		SQLiteDatabase db = getWritableDatabase();
-		
+
 		clearTableLessonsList(db);
 		fillTableLessonsList(db, jsonArray);
 	}
-	
-	//Filling a table tests list
-	
-	private void fillTableTestsList(SQLiteDatabase db,JSONArray jsonArray) {
+
+	// Filling a table tests list
+
+	private void fillTableTestsList(SQLiteDatabase db, JSONArray jsonArray) {
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
 
@@ -191,7 +196,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			try {
 				lesson = jsonArray.getJSONObject(i);
 				values.put(KEY_ID_LESSON, lesson.getInt(Api.Keys.ID_LESSON));
-				values.put(KEY_DB_NAME, lesson.getString(Api.Keys.DB_NAME).replace("-", "_"));
+				values.put(KEY_DB_NAME, lesson.getString(Api.Keys.DB_NAME)
+						.replace("-", "_"));
 				values.put(KEY_NAME_LESSON,
 						lesson.getString(Api.Keys.NAME_LESSON));
 				values.put(KEY_LINK_LESSON,
@@ -207,7 +213,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				values.put(KEY_TASK_VARS, lesson.getInt(Api.Keys.TASK_VARS));
 				values.put(KEY_TASK_ANS, lesson.getInt(Api.Keys.TASK_ANS));
 				values.put(KEY_LOADED, lesson.getInt(Api.Keys.LOADED));
-				
+
 				Log.i(LOG_TAG,
 						lesson.getString(Api.Keys.NAME_LESSON)
 								+ "inserted with status = "
@@ -218,18 +224,19 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		}
 	}
-	
+
 	public void fillTableTestsList(JSONArray jsonArray) {
 		SQLiteDatabase db = getWritableDatabase();
-		
+
 		clearTableTestsList(db);
 
 		fillTableTestsList(db, jsonArray);
 	}
-	
-	//Filling a table test
-	
-	private void fillTableTest(SQLiteDatabase db, String testTableName, JSONArray jsonArray) {
+
+	// Filling a table test
+
+	private void fillTableTest(SQLiteDatabase db, String testTableName,
+			JSONArray jsonArray) {
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
 
@@ -256,12 +263,12 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 	public void fillTableTest(String testTableName, JSONArray jsonArray) {
 		SQLiteDatabase db = getWritableDatabase();
-		
-		clearTableTest(db,testTableName);
+
+		clearTableTest(db, testTableName);
 		fillTableTest(db, testTableName, jsonArray);
 	}
-	
-	//Methods for cleaning tables
+
+	// Methods for cleaning tables
 
 	private void clearTableLessonsList(SQLiteDatabase db) {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_LESSONS_LIST);
@@ -275,9 +282,81 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		Log.i(LOG_TAG, "Table " + TABLE_TESTS_LIST + " cleard.");
 	}
 
-	private void clearTableTest(SQLiteDatabase db,String testTableName) {
+	private void clearTableTest(SQLiteDatabase db, String testTableName) {
 		db.execSQL("DROP TABLE IF EXISTS " + testTableName);
 		Log.i(LOG_TAG, "Table " + testTableName + " cleard.");
+	}
+
+	// Methods of access to information from the database
+
+	public ArrayList<TestInfo> getLessonTestsList(int idLesson) {
+		ArrayList<TestInfo> testsList = new ArrayList<TestInfo>();
+
+		SQLiteDatabase db = ZNOApplication.getInstance().getZnoDataBaseHelper()
+				.getReadableDatabase();
+		Cursor c = db.query(ZNODataBaseHelper.TABLE_TESTS_LIST, new String[] {
+				ZNODataBaseHelper.KEY_DB_NAME, ZNODataBaseHelper.KEY_NAME_TEST,
+				ZNODataBaseHelper.KEY_YEAR, ZNODataBaseHelper.KEY_TASKS_NUM,
+				ZNODataBaseHelper.KEY_LOADED }, ZNODataBaseHelper.KEY_ID_LESSON
+				+ "=" + idLesson, null, null, null, ZNODataBaseHelper.KEY_YEAR
+				+ " DESC");
+		TestInfo testInfo;
+
+		if (c.moveToFirst()) {
+			int dbNameIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_DB_NAME);
+			int nameTestIndex = c
+					.getColumnIndex(ZNODataBaseHelper.KEY_NAME_TEST);
+			int yearIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_YEAR);
+			int tastsNumIndex = c
+					.getColumnIndex(ZNODataBaseHelper.KEY_TASKS_NUM);
+			int loadedIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_LOADED);
+			do {
+				testInfo = new TestInfo(c.getString(dbNameIndex),
+						c.getString(nameTestIndex), c.getInt(yearIndex),
+						c.getInt(tastsNumIndex),
+						(c.getInt(loadedIndex) == 0) ? false : true);
+				testsList.add(testInfo);
+			} while (c.moveToNext());
+		}
+
+		return testsList;
+	}
+
+	public int getTestsCount(int idLesson) {
+		SQLiteDatabase db = ZNOApplication.getInstance().getZnoDataBaseHelper()
+				.getReadableDatabase();
+		return (db.query(ZNODataBaseHelper.TABLE_TESTS_LIST,
+				new String[] { ZNODataBaseHelper.KEY_ID },
+				ZNODataBaseHelper.KEY_ID_LESSON + " = " + idLesson, null, null,
+				null, null)).getCount();
+	}
+
+	public ArrayList<Lesson> getLessonsList() {
+		ArrayList<Lesson> lessonsList = new ArrayList<Lesson>();
+
+		SQLiteDatabase db = ZNOApplication.getInstance().getZnoDataBaseHelper()
+				.getReadableDatabase();
+		Cursor c = db.query(ZNODataBaseHelper.TABLE_LESSONS_LIST, new String[] {
+				ZNODataBaseHelper.KEY_ID, ZNODataBaseHelper.KEY_NAME }, null,
+				null, null, null, null);
+		String lessonName;
+		int idLesson;
+		Lesson lesson;
+
+		if (c.moveToFirst()) {
+			int lessonIdIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_ID);
+			int lessonNameIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_NAME);
+
+			do {
+				lessonName = c.getString(lessonNameIndex);
+				idLesson = c.getInt(lessonIdIndex);
+				lesson = new Lesson(idLesson,lessonName, getTestsCount(idLesson));
+				lessonsList.add(lesson);
+			} while (c.moveToNext());
+
+		}
+
+		return lessonsList;
 	}
 
 }
