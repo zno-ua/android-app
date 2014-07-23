@@ -1,6 +1,5 @@
 package com.vojkovladimir.zno.api;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
@@ -10,6 +9,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.vojkovladimir.zno.OnTestLoadListener;
 import com.vojkovladimir.zno.ZNOApplication;
 
 public class Api {
@@ -22,8 +22,8 @@ public class Api {
 
 	public static final String RESPONSE = "response";
 	public static final String INFO = "info";
-	
-	public interface Keys{
+
+	public interface Keys {
 		String ID = "id";
 		String ID_QUEST = "id-quest";
 		String ID_LESSON = "id-lesson";
@@ -51,7 +51,6 @@ public class Api {
 		String LOADED = "loaded";
 	}
 
-	
 	public static JsonObjectRequest getTestsListRequest() {
 		JsonObjectRequest request = new JsonObjectRequest(API_URL
 				+ GET_TESTS_LIST, null, new Listener<JSONObject>() {
@@ -73,22 +72,15 @@ public class Api {
 		});
 		return request;
 	}
-	
-	
-	public static JsonObjectRequest getTestRequest(String testName) {
-		JsonObjectRequest request = new JsonObjectRequest(API_URL
-				+ GET_TEST + testName, null, new Listener<JSONObject>() {
+
+	public static JsonObjectRequest getTestRequest(final String testName,
+			final OnTestLoadListener loadListener) {
+		JsonObjectRequest request = new JsonObjectRequest(API_URL + GET_TEST
+				+ testName, null, new Listener<JSONObject>() {
 
 			@Override
 			public void onResponse(JSONObject json) {
-				String testTableName;
-				try {
-					testTableName = json.getJSONObject(Api.INFO).getString(Api.Keys.DB_NAME);
-					Log.i(LOG_TAG, "Good Response. Test "+testTableName+" successfully loaded.");
-					ZNOApplication.getInstance().onTestRespose(testTableName,json);
-				} catch (JSONException e) {
-					Log.e(LOG_TAG, "Error in json: " + e.getMessage());
-				}
+				loadListener.onTestLoad(json);
 			}
 		}, new ErrorListener() {
 

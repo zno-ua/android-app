@@ -81,11 +81,12 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 	private void createTableTest(String testName) {
 		SQLiteDatabase db = getWritableDatabase();
-		db.execSQL("CREATE TABLE " + testName + " (" + KEY_ID
+		db.execSQL("CREATE TABLE " + testName.replace("-", "_") + " (" + KEY_ID
 				+ " INTEGER PRIMARY KEY, " + KEY_ID_QUEST + " INTEGER, "
 				+ KEY_TYPE + " INTEGER, " + KEY_TEXT + " TEXT, " + KEY_ANSWERS
 				+ " TEXT, " + KEY_CORRECT + " TEXT, " + KEY_BALL + " INTEGER"
 				+ ");");
+		Log.i(LOG_TAG, testName + " table created!");
 	}
 
 	public ZNODataBaseHelper(Context context) {
@@ -240,7 +241,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		JSONObject lesson;
 
-		Log.i(LOG_TAG, "\tfillTableTest(), " + testTableName
+		Log.i(LOG_TAG, "\tfillTableTest(), " + testTableName.replace("-", "_")
 				+ " Tests count = " + jsonArray.length());
 
 		for (int i = 0; i < jsonArray.length(); i++) {
@@ -254,7 +255,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				values.put(KEY_CORRECT, lesson.getString(Api.Keys.CORRECT));
 				values.put(KEY_BALL, lesson.getInt(Api.Keys.BALL));
 
-				db.insert(testTableName, null, values);
+				db.insert(testTableName.replace("-", "_"), null, values);
 			} catch (JSONException e) {
 				Log.e(LOG_TAG, e.getMessage());
 			}
@@ -263,9 +264,33 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 	public void fillTableTest(String testTableName, JSONArray jsonArray) {
 		SQLiteDatabase db = getWritableDatabase();
+		String tableName = testTableName.replace("-", "_");
 
-		clearTableTest(db, testTableName);
-		fillTableTest(db, testTableName, jsonArray);
+		Cursor c = db.query(TABLE_TESTS_LIST, new String[] { KEY_DB_NAME,
+				KEY_LOADED }, KEY_DB_NAME + "=?", new String[] { tableName },
+				null, null, null);
+
+		if (c.moveToNext()) {
+			int dbNameIndex = c.getColumnIndex(KEY_DB_NAME);
+			int loadedIndex = c.getColumnIndex(KEY_LOADED);
+
+			Log.i(LOG_TAG, c.getString(dbNameIndex) + " == " + tableName);
+
+			if (c.getInt(loadedIndex) == 0) {
+				createTableTest(tableName);
+				fillTableTest(db, tableName, jsonArray);
+				ContentValues values = new ContentValues();
+				values.put(KEY_LOADED, 1);
+				db.update(TABLE_TESTS_LIST, values, KEY_DB_NAME + "=?",
+						new String[] { tableName });
+				Log.i(LOG_TAG, "missing");
+			} else {
+				Log.i(LOG_TAG, "loaded");
+				clearTableTest(db, tableName);
+				fillTableTest(db, tableName, jsonArray);
+			}
+		}
+
 	}
 
 	// Methods for cleaning tables
@@ -292,24 +317,19 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	public ArrayList<TestInfo> getLessonTestsList(int idLesson) {
 		ArrayList<TestInfo> testsList = new ArrayList<TestInfo>();
 
-		SQLiteDatabase db = ZNOApplication.getInstance().getZnoDataBaseHelper()
-				.getReadableDatabase();
-		Cursor c = db.query(ZNODataBaseHelper.TABLE_TESTS_LIST, new String[] {
-				ZNODataBaseHelper.KEY_DB_NAME, ZNODataBaseHelper.KEY_NAME_TEST,
-				ZNODataBaseHelper.KEY_YEAR, ZNODataBaseHelper.KEY_TASKS_NUM,
-				ZNODataBaseHelper.KEY_LOADED }, ZNODataBaseHelper.KEY_ID_LESSON
-				+ "=" + idLesson, null, null, null, ZNODataBaseHelper.KEY_YEAR
-				+ " DESC");
+		SQLiteDatabase db = getWritableDatabase();
+		Cursor c = db.query(TABLE_TESTS_LIST, new String[] { KEY_DB_NAME,
+				KEY_NAME_TEST, KEY_YEAR, KEY_TASKS_NUM, KEY_LOADED },
+				KEY_ID_LESSON + "=" + idLesson, null, null, null, KEY_YEAR
+						+ " DESC");
 		TestInfo testInfo;
 
 		if (c.moveToFirst()) {
-			int dbNameIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_DB_NAME);
-			int nameTestIndex = c
-					.getColumnIndex(ZNODataBaseHelper.KEY_NAME_TEST);
-			int yearIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_YEAR);
-			int tastsNumIndex = c
-					.getColumnIndex(ZNODataBaseHelper.KEY_TASKS_NUM);
-			int loadedIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_LOADED);
+			int dbNameIndex = c.getColumnIndex(KEY_DB_NAME);
+			int nameTestIndex = c.getColumnIndex(KEY_NAME_TEST);
+			int yearIndex = c.getColumnIndex(KEY_YEAR);
+			int tastsNumIndex = c.getColumnIndex(KEY_TASKS_NUM);
+			int loadedIndex = c.getColumnIndex(KEY_LOADED);
 			do {
 				testInfo = new TestInfo(c.getString(dbNameIndex),
 						c.getString(nameTestIndex), c.getInt(yearIndex),
@@ -323,34 +343,32 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	}
 
 	public int getTestsCount(int idLesson) {
-		SQLiteDatabase db = ZNOApplication.getInstance().getZnoDataBaseHelper()
-				.getReadableDatabase();
-		return (db.query(ZNODataBaseHelper.TABLE_TESTS_LIST,
-				new String[] { ZNODataBaseHelper.KEY_ID },
-				ZNODataBaseHelper.KEY_ID_LESSON + " = " + idLesson, null, null,
-				null, null)).getCount();
+		SQLiteDatabase db = getWritableDatabase();
+		return (db.query(TABLE_TESTS_LIST, new String[] { KEY_ID },
+				KEY_ID_LESSON + " = " + idLesson, null, null, null, null))
+				.getCount();
 	}
 
 	public ArrayList<Lesson> getLessonsList() {
 		ArrayList<Lesson> lessonsList = new ArrayList<Lesson>();
 
-		SQLiteDatabase db = ZNOApplication.getInstance().getZnoDataBaseHelper()
-				.getReadableDatabase();
-		Cursor c = db.query(ZNODataBaseHelper.TABLE_LESSONS_LIST, new String[] {
-				ZNODataBaseHelper.KEY_ID, ZNODataBaseHelper.KEY_NAME }, null,
-				null, null, null, null);
+		SQLiteDatabase db = getWritableDatabase();
+		Cursor c = db
+				.query(TABLE_LESSONS_LIST, new String[] { KEY_ID, KEY_NAME },
+						null, null, null, null, null);
 		String lessonName;
 		int idLesson;
 		Lesson lesson;
 
 		if (c.moveToFirst()) {
-			int lessonIdIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_ID);
-			int lessonNameIndex = c.getColumnIndex(ZNODataBaseHelper.KEY_NAME);
+			int lessonIdIndex = c.getColumnIndex(KEY_ID);
+			int lessonNameIndex = c.getColumnIndex(KEY_NAME);
 
 			do {
 				lessonName = c.getString(lessonNameIndex);
 				idLesson = c.getInt(lessonIdIndex);
-				lesson = new Lesson(idLesson,lessonName, getTestsCount(idLesson));
+				lesson = new Lesson(idLesson, lessonName,
+						getTestsCount(idLesson));
 				lessonsList.add(lesson);
 			} while (c.moveToNext());
 

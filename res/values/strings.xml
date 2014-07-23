@@ -24,6 +24,7 @@
     <string name="dialog_load_test_text">Тест відсутній, завантажити?</string>
     <string name="dialog_positive_text">Так</string>
     <string name="dialog_negative_text">Ні</string>
+    <string name="progress_test_load">Завантаження тесту</string>
     <string name="image_desription">Image</string>
     <string name="loren_ipsum_text">Lorem Ipsum - це текст-"риба", що використовується</string>
     

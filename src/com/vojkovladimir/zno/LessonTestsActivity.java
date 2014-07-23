@@ -2,38 +2,54 @@ package com.vojkovladimir.zno;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.vojkovladimir.zno.api.Api;
 import com.vojkovladimir.zno.models.TestInfo;
 
 public class LessonTestsActivity extends Activity {
 
 	public static String LOG_TAG = "MyLogs";
-	final int DIALOG_TEST_LOAD = 1;
 
 	ListView testsListView;
 	TestsListAdapter testsListAdapter;
 	ArrayList<TestInfo> testsList;
+	ProgressDialog downloadProgress;
 
-	OnClickListener dialogListener = new OnClickListener() {
+	int idLesson;
+	String testTableName;
+
+	OnTestLoadListener testLoad = new OnTestLoadListener() {
 
 		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			switch (which) {
-			case Dialog.BUTTON_POSITIVE:
-				break;
-			case Dialog.BUTTON_NEGATIVE:
-				break;
+		public void onTestLoad(JSONObject json) {
+			try {
+				JSONArray response = json.getJSONArray(Api.RESPONSE);
+				ZNOApplication.getInstance().getZnoDataBaseHelper()
+						.fillTableTest(testTableName, response);
+				testsList = ZNOApplication.getInstance().getZnoDataBaseHelper()
+						.getLessonTestsList(idLesson);
+				testsListAdapter = new TestsListAdapter(
+						getApplicationContext(), testsList);
+				testsListView.setAdapter(testsListAdapter);
+				testsListView.invalidateViews();
+				downloadProgress.cancel();
+			} catch (JSONException e) {
+				Log.e(LOG_TAG,
+						"Error on load test: " + testTableName + " "
+								+ e.getMessage());
 			}
 		}
 	};
@@ -42,8 +58,13 @@ public class LessonTestsActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position,
 				long id) {
-			if(!testsList.get(position).loaded){
-				onDialogCreate(DIALOG_TEST_LOAD).show();
+			if (testsList.get(position).loaded) {
+
+			} else {
+				TestLoadDialogFragment f = TestLoadDialogFragment.newInstance(
+						testsList.get(position).dbName, testLoad,
+						downloadProgress);
+				f.show(getFragmentManager(), null);
 			}
 		}
 	};
@@ -54,30 +75,20 @@ public class LessonTestsActivity extends Activity {
 		setContentView(R.layout.activity_tests_list);
 
 		Intent intent = getIntent();
-		String testTableName = intent
+
+		testTableName = intent
 				.getStringExtra(ZNOApplication.ExtrasKeys.TABLE_NAME);
-		int idLesson = intent.getIntExtra(ZNOApplication.ExtrasKeys.ID_LESSON,
-				-1);
 		setTitle(testTableName);
-		
-		testsList = ZNOApplication.getInstance().getZnoDataBaseHelper().getLessonTestsList(idLesson);
+		idLesson = intent.getIntExtra(ZNOApplication.ExtrasKeys.ID_LESSON, -1);
+		testsList = ZNOApplication.getInstance().getZnoDataBaseHelper()
+				.getLessonTestsList(idLesson);
 		testsListAdapter = new TestsListAdapter(this, testsList);
 		testsListView = (ListView) findViewById(R.id.tests_list_view);
 		testsListView.setAdapter(testsListAdapter);
 		testsListView.setOnItemClickListener(itemListener);
-	}
-
-	private Dialog onDialogCreate(int id) {
-
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-		if (id == DIALOG_TEST_LOAD) {
-			dialogBuilder.setMessage(R.string.dialog_load_test_text);
-			dialogBuilder.setPositiveButton(R.string.dialog_positive_text,
-					dialogListener);
-			dialogBuilder.setNegativeButton(R.string.dialog_negative_text,
-					dialogListener);
-		}
-		return dialogBuilder.create();
+		downloadProgress = new ProgressDialog(this);
+		downloadProgress.setMessage(getResources().getString(
+				R.string.progress_test_load));
 	}
 
 }
