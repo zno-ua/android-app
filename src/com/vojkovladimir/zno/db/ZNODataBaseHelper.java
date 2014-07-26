@@ -338,6 +338,21 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				testsList.add(testInfo);
 			} while (c.moveToNext());
 		}
+		
+		ArrayList<TestInfo> part1 = new ArrayList<TestInfo>();
+		ArrayList<TestInfo> part2 = new ArrayList<TestInfo>();
+		
+		for(TestInfo currTest:testsList){
+			if(currTest.loaded){
+				part1.add(currTest);
+			}else{
+				part2.add(currTest);
+			}
+		}
+		
+		testsList = new ArrayList<TestInfo>();
+		testsList.addAll(part1);
+		testsList.addAll(part2);
 
 		return testsList;
 	}
