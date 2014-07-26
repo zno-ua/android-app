@@ -23,8 +23,11 @@ public class ZNOApplication extends Application {
 	private ZNODataBaseHelper znoDBHelper;
 	
 	public interface ExtrasKeys{
-		String TABLE_NAME = "table_name";
+		String LESSON_NAME = "lesson_name";
 		String ID_LESSON = "id-lesson";
+		String TEST_NAME = "test_name";
+		String DB_NAME = "db-name";
+		String YEAR = "year";
 	}
 
 	@Override

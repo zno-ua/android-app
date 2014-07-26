@@ -319,7 +319,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		SQLiteDatabase db = getWritableDatabase();
 		Cursor c = db.query(TABLE_TESTS_LIST, new String[] { KEY_DB_NAME,
-				KEY_NAME_TEST, KEY_YEAR, KEY_TASKS_NUM, KEY_LOADED },
+				KEY_NAME_TEST, KEY_NAME_LESSON,KEY_YEAR, KEY_TASKS_NUM, KEY_LOADED },
 				KEY_ID_LESSON + "=" + idLesson, null, null, null, KEY_YEAR
 						+ " DESC");
 		TestInfo testInfo;
@@ -327,12 +327,15 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		if (c.moveToFirst()) {
 			int dbNameIndex = c.getColumnIndex(KEY_DB_NAME);
 			int nameTestIndex = c.getColumnIndex(KEY_NAME_TEST);
+			int nameLessomIndex = c.getColumnIndex(KEY_NAME_LESSON);
 			int yearIndex = c.getColumnIndex(KEY_YEAR);
 			int tastsNumIndex = c.getColumnIndex(KEY_TASKS_NUM);
 			int loadedIndex = c.getColumnIndex(KEY_LOADED);
 			do {
 				testInfo = new TestInfo(c.getString(dbNameIndex),
-						c.getString(nameTestIndex), c.getInt(yearIndex),
+						c.getString(nameTestIndex),
+						c.getString(nameLessomIndex),
+						c.getInt(yearIndex),
 						c.getInt(tastsNumIndex),
 						(c.getInt(loadedIndex) == 0) ? false : true);
 				testsList.add(testInfo);

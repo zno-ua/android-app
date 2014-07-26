@@ -44,8 +44,7 @@ public class LessonTestsActivity extends Activity {
 				JSONArray response = json.getJSONArray(Api.RESPONSE);
 				String dbName = info.getJSONObject(0).getString(
 						Api.Keys.DB_NAME);
-				ZNOApplication.getInstance().getZnoDataBaseHelper()
-						.fillTableTest(dbName, response);
+				db.fillTableTest(dbName, response);
 				testsList = db.getLessonTestsList(idLesson);
 				testsListAdapter.setTestsList(testsList);
 				testsListView.invalidateViews();
@@ -60,12 +59,18 @@ public class LessonTestsActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position,
 				long id) {
-			if (testsList.get(position).loaded) {
-
+			TestInfo currTest = testsList.get(position);
+			if (currTest.loaded) {
+				Intent testActivity = new Intent(getApplicationContext(),
+						TestActivity.class);
+				
+				testActivity.putExtra(ZNOApplication.ExtrasKeys.LESSON_NAME, currTest.lessonName);
+				testActivity.putExtra(ZNOApplication.ExtrasKeys.DB_NAME, currTest.dbName);
+				testActivity.putExtra(ZNOApplication.ExtrasKeys.YEAR, currTest.year);
+				startActivity(testActivity);
 			} else {
 				TestLoadDialogFragment f = TestLoadDialogFragment.newInstance(
-						testsList.get(position).dbName, testLoad,
-						downloadProgress);
+						currTest.dbName, testLoad, downloadProgress);
 				f.show(getFragmentManager(), null);
 			}
 		}
@@ -81,7 +86,7 @@ public class LessonTestsActivity extends Activity {
 
 		Intent intent = getIntent();
 
-		setTitle(intent.getStringExtra(ZNOApplication.ExtrasKeys.TABLE_NAME));
+		setTitle(intent.getStringExtra(ZNOApplication.ExtrasKeys.LESSON_NAME));
 		idLesson = intent.getIntExtra(ZNOApplication.ExtrasKeys.ID_LESSON, -1);
 		testsList = db.getLessonTestsList(idLesson);
 		testsListAdapter = new TestsListAdapter(this, testsList);

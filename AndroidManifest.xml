@@ -18,7 +18,7 @@
         <activity
             android:name="MainActivity"
             android:label="@string/app_name" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -38,6 +38,9 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".TestingActivity" />
+        </activity>
+        <activity
+            android:name="TestActivity">
         </activity>
     </application>
 

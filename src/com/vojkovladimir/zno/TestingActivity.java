@@ -34,7 +34,7 @@ public class TestingActivity extends Activity {
 						LessonTestsActivity.class);
 				testsList.putExtra(ZNOApplication.ExtrasKeys.ID_LESSON,
 						lessonsList.get(position).id);
-				testsList.putExtra(ZNOApplication.ExtrasKeys.TABLE_NAME,
+				testsList.putExtra(ZNOApplication.ExtrasKeys.LESSON_NAME,
 						lessonsList.get(position).name);
 
 				startActivity(testsList);
