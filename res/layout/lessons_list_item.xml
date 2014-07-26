@@ -6,7 +6,7 @@
 
     <ImageView
         android:id="@+id/lessons_list_lesson_icon"
-        android:layout_width="64dp"
+        android:layout_width="48dp"
         android:layout_height="64dp"
         android:contentDescription="@string/image_desription"
         android:src="@drawable/tmp_lesson" />
@@ -16,8 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:orientation="vertical"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp" >
+        android:paddingLeft="10dp">
 
         <TextView
             android:id="@+id/lessons_list_lesson_name"
