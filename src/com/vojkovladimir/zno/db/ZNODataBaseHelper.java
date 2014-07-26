@@ -20,6 +20,8 @@ import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.api.Api;
 import com.vojkovladimir.zno.models.Lesson;
+import com.vojkovladimir.zno.models.Question;
+import com.vojkovladimir.zno.models.Test;
 import com.vojkovladimir.zno.models.TestInfo;
 
 public class ZNODataBaseHelper extends SQLiteOpenHelper {
@@ -319,9 +321,9 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		SQLiteDatabase db = getWritableDatabase();
 		Cursor c = db.query(TABLE_TESTS_LIST, new String[] { KEY_DB_NAME,
-				KEY_NAME_TEST, KEY_NAME_LESSON,KEY_YEAR, KEY_TASKS_NUM, KEY_LOADED },
-				KEY_ID_LESSON + "=" + idLesson, null, null, null, KEY_YEAR
-						+ " DESC");
+				KEY_NAME_TEST, KEY_NAME_LESSON, KEY_YEAR, KEY_TASKS_NUM,
+				KEY_LOADED }, KEY_ID_LESSON + "=" + idLesson, null, null, null,
+				KEY_YEAR + " DESC");
 		TestInfo testInfo;
 
 		if (c.moveToFirst()) {
@@ -334,25 +336,24 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			do {
 				testInfo = new TestInfo(c.getString(dbNameIndex),
 						c.getString(nameTestIndex),
-						c.getString(nameLessomIndex),
-						c.getInt(yearIndex),
+						c.getString(nameLessomIndex), c.getInt(yearIndex),
 						c.getInt(tastsNumIndex),
 						(c.getInt(loadedIndex) == 0) ? false : true);
 				testsList.add(testInfo);
 			} while (c.moveToNext());
 		}
-		
+
 		ArrayList<TestInfo> part1 = new ArrayList<TestInfo>();
 		ArrayList<TestInfo> part2 = new ArrayList<TestInfo>();
-		
-		for(TestInfo currTest:testsList){
-			if(currTest.loaded){
+
+		for (TestInfo currTest : testsList) {
+			if (currTest.loaded) {
 				part1.add(currTest);
-			}else{
+			} else {
 				part2.add(currTest);
 			}
 		}
-		
+
 		testsList = new ArrayList<TestInfo>();
 		testsList.addAll(part1);
 		testsList.addAll(part2);
@@ -393,6 +394,48 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		}
 
 		return lessonsList;
+	}
+
+	public Test getTest(String dbName) {
+		ArrayList<Question> questions = new ArrayList<Question>();
+
+		SQLiteDatabase db = getWritableDatabase();
+
+		Cursor c = db.query(dbName, new String[] { KEY_ID, KEY_ID_QUEST,
+				KEY_TYPE, KEY_TEXT, KEY_ANSWERS, KEY_CORRECT, KEY_BALL }, null,
+				null, null, null, null);
+		
+		if (c.moveToFirst()) {
+			int idIndex = c.getColumnIndex(KEY_ID);
+			int idQuestInted= c.getColumnIndex(KEY_ID_QUEST);
+			int typeIndex = c.getColumnIndex(KEY_TYPE);
+			int textIndex = c.getColumnIndex(KEY_TEXT);
+			int answersIndex = c.getColumnIndex(KEY_ANSWERS);
+			int correctIndex = c.getColumnIndex(KEY_CORRECT);
+			int ballIndex = c.getColumnIndex(KEY_BALL);
+			
+			int id;
+			int idQuest;
+			int type;
+			String text;
+			String answers;
+			String correct;
+			int ball;
+			
+			do{
+				id = c.getInt(idIndex);
+				idQuest = c.getInt(idQuestInted);
+				type = c.getInt(typeIndex);
+				text = c.getString(textIndex);
+				answers = c.getString(answersIndex);
+				correct = c.getString(correctIndex);
+				ball = c.getInt(ballIndex);
+				
+				questions.add(new Question(id, idQuest, type, text, answers, correct, ball));
+			}while(c.moveToNext());
+		}
+
+		return new Test(questions);
 	}
 
 }
