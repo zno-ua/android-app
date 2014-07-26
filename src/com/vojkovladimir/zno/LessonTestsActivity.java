@@ -29,16 +29,17 @@ public class LessonTestsActivity extends Activity {
 	ProgressDialog downloadProgress;
 
 	int idLesson;
-	String testTableName;
 
 	OnTestLoadListener testLoad = new OnTestLoadListener() {
 
 		@Override
 		public void onTestLoad(JSONObject json) {
 			try {
+				JSONArray info = json.getJSONArray(Api.INFO);
 				JSONArray response = json.getJSONArray(Api.RESPONSE);
+				String dbName = info.getJSONObject(0).getString(Api.Keys.DB_NAME);
 				ZNOApplication.getInstance().getZnoDataBaseHelper()
-						.fillTableTest(testTableName, response);
+						.fillTableTest(dbName, response);
 				testsList = ZNOApplication.getInstance().getZnoDataBaseHelper()
 						.getLessonTestsList(idLesson);
 				testsListAdapter = new TestsListAdapter(
@@ -47,9 +48,7 @@ public class LessonTestsActivity extends Activity {
 				testsListView.invalidateViews();
 				downloadProgress.cancel();
 			} catch (JSONException e) {
-				Log.e(LOG_TAG,
-						"Error on load test: " + testTableName + " "
-								+ e.getMessage());
+				Log.e(LOG_TAG, "Error on load test: " + e.getMessage());
 			}
 		}
 	};
@@ -74,11 +73,10 @@ public class LessonTestsActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tests_list);
 
+
 		Intent intent = getIntent();
 
-		testTableName = intent
-				.getStringExtra(ZNOApplication.ExtrasKeys.TABLE_NAME);
-		setTitle(testTableName);
+		setTitle(intent.getStringExtra(ZNOApplication.ExtrasKeys.TABLE_NAME));
 		idLesson = intent.getIntExtra(ZNOApplication.ExtrasKeys.ID_LESSON, -1);
 		testsList = ZNOApplication.getInstance().getZnoDataBaseHelper()
 				.getLessonTestsList(idLesson);
