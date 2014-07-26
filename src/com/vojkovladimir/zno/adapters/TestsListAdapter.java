@@ -31,6 +31,7 @@ public class TestsListAdapter extends BaseAdapter {
 		lInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.testsList = testsList;
+		orderTestsList();
 	}
 
 	@Override
@@ -119,5 +120,24 @@ public class TestsListAdapter extends BaseAdapter {
 	
 	public void setTestsList(ArrayList<TestInfo> testsList) {
 		this.testsList = testsList;
+		orderTestsList();
+	}
+	
+	private void  orderTestsList(){
+		ArrayList<TestInfo> part1 = new ArrayList<TestInfo>();
+		ArrayList<TestInfo> part2 = new ArrayList<TestInfo>();
+		
+		for(TestInfo currTest:testsList){
+			if(currTest.loaded){
+				part1.add(currTest);
+			}else{
+				part2.add(currTest);
+			}
+		}
+		
+		testsList = new ArrayList<TestInfo>();
+		testsList.addAll(part1);
+		testsList.addAll(part2);
+		
 	}
 }
