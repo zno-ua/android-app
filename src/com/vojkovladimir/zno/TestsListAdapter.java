@@ -3,7 +3,6 @@ package com.vojkovladimir.zno;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,7 @@ public class TestsListAdapter extends BaseAdapter {
 
 	private Context context;
 	private LayoutInflater lInflater;
-	private ArrayList<TestInfo> list;
+	private ArrayList<TestInfo> testsList;
 
 	static class ViewHolder {
 		public TextView testName;
@@ -26,21 +25,21 @@ public class TestsListAdapter extends BaseAdapter {
 		public View downloadFrame;
 	}
 
-	public TestsListAdapter(Context context, ArrayList<TestInfo> list) {
+	public TestsListAdapter(Context context, ArrayList<TestInfo> testsList) {
 		this.context = context;
 		lInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		this.list = list;
+		this.testsList = testsList;
 	}
 
 	@Override
 	public int getCount() {
-		return list.size();
+		return testsList.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return list.get(position);
+		return testsList.get(position);
 	}
 
 	@Override
@@ -69,7 +68,7 @@ public class TestsListAdapter extends BaseAdapter {
 
 		ViewHolder viewHolder = (ViewHolder) testItem.getTag();
 
-		TestInfo testInfo = list.get(position);
+		TestInfo testInfo = testsList.get(position);
 
 		String testNameFull = testInfo.name;
 		String testName = "";
@@ -91,8 +90,6 @@ public class TestsListAdapter extends BaseAdapter {
 				+ " " + testInfo.year + " "
 				+ context.getResources().getString(R.string.year);
 
-		Log.i(LOG_TAG, testNameFull);
-
 		if (testNameFull.contains("(I " + session + ")")) {
 			testProperties = "I " + session + ", ";
 		} else if (testNameFull.contains("(II " + session + ")")) {
@@ -113,5 +110,13 @@ public class TestsListAdapter extends BaseAdapter {
 		viewHolder.testProperties.setText(testProperties);
 
 		return testItem;
+	}
+	
+	public ArrayList<TestInfo> getTestsList() {
+		return testsList;
+	}
+	
+	public void setTestsList(ArrayList<TestInfo> testsList) {
+		this.testsList = testsList;
 	}
 }

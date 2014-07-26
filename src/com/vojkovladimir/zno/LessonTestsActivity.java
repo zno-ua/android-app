@@ -17,11 +17,15 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.vojkovladimir.zno.api.Api;
+import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.models.TestInfo;
 
 public class LessonTestsActivity extends Activity {
 
 	public static String LOG_TAG = "MyLogs";
+
+	ZNOApplication app;
+	ZNODataBaseHelper db;
 
 	ListView testsListView;
 	TestsListAdapter testsListAdapter;
@@ -37,14 +41,12 @@ public class LessonTestsActivity extends Activity {
 			try {
 				JSONArray info = json.getJSONArray(Api.INFO);
 				JSONArray response = json.getJSONArray(Api.RESPONSE);
-				String dbName = info.getJSONObject(0).getString(Api.Keys.DB_NAME);
+				String dbName = info.getJSONObject(0).getString(
+						Api.Keys.DB_NAME);
 				ZNOApplication.getInstance().getZnoDataBaseHelper()
 						.fillTableTest(dbName, response);
-				testsList = ZNOApplication.getInstance().getZnoDataBaseHelper()
-						.getLessonTestsList(idLesson);
-				testsListAdapter = new TestsListAdapter(
-						getApplicationContext(), testsList);
-				testsListView.setAdapter(testsListAdapter);
+				testsList = db.getLessonTestsList(idLesson);
+				testsListAdapter.setTestsList(testsList);
 				testsListView.invalidateViews();
 				downloadProgress.cancel();
 			} catch (JSONException e) {
@@ -73,13 +75,14 @@ public class LessonTestsActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tests_list);
 
+		app = ZNOApplication.getInstance();
+		db = app.getZnoDataBaseHelper();
 
 		Intent intent = getIntent();
 
 		setTitle(intent.getStringExtra(ZNOApplication.ExtrasKeys.TABLE_NAME));
 		idLesson = intent.getIntExtra(ZNOApplication.ExtrasKeys.ID_LESSON, -1);
-		testsList = ZNOApplication.getInstance().getZnoDataBaseHelper()
-				.getLessonTestsList(idLesson);
+		testsList = db.getLessonTestsList(idLesson);
 		testsListAdapter = new TestsListAdapter(this, testsList);
 		testsListView = (ListView) findViewById(R.id.tests_list_view);
 		testsListView.setAdapter(testsListAdapter);
