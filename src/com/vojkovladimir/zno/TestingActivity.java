@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.vojkovladimir.zno.adapters.LessonsListAdapter;
 import com.vojkovladimir.zno.models.Lesson;
 
 public class TestingActivity extends Activity {

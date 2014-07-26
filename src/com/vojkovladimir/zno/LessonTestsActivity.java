@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.vojkovladimir.zno.adapters.TestsListAdapter;
 import com.vojkovladimir.zno.api.Api;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.models.TestInfo;

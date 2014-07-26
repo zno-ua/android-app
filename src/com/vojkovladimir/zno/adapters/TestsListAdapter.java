@@ -1,4 +1,4 @@
-package com.vojkovladimir.zno;
+package com.vojkovladimir.zno.adapters;
 
 import java.util.ArrayList;
 
@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.models.TestInfo;
 
 public class TestsListAdapter extends BaseAdapter {
