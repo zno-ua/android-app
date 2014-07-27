@@ -25,8 +25,11 @@
     <string name="dialog_positive_text">Так</string>
     <string name="dialog_negative_text">Ні</string>
     <string name="progress_test_load">Завантаження тесту</string>
+    <string name="skip_question_text">Пропустити запитання</string>
+    <string name="question">Запитання</string>
     <string name="image_desription">Image</string>
     <string name="loren_ipsum_text">Lorem Ipsum - це текст-"риба", що використовується</string>
+    
     
     <string name="quotes_2011_title">Цитата з твору ЗНО-2011:</string>
     

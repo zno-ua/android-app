@@ -12,4 +12,9 @@
     <color name="download_divider_color">#dbdbdb</color>
     
     
+    <color name="question_num_text_color">@color/chooser_text_color</color>
+    <color name="question_underline_color">#b2b2b2</color>
+    <color name="question_text_color">@color/quote_color</color>
+    <color name="question_bg_color">#fff</color>
+    
 </resources>
