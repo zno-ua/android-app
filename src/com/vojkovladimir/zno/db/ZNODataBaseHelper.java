@@ -404,16 +404,16 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.query(dbName, new String[] { KEY_ID, KEY_ID_QUEST,
 				KEY_TYPE, KEY_TEXT, KEY_ANSWERS, KEY_CORRECT, KEY_BALL }, null,
 				null, null, null, null);
-		
+
 		if (c.moveToFirst()) {
 			int idIndex = c.getColumnIndex(KEY_ID);
-			int idQuestInted= c.getColumnIndex(KEY_ID_QUEST);
+			int idQuestInted = c.getColumnIndex(KEY_ID_QUEST);
 			int typeIndex = c.getColumnIndex(KEY_TYPE);
 			int textIndex = c.getColumnIndex(KEY_TEXT);
 			int answersIndex = c.getColumnIndex(KEY_ANSWERS);
 			int correctIndex = c.getColumnIndex(KEY_CORRECT);
 			int ballIndex = c.getColumnIndex(KEY_BALL);
-			
+
 			int id;
 			int idQuest;
 			int type;
@@ -421,8 +421,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			String answers;
 			String correct;
 			int ball;
-			
-			do{
+
+			do {
 				id = c.getInt(idIndex);
 				idQuest = c.getInt(idQuestInted);
 				type = c.getInt(typeIndex);
@@ -430,12 +430,28 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				answers = c.getString(answersIndex);
 				correct = c.getString(correctIndex);
 				ball = c.getInt(ballIndex);
-				
-				questions.add(new Question(id, idQuest, type, text, answers, correct, ball));
-			}while(c.moveToNext());
+
+				questions.add(new Question(id, idQuest, type, text, answers,
+						correct, ball));
+			} while (c.moveToNext());
 		}
 
-		return new Test(questions);
+		c = db.query(TABLE_TESTS_LIST, new String[] { KEY_DB_NAME,
+				KEY_NAME_TEST, KEY_NAME_LESSON, KEY_YEAR, KEY_TASKS_NUM,
+				KEY_LOADED }, KEY_DB_NAME + "=?", new String[] { dbName },
+				null, null, null);
+
+		c.moveToFirst();
+		int dbNameIndex = c.getColumnIndex(KEY_DB_NAME);
+		int nameTestIndex = c.getColumnIndex(KEY_NAME_TEST);
+		int nameLessomIndex = c.getColumnIndex(KEY_NAME_LESSON);
+		int yearIndex = c.getColumnIndex(KEY_YEAR);
+		int tastsNumIndex = c.getColumnIndex(KEY_TASKS_NUM);
+		int loadedIndex = c.getColumnIndex(KEY_LOADED);
+		return new Test(c.getString(dbNameIndex), c.getString(nameTestIndex),
+				c.getString(nameLessomIndex), c.getInt(yearIndex),
+				c.getInt(tastsNumIndex), (c.getInt(loadedIndex) == 0) ? false
+						: true, questions);
 	}
 
 }
