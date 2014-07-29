@@ -167,7 +167,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			try {
 				lesson = jsonArray.getJSONObject(i);
-				values.put(KEY_LINK, lesson.getString(Api.Keys.LINK));
+				values.put(KEY_LINK, lesson.getString(Api.Keys.LINK).replace("-", "_"));
 				values.put(KEY_NAME, lesson.getString(Api.Keys.NAME));
 				values.put(KEY_NAME_ROD, lesson.getString(Api.Keys.NAME_ROD));
 
@@ -373,20 +373,23 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		SQLiteDatabase db = getWritableDatabase();
 		Cursor c = db
-				.query(TABLE_LESSONS_LIST, new String[] { KEY_ID, KEY_NAME },
+				.query(TABLE_LESSONS_LIST, new String[] { KEY_ID, KEY_NAME,KEY_LINK},
 						null, null, null, null, null);
 		String lessonName;
+		String lessonLink;
 		int idLesson;
 		Lesson lesson;
 
 		if (c.moveToFirst()) {
 			int lessonIdIndex = c.getColumnIndex(KEY_ID);
 			int lessonNameIndex = c.getColumnIndex(KEY_NAME);
+			int lessonLinkIndex = c.getColumnIndex(KEY_LINK);
 
 			do {
 				lessonName = c.getString(lessonNameIndex);
 				idLesson = c.getInt(lessonIdIndex);
-				lesson = new Lesson(idLesson, lessonName,
+				lessonLink = c.getString(lessonLinkIndex);
+				lesson = new Lesson(idLesson, lessonName,lessonLink,
 						getTestsCount(idLesson));
 				lessonsList.add(lesson);
 			} while (c.moveToNext());
