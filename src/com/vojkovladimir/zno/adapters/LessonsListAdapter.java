@@ -3,10 +3,13 @@ package com.vojkovladimir.zno.adapters;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vojkovladimir.zno.R;
@@ -14,25 +17,32 @@ import com.vojkovladimir.zno.models.Lesson;
 
 public class LessonsListAdapter extends BaseAdapter {
 
-	private final ArrayList<Lesson> list;
+	private final String TEST_ONE;
+	private final String TESTS_TWO_FOUR;
+	private final String TESTS_OVER_FIVE;
+	private final String PACKAGE_NAME;
+	private final String LOG_TAG = "MyLogs";
+
+	private ArrayList<Lesson> list;
 	private LayoutInflater lInflater;
-	private String testsOne;
-	private String testsTwoFour;
-	private String testsOverFive;
+	private Resources resources;
 
 	static class ViewHolder {
+		public ImageView icon;
 		public TextView name;
 		public TextView testsCounter;
 	}
 
 	public LessonsListAdapter(Context context, ArrayList<Lesson> list) {
 		this.list = list;
+		PACKAGE_NAME = context.getPackageName();
+		resources = context.getResources();
 		lInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		testsOne = context.getResources().getString(R.string.tests_one);
-		testsTwoFour = context.getResources()
+		TEST_ONE = context.getResources().getString(R.string.tests_one);
+		TESTS_TWO_FOUR = context.getResources()
 				.getString(R.string.tests_two_four);
-		testsOverFive = context.getResources().getString(
+		TESTS_OVER_FIVE = context.getResources().getString(
 				R.string.tests_over_five);
 	}
 
@@ -61,6 +71,8 @@ public class LessonsListAdapter extends BaseAdapter {
 					false);
 			ViewHolder viewHolder = new ViewHolder();
 
+			viewHolder.icon = (ImageView) lessonItem
+					.findViewById(R.id.lessons_list_lesson_icon);
 			viewHolder.name = (TextView) lessonItem
 					.findViewById(R.id.lessons_list_lesson_name);
 			viewHolder.testsCounter = (TextView) lessonItem
@@ -70,25 +82,29 @@ public class LessonsListAdapter extends BaseAdapter {
 
 		ViewHolder viewHolder = (ViewHolder) lessonItem.getTag();
 
-		Lesson curLesson = list.get(position);
+		Lesson currentLesson = list.get(position);
 
-		viewHolder.name.setText(curLesson.name);
+		Log.i(LOG_TAG,currentLesson.link);
+		viewHolder.icon.setImageDrawable(resources.getDrawable(resources
+				.getIdentifier("ic_"+currentLesson.link, "drawable", PACKAGE_NAME)));
 
-		String counter = String.valueOf(curLesson.testsCount)+" ";
+		viewHolder.name.setText(currentLesson.name);
 
-		switch (curLesson.testsCount) {
+		String counter = String.valueOf(currentLesson.testsCount) + " ";
+
+		switch (currentLesson.testsCount) {
 		case 1:
-			counter += testsOne;
+			counter += TEST_ONE;
 			break;
 		case 2:
 		case 3:
 		case 4:
-			counter += testsTwoFour;
+			counter += TESTS_TWO_FOUR;
 			break;
 		default:
-			counter += testsOverFive;
+			counter += TESTS_OVER_FIVE;
 		}
-		
+
 		viewHolder.testsCounter.setText(counter);
 
 		return lessonItem;
