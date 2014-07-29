@@ -19,6 +19,15 @@
             android:paddingRight="10dp"
             android:layout_marginBottom="10dp" >
         </FrameLayout>
+        
+        <FrameLayout
+            android:id="@+id/test_answers_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_marginBottom="10dp" >
+        </FrameLayout>
 
         <Button
             android:id="@+id/test_skip_btn"
