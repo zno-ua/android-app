@@ -3,8 +3,7 @@
     android:id="@+id/ScrollView1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="10dp" >
+    android:orientation="vertical" >
 
     <ImageView
         android:id="@+id/app_logo"
@@ -28,6 +27,9 @@
             android:id="@+id/begin_testing_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:onClick="beginTesting"
             android:text="@string/begin_testing_btn_text" />
 
@@ -35,6 +37,9 @@
             android:id="@+id/last_passed_tests_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:onClick="lastPassedTests"
             android:text="@string/last_passed_tests_btn_text" />
 
@@ -42,6 +47,9 @@
             android:id="@+id/records_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:onClick="records"
             android:text="@string/records_btn_text" />
 
@@ -49,6 +57,9 @@
             android:id="@+id/settings_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:onClick="settings"
             android:text="@string/settings_btn_text" />
     </LinearLayout>
@@ -109,12 +120,12 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/quote_divider_2"
         android:layout_below="@id/quote_divider_1"
+        android:clickable="true"
         android:gravity="center_vertical|center_horizontal"
+        android:onClick="refreshQuote"
         android:paddingBottom="16dp"
         android:paddingTop="16dp"
-        android:textSize="17sp"
-        android:onClick="refreshQuote"
-        android:clickable="true"
-        android:textColor="@color/quote_color" />
+        android:textColor="@color/quote_color"
+        android:textSize="17sp" />
 
 </RelativeLayout>
