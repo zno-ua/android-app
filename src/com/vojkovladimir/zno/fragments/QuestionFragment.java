@@ -2,6 +2,8 @@ package com.vojkovladimir.zno.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,17 +15,17 @@ public class QuestionFragment extends Fragment {
 
 	int num;
 	int numMax;
-	String text;
+	Spanned text;
 
 	TextView questNum;
 	TextView questNumFull;
 	TextView questText;
-	
-	public static QuestionFragment newIntstance(int num, int numMax, String text){
+
+	public static QuestionFragment newIntstance(int num, int numMax, String text) {
 		QuestionFragment f = new QuestionFragment();
 		f.num = num;
 		f.numMax = numMax;
-		f.text = text;
+		f.text = Html.fromHtml(text);
 		return f;
 	}
 
