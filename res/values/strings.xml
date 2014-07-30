@@ -11,6 +11,7 @@
     <string name="choose_test_view_text">ОБЕРІТЬ ТЕСТ:</string>
     <string name="needed_to_load_text">необхідно завантажити</string>
     <string name="session_text">сесія</string>
+    <string name="task_text">завдання</string>
     <string name="tasks_text">завдань</string>
     <string name="check_zno_full">Зовнішнє незалежне оцінювання</string>
     <string name="check_zno_lite">Офіційний тест ЗНО</string>

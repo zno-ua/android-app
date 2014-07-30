@@ -98,8 +98,17 @@ public class TestsListAdapter extends BaseAdapter {
 		}
 
 		if (loaded) {
-			testProperties += testInfo.tasksNum + " "
-					+ context.getResources().getString(R.string.tasks_text);
+			testProperties += testInfo.tasksNum + " ";
+			switch(testInfo.tasksNum %10){
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+				testProperties += context.getResources().getString(R.string.task_text);
+				break;
+			default:
+				testProperties += context.getResources().getString(R.string.tasks_text);
+			}
 			viewHolder.downloadFrame.setVisibility(View.GONE);
 		} else {
 			testProperties += context.getResources().getString(
