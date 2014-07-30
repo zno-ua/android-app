@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +19,6 @@ import com.vojkovladimir.zno.models.Test;
 public class TestActivity extends Activity {
 
 	public static String LOG_TAG = "MyLogs";
-	private static String KEY_CURRENT = "MyLogs";
 
 	ZNOApplication app;
 	ZNODataBaseHelper db;
