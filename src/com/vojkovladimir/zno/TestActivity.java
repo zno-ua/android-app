@@ -6,7 +6,9 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -55,20 +57,31 @@ public class TestActivity extends Activity {
 
 		next = (Button) findViewById(R.id.test_skip_btn);
 	}
-
+	
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		outState.putInt(KEY_CURRENT, current);
-		Log.i(LOG_TAG, "TestActivity: onSaveInstanceState()");
-		super.onSaveInstanceState(outState);
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case android.R.id.home:
+	    	finish();
+	        return true;
+	    }
+	    return super.onOptionsItemSelected(item);
 	}
-
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		Log.i(LOG_TAG, "TestActivity: onRestoreInstanceState()");
-		current = savedInstanceState.getInt(KEY_CURRENT);
-		super.onRestoreInstanceState(savedInstanceState);
-	}
+	
+//
+//	@Override
+//	protected void onSaveInstanceState(Bundle outState) {
+//		outState.putInt(KEY_CURRENT, current);
+//		Log.i(LOG_TAG, "TestActivity: onSaveInstanceState()");
+//		super.onSaveInstanceState(outState);
+//	}
+//
+//	@Override
+//	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//		Log.i(LOG_TAG, "TestActivity: onRestoreInstanceState()");
+//		current = savedInstanceState.getInt(KEY_CURRENT);
+//		super.onRestoreInstanceState(savedInstanceState);
+//	}
 
 	@Override
 	protected void onStart() {
@@ -109,6 +122,7 @@ public class TestActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
+		Log.i(LOG_TAG, "TestActivity: onBackPressed()");
 		if (current > 0) {
 			current--;
 			loadQuestion();

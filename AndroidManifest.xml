@@ -42,7 +42,12 @@
                 android:value=".TestingActivity" />
         </activity>
         <activity
-            android:name="TestActivity">
+            android:name="TestActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".LessonTestsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LessonTestsActivity" />
         </activity>
     </application>
 
