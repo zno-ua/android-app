@@ -41,14 +41,28 @@ public class LessonTestsActivity extends Activity {
 		public void onTestLoad(JSONObject json) {
 			try {
 				JSONArray info = json.getJSONArray(Api.INFO);
-				JSONArray response = json.getJSONArray(Api.RESPONSE);
-				String dbName = info.getJSONObject(0).getString(
+				final JSONArray response = json.getJSONArray(Api.RESPONSE);
+				final String dbName = info.getJSONObject(0).getString(
 						Api.Keys.DB_NAME);
-				db.fillTableTest(dbName, response);
-				testsList = db.getLessonTestsList(idLesson);
-				testsListAdapter.setTestsList(testsList);
-				testsListView.invalidateViews();
-				downloadProgress.cancel();
+				final Runnable invalidateList = new Runnable() {
+
+					@Override
+					public void run() {
+						invalidate();
+					}
+				};
+
+				Runnable fillTableTest = new Runnable() {
+
+					@Override
+					public void run() {
+						db.fillTableTest(dbName, response);
+						runOnUiThread(invalidateList);
+						downloadProgress.cancel();
+					}
+				};
+
+				new Thread(fillTableTest).start();
 			} catch (JSONException e) {
 				Log.e(LOG_TAG, "Error on load test: " + e.getMessage());
 			}
@@ -63,10 +77,13 @@ public class LessonTestsActivity extends Activity {
 			if (currTest.loaded) {
 				Intent testActivity = new Intent(getApplicationContext(),
 						TestActivity.class);
-				
-				testActivity.putExtra(ZNOApplication.ExtrasKeys.LESSON_NAME, currTest.lessonName);
-				testActivity.putExtra(ZNOApplication.ExtrasKeys.DB_NAME, currTest.dbName);
-				testActivity.putExtra(ZNOApplication.ExtrasKeys.YEAR, currTest.year);
+
+				testActivity.putExtra(ZNOApplication.ExtrasKeys.LESSON_NAME,
+						currTest.lessonName);
+				testActivity.putExtra(ZNOApplication.ExtrasKeys.DB_NAME,
+						currTest.dbName);
+				testActivity.putExtra(ZNOApplication.ExtrasKeys.YEAR,
+						currTest.year);
 				startActivity(testActivity);
 			} else {
 				TestLoadDialogFragment f = TestLoadDialogFragment.newInstance(
@@ -96,6 +113,12 @@ public class LessonTestsActivity extends Activity {
 		downloadProgress = new ProgressDialog(this);
 		downloadProgress.setMessage(getResources().getString(
 				R.string.progress_test_load));
+	}
+
+	public void invalidate() {
+		testsList = db.getLessonTestsList(idLesson);
+		testsListAdapter.setTestsList(testsList);
+		testsListView.invalidateViews();
 	}
 
 }
