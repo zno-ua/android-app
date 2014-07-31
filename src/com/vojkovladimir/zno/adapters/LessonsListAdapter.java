@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +21,9 @@ public class LessonsListAdapter extends BaseAdapter {
 	private final String TESTS_TWO_FOUR;
 	private final String TESTS_OVER_FIVE;
 	private final String PACKAGE_NAME;
-	private final String LOG_TAG = "MyLogs";
 
-	private ArrayList<Lesson> list;
+	private ArrayList<Lesson> lessonsList;
+	private ArrayList<Drawable> lessonsIconsList;
 	private LayoutInflater lInflater;
 	private Resources resources;
 
@@ -33,27 +33,32 @@ public class LessonsListAdapter extends BaseAdapter {
 		public TextView testsCounter;
 	}
 
-	public LessonsListAdapter(Context context, ArrayList<Lesson> list) {
-		this.list = list;
+	public LessonsListAdapter(Context context, ArrayList<Lesson> lessonsList) {
+		this.lessonsList = lessonsList;
 		PACKAGE_NAME = context.getPackageName();
 		resources = context.getResources();
 		lInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		TEST_ONE = context.getResources().getString(R.string.tests_one);
-		TESTS_TWO_FOUR = context.getResources()
-				.getString(R.string.tests_two_four);
+		TESTS_TWO_FOUR = context.getResources().getString(
+				R.string.tests_two_four);
 		TESTS_OVER_FIVE = context.getResources().getString(
 				R.string.tests_over_five);
+		lessonsIconsList = new ArrayList<Drawable>();
+		for (Lesson lesson : lessonsList) {
+			lessonsIconsList.add(resources.getDrawable(resources.getIdentifier(
+					"ic_" + lesson.link, "drawable", PACKAGE_NAME)));
+		}
 	}
 
 	@Override
 	public int getCount() {
-		return list.size();
+		return lessonsList.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return list.get(position);
+		return lessonsList.get(position);
 	}
 
 	@Override
@@ -63,7 +68,6 @@ public class LessonsListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-
 		View lessonItem = convertView;
 
 		if (lessonItem == null) {
@@ -80,16 +84,7 @@ public class LessonsListAdapter extends BaseAdapter {
 			lessonItem.setTag(viewHolder);
 		}
 
-		ViewHolder viewHolder = (ViewHolder) lessonItem.getTag();
-
-		Lesson currentLesson = list.get(position);
-
-		Log.i(LOG_TAG,currentLesson.link);
-		viewHolder.icon.setImageDrawable(resources.getDrawable(resources
-				.getIdentifier("ic_"+currentLesson.link, "drawable", PACKAGE_NAME)));
-
-		viewHolder.name.setText(currentLesson.name);
-
+		Lesson currentLesson = lessonsList.get(position);
 		String counter = String.valueOf(currentLesson.testsCount) + " ";
 
 		switch (currentLesson.testsCount) {
@@ -104,7 +99,10 @@ public class LessonsListAdapter extends BaseAdapter {
 		default:
 			counter += TESTS_OVER_FIVE;
 		}
-
+		
+		ViewHolder viewHolder = (ViewHolder) lessonItem.getTag();
+		viewHolder.icon.setImageDrawable(lessonsIconsList.get(position));
+		viewHolder.name.setText(currentLesson.name);
 		viewHolder.testsCounter.setText(counter);
 
 		return lessonItem;
