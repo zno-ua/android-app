@@ -17,4 +17,10 @@
     <color name="question_text_color">@color/quote_color</color>
     <color name="question_bg_color">#fff</color>
     
+    <color name="answer_bg_color">@color/question_bg_color</color>
+    <color name="answer_pressed_bg_color">#65b65f</color>
+    <color name="answer_text_color">@color/question_text_color</color>
+    <color name="answer_text_pressed_color">#000</color>
+    
+    
 </resources>

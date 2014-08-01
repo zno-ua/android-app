@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
+import com.vojkovladimir.zno.fragments.AnswersFragment;
 import com.vojkovladimir.zno.fragments.QuestionFragment;
 import com.vojkovladimir.zno.models.Question;
 import com.vojkovladimir.zno.models.Test;
@@ -136,8 +137,11 @@ public class TestActivity extends Activity {
 
 		currentQuestion = QuestionFragment.newIntstance(currQuest.id,
 				test.tasksNum, currQuest.text);
+		
+		AnswersFragment currentQuestionAnswers = AnswersFragment.newIntstance(currQuest.answers.split("\n")); 
 
 		transaction.replace(R.id.test_question_container, currentQuestion);
+		transaction.replace(R.id.test_answers_container, currentQuestionAnswers);
 		transaction.commit();
 	}
 
