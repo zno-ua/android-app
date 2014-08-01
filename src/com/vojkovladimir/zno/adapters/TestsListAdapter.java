@@ -16,7 +16,17 @@ public class TestsListAdapter extends BaseAdapter {
 
 	public static String LOG_TAG = "MyLogs";
 
-	private Context context;
+	private final String ZNO_FULL;
+	private final String ZNO_LIGHT;
+	private final String ZNO;
+	private final String EXP_ZNO;
+	private final String FOR_YEAR;
+	private final String YEAR;
+	private final String SESSION;
+	private final String TASK_TEXT;
+	private final String TASKS_TEXT;
+	private final String NEEDED_TO_LOAD;
+
 	private LayoutInflater lInflater;
 	private ArrayList<TestInfo> testsList;
 
@@ -27,10 +37,20 @@ public class TestsListAdapter extends BaseAdapter {
 	}
 
 	public TestsListAdapter(Context context, ArrayList<TestInfo> testsList) {
-		this.context = context;
 		lInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.testsList = testsList;
+
+		ZNO_FULL = context.getResources().getString(R.string.check_zno_full);
+		ZNO_LIGHT = context.getResources().getString(R.string.check_zno_lite);
+		ZNO = context.getResources().getString(R.string.zno);
+		EXP_ZNO = context.getResources().getString(R.string.exp_zno);
+		FOR_YEAR = context.getResources().getString(R.string.for_year);
+		YEAR = context.getResources().getString(R.string.year);
+		SESSION = context.getResources().getString(R.string.session_text);
+		TASK_TEXT = context.getResources().getString(R.string.task_text);
+		TASKS_TEXT = context.getResources().getString(R.string.tasks_text);
+		NEEDED_TO_LOAD = context.getResources().getString(R.string.needed_to_load_text);
 	}
 
 	@Override
@@ -71,48 +91,41 @@ public class TestsListAdapter extends BaseAdapter {
 
 		TestInfo testInfo = testsList.get(position);
 
-		String testNameFull = testInfo.name;
 		String testName = "";
 		String testProperties = "";
-		String session = context.getResources()
-				.getString(R.string.session_text);
-		boolean loaded = testInfo.loaded;
 
-		if (testNameFull.contains(context.getResources().getString(
-				R.string.check_zno_full))
-				|| testNameFull.contains(context.getResources().getString(
-						R.string.check_zno_lite))) {
-			testName = context.getResources().getString(R.string.zno);
+		if (testInfo.name.contains(ZNO_FULL) || testInfo.name.contains(ZNO_LIGHT)) {
+			testName = ZNO;
 		} else {
-			testName = context.getResources().getString(R.string.exp_zno);
+			testName = EXP_ZNO;
 		}
 
-		testName += " " + context.getResources().getString(R.string.for_year)
-				+ " " + testInfo.year + " "
-				+ context.getResources().getString(R.string.year);
-
-		if (testNameFull.contains("(I " + session + ")")) {
-			testProperties = "I " + session + ", ";
-		} else if (testNameFull.contains("(II " + session + ")")) {
-			testProperties = "II " + session + ", ";
+		testName += " " + FOR_YEAR + " " + testInfo.year + " " + YEAR;
+		
+		if (testInfo.name.contains(SESSION)) {
+			if(testInfo.name.contains("(І ")){
+				testProperties = "I ";
+			}else{
+				testProperties = "II ";
+			}
+			testProperties += SESSION+", ";
 		}
 
-		if (loaded) {
+		if (testInfo.loaded) {
 			testProperties += testInfo.tasksNum + " ";
-			switch(testInfo.tasksNum %10){
+			switch (testInfo.tasksNum % 10) {
 			case 1:
 			case 2:
 			case 3:
 			case 4:
-				testProperties += context.getResources().getString(R.string.task_text);
+				testProperties += TASK_TEXT;
 				break;
 			default:
-				testProperties += context.getResources().getString(R.string.tasks_text);
+				testProperties += TASKS_TEXT;
 			}
 			viewHolder.downloadFrame.setVisibility(View.GONE);
 		} else {
-			testProperties += context.getResources().getString(
-					R.string.needed_to_load_text);
+			testProperties += NEEDED_TO_LOAD;
 			viewHolder.downloadFrame.setVisibility(View.VISIBLE);
 		}
 
@@ -121,13 +134,13 @@ public class TestsListAdapter extends BaseAdapter {
 
 		return testItem;
 	}
-	
+
 	public ArrayList<TestInfo> getTestsList() {
 		return testsList;
 	}
-	
+
 	public void setTestsList(ArrayList<TestInfo> testsList) {
 		this.testsList = testsList;
 	}
-	
+
 }
