@@ -3,6 +3,7 @@ package com.vojkovladimir.zno.adapters;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +51,8 @@ public class TestsListAdapter extends BaseAdapter {
 		SESSION = context.getResources().getString(R.string.session_text);
 		TASK_TEXT = context.getResources().getString(R.string.task_text);
 		TASKS_TEXT = context.getResources().getString(R.string.tasks_text);
-		NEEDED_TO_LOAD = context.getResources().getString(R.string.needed_to_load_text);
+		NEEDED_TO_LOAD = context.getResources().getString(
+				R.string.needed_to_load_text);
 	}
 
 	@Override
@@ -94,21 +96,19 @@ public class TestsListAdapter extends BaseAdapter {
 		String testName = "";
 		String testProperties = "";
 
-		if (testInfo.name.contains(ZNO_FULL) || testInfo.name.contains(ZNO_LIGHT)) {
+		if (testInfo.name.contains(ZNO_FULL)
+				|| testInfo.name.contains(ZNO_LIGHT)) {
 			testName = ZNO;
 		} else {
 			testName = EXP_ZNO;
 		}
 
 		testName += " " + FOR_YEAR + " " + testInfo.year + " " + YEAR;
-		
-		if (testInfo.name.contains(SESSION)) {
-			if(testInfo.name.contains("(І ")){
-				testProperties = "I ";
-			}else{
-				testProperties = "II ";
-			}
-			testProperties += SESSION+", ";
+
+		if (testInfo.name.contains("(I " + SESSION + ")")) {
+			testProperties = "I " + SESSION + ", ";
+		} else if (testInfo.name.contains("(II " + SESSION + ")")) {
+			testProperties = "II " + SESSION + ", ";
 		}
 
 		if (testInfo.loaded) {
