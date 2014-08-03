@@ -2,29 +2,36 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="15dp" >
+    android:orientation="vertical" >
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:textStyle="bold"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
         android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:text="@string/choose_lesson_view_text"
         android:textColor="@color/chooser_text_color"
-        android:text="@string/choose_lesson_view_text"/>
+        android:textStyle="bold" />
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="1.7dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:background="@color/chooser_divider_color"
         android:visibility="visible" />
 
     <ListView
         android:id="@+id/lessons_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-</ListView>
+        android:layout_height="match_parent"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="5dp"
+        android:scrollbarStyle="outsideInset" >
+    </ListView>
 
 </LinearLayout>
