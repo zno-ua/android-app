@@ -3,28 +3,25 @@ package com.vojkovladimir.zno.models;
 public class Question {
 
 	public int id;
-	public int idQuest;
-	public int type;
-	public String text;
+	public int idTestQuestion;
+	public String question;
 	public String answers;
-	public String correct;
-	public int ball;
+	public String correctAnswer;
+	public int balls;
+	public int typeQuestion;
+	public String test;
 
-	public Question(int id, int idQuest, int type, String text, String answers,
-			String correct, int ball) {
+	public Question(int id, int idTestQuestion, String question,
+			String answers, String correctAnswer, int balls, int typeQuestion,
+			String test) {
 		this.id = id;
-		this.idQuest = idQuest;
-		this.type = type;
-		this.text = text;
+		this.idTestQuestion = idTestQuestion;
+		this.question = question;
 		this.answers = answers;
-		this.correct = correct;
-		this.ball = ball;
-
-	}
-	
-	@Override
-	public String toString() {
-		return "# "+id+" "+idQuest+" "+type+" "+text+" "+answers+" "+correct+" "+ball+" @";
+		this.correctAnswer = correctAnswer;
+		this.balls = balls;
+		this.typeQuestion = typeQuestion;
+		this.test = test;
 	}
 
 }
