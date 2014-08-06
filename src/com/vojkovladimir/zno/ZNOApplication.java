@@ -1,8 +1,5 @@
 package com.vojkovladimir.zno;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
@@ -10,7 +7,6 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.vojkovladimir.zno.api.Api;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 
 public class ZNOApplication extends Application {
@@ -21,20 +17,20 @@ public class ZNOApplication extends Application {
 	private static ZNOApplication mInstance;
 	private RequestQueue mRequestQueue;
 	private ZNODataBaseHelper znoDBHelper;
-	
-	public interface ExtrasKeys{
+
+	public interface ExtrasKeys {
 		String LESSON_NAME = "lesson_name";
-		String ID_LESSON = "id-lesson";
-		String TEST_NAME = "test_name";
-		String DB_NAME = "db-name";
-		String YEAR = "year";
+		String LINK = "link";
+		String ID_LESSON = "id_lesson";
+		String ID_TEST = "id_test";
+		String TABLE_NAME= "table_name";
 	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		mInstance = this;
-		Log.d(LOG_TAG, "App Instance created.");
+		Log.v(LOG_TAG, "App Instance created.");
 	}
 
 	public static synchronized ZNOApplication getInstance() {
@@ -70,31 +66,6 @@ public class ZNOApplication extends Application {
 	public void cancelPendingRequests(Object tag) {
 		if (mRequestQueue != null) {
 			mRequestQueue.cancelAll(tag);
-		}
-	}
-
-	public void onTestsListRespose(JSONObject responseObject) {
-		try {
-			Log.i(LOG_TAG, "ZNOApplication received TestListRespose");
-			getZnoDataBaseHelper().fillTableTestsList(
-					responseObject.getJSONArray(Api.RESPONSE));
-		} catch (JSONException e) {
-			Log.e(LOG_TAG,
-					"Can't get TestListResposne from JSON:\n"
-							+ e.getMessage());
-		}
-	}
-
-	public void onTestRespose(String testTableName, JSONObject responseObject) {
-		try {
-			Log.i(LOG_TAG,
-					"ZNOApplication received Test "
-							+ testTableName);
-			getZnoDataBaseHelper().fillTableTest(testTableName, responseObject.getJSONArray(Api.RESPONSE));
-		} catch (JSONException e) {
-			Log.e(LOG_TAG,
-					"Can't get TestResposne from JSON:\n"
-							+ e.getMessage());
 		}
 	}
 
