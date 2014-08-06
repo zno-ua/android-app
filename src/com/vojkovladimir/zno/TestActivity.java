@@ -41,46 +41,44 @@ public class TestActivity extends Activity {
 		Log.i(LOG_TAG, "TestActivity: onCreate()");
 
 		Intent intent = getIntent();
-		setTitle(intent.getStringExtra(ZNOApplication.ExtrasKeys.LESSON_NAME)
-				+ " " + intent.getIntExtra(ZNOApplication.ExtrasKeys.YEAR, 0));
 
 		app = ZNOApplication.getInstance();
 		db = app.getZnoDataBaseHelper();
 		manager = getFragmentManager();
 
-		String dbName = intent
-				.getStringExtra(ZNOApplication.ExtrasKeys.DB_NAME);
+		String tableName = intent
+				.getStringExtra(ZNOApplication.ExtrasKeys.TABLE_NAME);
 
-		test = db.getTest(dbName);
+		test = db.getTest(tableName);
 		current = 0;
 
 		next = (Button) findViewById(R.id.test_skip_btn);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    switch (item.getItemId()) {
-	    case android.R.id.home:
-	    	finish();
-	        return true;
-	    }
-	    return super.onOptionsItemSelected(item);
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
-	
-//
-//	@Override
-//	protected void onSaveInstanceState(Bundle outState) {
-//		outState.putInt(KEY_CURRENT, current);
-//		Log.i(LOG_TAG, "TestActivity: onSaveInstanceState()");
-//		super.onSaveInstanceState(outState);
-//	}
-//
-//	@Override
-//	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//		Log.i(LOG_TAG, "TestActivity: onRestoreInstanceState()");
-//		current = savedInstanceState.getInt(KEY_CURRENT);
-//		super.onRestoreInstanceState(savedInstanceState);
-//	}
+
+	//
+	// @Override
+	// protected void onSaveInstanceState(Bundle outState) {
+	// outState.putInt(KEY_CURRENT, current);
+	// Log.i(LOG_TAG, "TestActivity: onSaveInstanceState()");
+	// super.onSaveInstanceState(outState);
+	// }
+	//
+	// @Override
+	// protected void onRestoreInstanceState(Bundle savedInstanceState) {
+	// Log.i(LOG_TAG, "TestActivity: onRestoreInstanceState()");
+	// current = savedInstanceState.getInt(KEY_CURRENT);
+	// super.onRestoreInstanceState(savedInstanceState);
+	// }
 
 	@Override
 	protected void onStart() {
@@ -109,11 +107,11 @@ public class TestActivity extends Activity {
 
 	public void skip(View v) {
 
-		if (current < test.tasksNum) {
+		if (current < test.taskAll) {
 			current++;
 		} else {
-			//end of testing
-			//print result
+			// end of testing
+			// print result
 			current = 0;
 		}
 		loadQuestion();
@@ -133,15 +131,17 @@ public class TestActivity extends Activity {
 	private void loadQuestion() {
 		transaction = manager.beginTransaction();
 
-		Question currQuest = test.questions.get(current);
+		Question question = test.questions.get(current);
 
-		currentQuestion = QuestionFragment.newIntstance(currQuest.id,
-				test.tasksNum, currQuest.text);
-		
-		AnswersFragment currentQuestionAnswers = AnswersFragment.newIntstance(currQuest.answers.split("\n")); 
+		currentQuestion = QuestionFragment.newIntstance(question.id,
+				test.taskAll, question.question);
+
+		AnswersFragment currentQuestionAnswers = AnswersFragment
+				.newIntstance(question.answers.split("\n"));
 
 		transaction.replace(R.id.test_question_container, currentQuestion);
-		transaction.replace(R.id.test_answers_container, currentQuestionAnswers);
+		transaction
+				.replace(R.id.test_answers_container, currentQuestionAnswers);
 		transaction.commit();
 	}
 
