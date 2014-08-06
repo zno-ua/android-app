@@ -3,7 +3,6 @@ package com.vojkovladimir.zno.adapters;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +13,6 @@ import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.models.TestInfo;
 
 public class TestsListAdapter extends BaseAdapter {
-
-	public static String LOG_TAG = "MyLogs";
 
 	private final String ZNO_FULL;
 	private final String ZNO_LIGHT;
@@ -112,8 +109,8 @@ public class TestsListAdapter extends BaseAdapter {
 		}
 
 		if (testInfo.loaded) {
-			testProperties += testInfo.tasksNum + " ";
-			switch (testInfo.tasksNum % 10) {
+			testProperties += testInfo.taskAll + " ";
+			switch (testInfo.taskAll % 10) {
 			case 1:
 			case 2:
 			case 3:
