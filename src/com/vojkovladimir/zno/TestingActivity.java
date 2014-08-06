@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -21,7 +20,7 @@ public class TestingActivity extends Activity {
 	ListView lessonsListView;
 
 	LessonsListAdapter lessonsListAdapter;
-	ArrayList<Lesson> lessonsList;
+	ArrayList<Lesson> lessons;
 
 	int[] lessonsIds;
 
@@ -29,19 +28,15 @@ public class TestingActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position,
 				long id) {
-			try {
-				Intent testsList = new Intent(getApplicationContext(),
-						LessonTestsActivity.class);
-				testsList.putExtra(ZNOApplication.ExtrasKeys.ID_LESSON,
-						lessonsList.get(position).id);
-				testsList.putExtra(ZNOApplication.ExtrasKeys.LESSON_NAME,
-						lessonsList.get(position).name);
-
-				startActivity(testsList);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				Log.e(LOG_TAG, "You try to select lesson #" + position
-						+ " from list.");
-			}
+			Intent testsList = new Intent(getApplicationContext(),
+					LessonTestsActivity.class);
+			testsList.putExtra(ZNOApplication.ExtrasKeys.ID_LESSON,
+					lessons.get(position).id);
+			testsList.putExtra(ZNOApplication.ExtrasKeys.LESSON_NAME,
+					lessons.get(position).name);
+			testsList.putExtra(ZNOApplication.ExtrasKeys.LINK,
+					lessons.get(position).link);
+			startActivity(testsList);
 		}
 	};
 
@@ -50,8 +45,10 @@ public class TestingActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_testing);
 
-		lessonsList = ZNOApplication.getInstance().getZnoDataBaseHelper().getLessonsList();
-		lessonsListAdapter = new LessonsListAdapter(this, lessonsList);
+		lessons = new ArrayList<Lesson>();
+		lessons = ZNOApplication.getInstance().getZnoDataBaseHelper()
+				.getLessons();
+		lessonsListAdapter = new LessonsListAdapter(this, lessons);
 		lessonsListView = (ListView) findViewById(R.id.lessons_list_view);
 		lessonsListView.setAdapter(lessonsListAdapter);
 		lessonsListView.setOnItemClickListener(itemListener);
