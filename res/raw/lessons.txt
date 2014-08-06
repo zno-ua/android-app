@@ -1,0 +1,47 @@
+[
+    {
+      "id": 1,
+      "link": "ukrainian",
+      "name": "Українська мова"
+    },
+    {
+      "id": 2,
+      "link": "history-ukr",
+      "name": "Історія України"
+    },
+    {
+      "id": 3,
+      "link": "history-world",
+      "name": "Всесвітня історія"
+    },
+    {
+      "id": 4,
+      "link": "math",
+      "name": "Математика"
+    },
+    {
+      "id": 5,
+      "link": "biology",
+      "name": "Біологія"
+    },
+    {
+      "id": 6,
+      "link": "geography",
+      "name": "Географія"
+    },
+    {
+      "id": 7,
+      "link": "english",
+      "name": "Англійська мова"
+    },
+    {
+      "id": 8,
+      "link": "physics",
+      "name": "Фізика"
+    },
+    {
+      "id": 9,
+      "link": "chemistry",
+      "name": "Хімія"
+    }
+  ]
