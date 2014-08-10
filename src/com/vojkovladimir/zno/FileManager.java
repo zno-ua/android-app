@@ -8,9 +8,7 @@ import java.io.IOException;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 public class FileManager {
 
@@ -22,7 +20,7 @@ public class FileManager {
 		FILES_PATH = context.getFilesDir().getAbsolutePath();
 	}
 
-	public void saveDrawable(String path, String name, Drawable drawable) {
+	public void saveBitmap(String path, String name, Bitmap bitmap) {
 		File dir = new File(path);
 		if (!dir.exists()) {
 			createFolder(path);
@@ -33,7 +31,6 @@ public class FileManager {
 		try {
 			file.createNewFile();
 			FileOutputStream fout = new FileOutputStream(file);
-			Bitmap bd = ((BitmapDrawable) drawable).getBitmap();
 
 			if (name.contains("jpg")) {
 				format = Bitmap.CompressFormat.JPEG;
@@ -42,13 +39,10 @@ public class FileManager {
 				format = Bitmap.CompressFormat.PNG;
 			}
 			
-			bd.compress(format, 100, fout);
+			bitmap.compress(format, 100, fout);
 		} catch (IOException e) {
-			Log.e("MyLogs", file.getAbsolutePath() + " can't create!");
-			Log.e("MyLogs", e.toString());
 			e.printStackTrace();
 		}
-
 	}
 
 	public Drawable openDrawable(String path) throws FileNotFoundException {
@@ -75,8 +69,6 @@ public class FileManager {
 					folder.mkdir();
 				}
 				fullPath += "/";
-				Log.i("MyLogs", folder.getAbsolutePath()
-						+ ((folder.exists()) ? " created" : " don't created"));
 			}
 		}
 	}
