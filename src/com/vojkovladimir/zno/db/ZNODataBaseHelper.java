@@ -369,7 +369,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	public Test getTest(String tableName) {
 		ArrayList<Question> questions = new ArrayList<Question>();
 		TestInfo testInfo = null;
-		int id = Integer.parseInt(tableName.split("_", 3)[2]);
+		int id = Integer.parseInt(tableName.substring(
+				tableName.lastIndexOf('_') + 1, tableName.length()));
 
 		SQLiteDatabase db = getWritableDatabase();
 
