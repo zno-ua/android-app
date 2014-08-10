@@ -9,13 +9,15 @@ import com.android.volley.toolbox.JsonObjectRequest;
 public class Api {
 	public static String LOG_TAG = "MyLogs";
 
-	public static final String API_URL = "http://new.zno-ua.net/api/v1/";
+	public static final String SITE_URL = "http://new.zno-ua.net";
+	public static final String API_URL = SITE_URL + "/api/v1/";
 	public static final String GET_LESSONS = "lesson/?format=json";
 	public static final String GET_TESTS = "test/?format=json";
 	public static final String GET_TEST = "question/?format=json&test=";
 
 	public interface Keys {
 		String OBJECTS = "objects";
+		String IMAGES = "images";
 		String META = "meta";
 		String ID = "id";
 		String ID_ON_TEST = "id_on_test";
@@ -36,23 +38,8 @@ public class Api {
 		String QUESTION = "question";
 		String TEST = "test";
 		String TYPE_QUESTION = "type_question";
-
-		// String ID_QUEST = "id-quest";
-		// String ID_LESSON = "id-lesson";
-		// String LINK = "link";
-
-		// String NAME_ROD = "name_rod";
-		// String DB_NAME = "db-name";
-		// String NAME_LESSON = "name-lesson";
-		// String LINK_LESSON = "link-lesson";
-		// String NAME_TEST = "name-test";
-
-		// String TASK_BLOCKS = "task-blocks";
-		// String TASKS_NUM = "tasks-num";
-		// String TASK_TEST = "task-test";
-		// String TASK_TEXTS = "task-texts";
-		// String TASK_VIDPOV = "task-vidpov";
-		// String TASK_ANS = "task-ans";
+		String IMAGES_PATH = "images_path";
+		
 	}
 
 	public static JsonObjectRequest getTestsListRequest(

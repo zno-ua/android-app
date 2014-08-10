@@ -133,7 +133,7 @@ public class TestActivity extends Activity {
 
 		Question question = test.questions.get(current);
 
-		currentQuestion = QuestionFragment.newIntstance(question.id,
+		currentQuestion = QuestionFragment.newIntstance(this,question.id,
 				test.taskAll, question.question);
 
 		AnswersFragment currentQuestionAnswers = AnswersFragment

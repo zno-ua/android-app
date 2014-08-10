@@ -13,8 +13,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.vojkovladimir.zno.adapters.TestsListAdapter;
 import com.vojkovladimir.zno.api.Api;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
@@ -56,8 +57,8 @@ public class LessonTestsActivity extends Activity {
 
 				testActivity.putExtra(ZNOApplication.ExtrasKeys.TABLE_NAME,
 						link + "_" + test.year + "_" + test.id);
-				testActivity.putExtra(ZNOApplication.ExtrasKeys.ID_TEST,
-						""+test.id);
+				testActivity.putExtra(ZNOApplication.ExtrasKeys.ID_TEST, ""
+						+ test.id);
 				startActivity(testActivity);
 			} else {
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
@@ -74,7 +75,11 @@ public class LessonTestsActivity extends Activity {
 						try {
 							final JSONArray questions = responce
 									.getJSONArray(Api.Keys.OBJECTS);
-
+							final String path = responce
+									.getString(Api.Keys.IMAGES_PATH);
+							final JSONArray images = responce
+									.getJSONArray(Api.Keys.IMAGES);
+							
 							final Runnable invalidateList = new Runnable() {
 
 								@Override
@@ -82,23 +87,51 @@ public class LessonTestsActivity extends Activity {
 									invalidate();
 								}
 							};
+							
+							final FileManager fm = new FileManager(getApplicationContext());
 
-							Runnable fillTableTest = new Runnable() {
+							Runnable saveTest = new Runnable() {
 
 								@Override
 								public void run() {
-									db.updateTableTest(link, test.year,
-											test.id, questions);
+									for (int i = 0; i < images.length(); i++) {
+										try {
+											final String name = images.getJSONObject(i).getString(Api.Keys.NAME);
+											final Listener<Bitmap> imagesListener = new Listener<Bitmap>() {
+
+												@Override
+												public void onResponse(Bitmap image) {
+													fm.saveBitmap(path, name, image);
+												}
+											};
+											
+											final ErrorListener errorListener = new ErrorListener() {
+
+												@Override
+												public void onErrorResponse(VolleyError error) {
+													error.printStackTrace();
+												}
+											};
+
+											app.addToRequestQueue(new ImageRequest(
+													Api.SITE_URL + path +"/"+ name,
+													imagesListener, 0, 0, null,
+													errorListener));
+										} catch (JSONException e) {
+											e.printStackTrace();
+										}
+									}
+
+									db.updateTableTest(link, test.year,test.id, questions);
 									runOnUiThread(invalidateList);
 									downloadProgress.cancel();
 								}
 							};
 
-							new Thread(fillTableTest).start();
+							new Thread(saveTest).start();
 
 						} catch (JSONException e) {
 							e.printStackTrace();
-							Log.e("jsonErrors", e.toString());
 						}
 						downloadProgress.cancel();
 					}
