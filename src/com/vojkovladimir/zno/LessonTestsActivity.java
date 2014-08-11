@@ -75,10 +75,6 @@ public class LessonTestsActivity extends Activity {
 						try {
 							final JSONArray questions = responce
 									.getJSONArray(Api.Keys.OBJECTS);
-							final String path = responce
-									.getString(Api.Keys.IMAGES_PATH);
-							final JSONArray images = responce
-									.getJSONArray(Api.Keys.IMAGES);
 							
 							final Runnable invalidateList = new Runnable() {
 
@@ -94,29 +90,35 @@ public class LessonTestsActivity extends Activity {
 
 								@Override
 								public void run() {
-									for (int i = 0; i < images.length(); i++) {
+									for (int i = 0; i < questions.length(); i++) {
 										try {
-											final String name = images.getJSONObject(i).getString(Api.Keys.NAME);
-											final Listener<Bitmap> imagesListener = new Listener<Bitmap>() {
-
-												@Override
-												public void onResponse(Bitmap image) {
-													fm.saveBitmap(path, name, image);
-												}
-											};
+											final JSONArray images = questions.getJSONObject(i).getJSONArray(Api.Keys.IMAGES); 
+											final String path = questions.getJSONObject(i).getString(Api.Keys.IMAGES_RELATIVE_URL);
 											
-											final ErrorListener errorListener = new ErrorListener() {
+											for(int j = 0; j<images.length();j++){
+												final String name = images.getJSONObject(j).getString(Api.Keys.NAME);
+												
+												final Listener<Bitmap> imagesListener = new Listener<Bitmap>() {
 
-												@Override
-												public void onErrorResponse(VolleyError error) {
-													error.printStackTrace();
-												}
-											};
+													@Override
+													public void onResponse(Bitmap image) {
+														fm.saveBitmap(path, name, image);
+													}
+												};
+												
+												final ErrorListener errorListener = new ErrorListener() {
 
-											app.addToRequestQueue(new ImageRequest(
-													Api.SITE_URL + path +"/"+ name,
-													imagesListener, 0, 0, null,
-													errorListener));
+													@Override
+													public void onErrorResponse(VolleyError error) {
+														error.printStackTrace();
+													}
+												};
+
+												app.addToRequestQueue(new ImageRequest(Api.SITE_URL + path +"/"+ name,
+														imagesListener, 0, 0, null,
+														errorListener));
+											}
+											
 										} catch (JSONException e) {
 											e.printStackTrace();
 										}
