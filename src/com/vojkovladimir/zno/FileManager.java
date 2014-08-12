@@ -8,6 +8,8 @@ import java.io.IOException;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 public class FileManager {
@@ -49,7 +51,7 @@ public class FileManager {
 		File drawable = new File(FILES_PATH + path);
 		if (drawable.exists()) {
 			FileInputStream fis = new FileInputStream(drawable);
-			return Drawable.createFromStream(fis, null);
+			return new BitmapDrawable(context.getResources(), BitmapFactory.decodeStream(fis));
 		} else {
 			return null;
 		}
