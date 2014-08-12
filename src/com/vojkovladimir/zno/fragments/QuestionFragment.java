@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +17,7 @@ import android.widget.TextView;
 import com.vojkovladimir.zno.FileManager;
 import com.vojkovladimir.zno.R;
 
-public class QuestionFragment extends Fragment {
-
-	Context context;
+public class QuestionFragment extends Fragment{
 
 	int id;
 	int taskAll;
@@ -33,7 +32,6 @@ public class QuestionFragment extends Fragment {
 	public static QuestionFragment newIntstance(Context context, int id,
 			int taskAll, String question) {
 		QuestionFragment f = new QuestionFragment();
-		f.context = context;
 		f.id = id;
 		f.taskAll = taskAll;
 		f.question = question;
@@ -61,6 +59,7 @@ public class QuestionFragment extends Fragment {
 
 		public Drawable getDrawable(String source) {
 			Drawable drawable = null;
+
 			try {
 				drawable = fm.openDrawable(source);
 			} catch (FileNotFoundException e) {
@@ -68,12 +67,25 @@ public class QuestionFragment extends Fragment {
 			}
 
 			if (drawable == null) {
-				drawable = context.getResources().getDrawable(
-						R.drawable.emo_im_crying);
+				drawable = getResources().getDrawable(R.drawable.emo_im_crying);
 			}
-			drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
-					drawable.getIntrinsicHeight());
+
+			DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+
+			int width = (int) (drawable.getIntrinsicWidth() * displayMetrics.scaledDensity);
+			int heigth = (int) (drawable.getIntrinsicHeight() * displayMetrics.scaledDensity);
+			int maxWidth = (int) (displayMetrics.widthPixels * 0.75f);
+
+			if (width > maxWidth) {
+				float scale = (float) maxWidth / (float) width;
+				width = maxWidth;
+				heigth = (int) (heigth * scale);
+			}
+
+			drawable.setBounds(0, 0, width, heigth);
+
 			return drawable;
 		}
 	};
+	
 }
