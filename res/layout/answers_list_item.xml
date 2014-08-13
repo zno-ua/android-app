@@ -29,12 +29,16 @@
             android:textSize="16sp" />
     </FrameLayout>
 
+    <Space
+        android:layout_width="6dp"
+        android:layout_height="match_parent" />
+
     <TextView
         android:id="@+id/answer_item_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="center_vertical|left"
+        android:gravity="center_vertical|start"
         android:minHeight="36dp"
         android:text="@string/loren_ipsum_text"
         android:textColor="@drawable/answers_list_item_text_color"
