@@ -137,7 +137,7 @@ public class TestActivity extends Activity {
 				test.taskAll, question.question);
 
 		AnswersFragment currentQuestionAnswers = AnswersFragment
-				.newIntstance(question.answers.split("\n"));
+				.newIntstance(this,question.answers.split("\n"));
 
 		transaction.replace(R.id.test_question_container, currentQuestion);
 		transaction
