@@ -24,6 +24,7 @@ public class ZNOApplication extends Application {
 		String ID_LESSON = "id_lesson";
 		String ID_TEST = "id_test";
 		String TABLE_NAME= "table_name";
+		String IMG_SOURCE = "src";
 	}
 
 	@Override

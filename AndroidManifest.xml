@@ -35,7 +35,7 @@
         </activity>
         <activity
             android:name="LessonTestsActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" 
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".TestingActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -48,6 +48,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LessonTestsActivity" />
+        </activity>
+        <activity
+            android:name="ViewImageActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
     </application>
 
