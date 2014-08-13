@@ -1,9 +1,12 @@
 package com.vojkovladimir.zno.fragments;
 
 import java.io.FileNotFoundException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Html;
@@ -11,13 +14,16 @@ import android.text.Html.ImageGetter;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.vojkovladimir.zno.FileManager;
 import com.vojkovladimir.zno.R;
+import com.vojkovladimir.zno.ViewImageActivity;
+import com.vojkovladimir.zno.ZNOApplication;
 
-public class QuestionFragment extends Fragment{
+public class QuestionFragment extends Fragment implements OnClickListener {
 
 	int id;
 	int taskAll;
@@ -51,6 +57,7 @@ public class QuestionFragment extends Fragment{
 		tvId.setText(getResources().getString(R.string.question) + " " + id);
 		tvTaskAll.setText(id + "/" + taskAll);
 		tvQuestion.setText(Html.fromHtml(question, imgGetter, null));
+		tvQuestion.setOnClickListener(this);
 
 		return v;
 	}
@@ -87,5 +94,19 @@ public class QuestionFragment extends Fragment{
 			return drawable;
 		}
 	};
-	
+
+	@Override
+	public void onClick(View v) {
+		if (question.contains("href")) {
+			Matcher matcher = Pattern.compile("<img src=\"([^\"]+)").matcher(
+					question);
+			while (matcher.find()) {
+				Intent viewImage = new Intent(getActivity(),
+						ViewImageActivity.class);
+				viewImage.putExtra(ZNOApplication.ExtrasKeys.IMG_SOURCE,
+						matcher.group(1));
+				startActivity(viewImage);
+			}
+		}
+	}
 }
