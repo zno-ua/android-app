@@ -15,6 +15,8 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -180,6 +182,7 @@ public class LessonTestsActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tests_list);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		app = ZNOApplication.getInstance();
 		db = app.getZnoDataBaseHelper();
@@ -197,6 +200,16 @@ public class LessonTestsActivity extends Activity {
 		testsListView.setOnItemClickListener(itemListener);
 		downloadProgressMessage = getResources().getString(
 				R.string.progress_test_load);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case android.R.id.home:
+	        NavUtils.navigateUpFromSameTask(this);
+	        return true;
+	    }
+	    return super.onOptionsItemSelected(item);
 	}
 
 	public void invalidate() {

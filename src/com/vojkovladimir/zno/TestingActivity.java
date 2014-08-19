@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -44,6 +46,7 @@ public class TestingActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_testing);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		lessons = new ArrayList<Lesson>();
 		lessons = ZNOApplication.getInstance().getZnoDataBaseHelper()
@@ -52,5 +55,15 @@ public class TestingActivity extends Activity {
 		lessonsListView = (ListView) findViewById(R.id.lessons_list_view);
 		lessonsListView.setAdapter(lessonsListAdapter);
 		lessonsListView.setOnItemClickListener(itemListener);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case android.R.id.home:
+	        NavUtils.navigateUpFromSameTask(this);
+	        return true;
+	    }
+	    return super.onOptionsItemSelected(item);
 	}
 }
