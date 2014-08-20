@@ -16,31 +16,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vojkovladimir.zno.FileManager;
 import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.ViewImageActivity;
 import com.vojkovladimir.zno.ZNOApplication;
+import com.vojkovladimir.zno.models.Question;
 
 public class QuestionFragment extends Fragment implements OnClickListener {
 
-	int id;
+	Question question;
 	int taskAll;
-	String question;
-
-	TextView tvId;
-	TextView tvTaskAll;
-	TextView tvQuestion;
 
 	FileManager fm;
 
-	public static QuestionFragment newIntstance(Context context, int id,
-			int taskAll, String question) {
+	public static QuestionFragment newIntstance(Context context,
+			Question question, int taskAll) {
 		QuestionFragment f = new QuestionFragment();
-		f.id = id;
-		f.taskAll = taskAll;
 		f.question = question;
+		f.taskAll = taskAll;
 		f.fm = new FileManager(context);
 		return f;
 	}
@@ -50,14 +46,70 @@ public class QuestionFragment extends Fragment implements OnClickListener {
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.question, container, false);
 
-		tvId = (TextView) v.findViewById(R.id.test_question_num);
-		tvTaskAll = (TextView) v.findViewById(R.id.test_question_num_full);
-		tvQuestion = (TextView) v.findViewById(R.id.test_question_text);
+		switch (question.typeQuestion) {
+		case Question.TYPE_1: {
+			v.findViewById(R.id.test_question_header).setVisibility(
+					View.VISIBLE);
 
-		tvId.setText(getResources().getString(R.string.question) + " " + id);
-		tvTaskAll.setText(id + "/" + taskAll);
-		tvQuestion.setText(Html.fromHtml(question, imgGetter, null));
-		tvQuestion.setOnClickListener(this);
+			TextView tvId = (TextView) v.findViewById(R.id.test_question_num);
+			TextView tvTaskAll = (TextView) v
+					.findViewById(R.id.test_question_num_full);
+			TextView tvQuestion = (TextView) v
+					.findViewById(R.id.test_question_text);
+
+			tvId.setText(getResources().getString(R.string.question) + " "
+					+ question.idTestQuestion);
+			tvTaskAll.setText(question.idTestQuestion + "/" + taskAll);
+			tvQuestion.setText(Html
+					.fromHtml(question.question, imgGetter, null));
+			tvQuestion.setOnClickListener(this);
+
+			LinearLayout answersList = (LinearLayout) v
+					.findViewById(R.id.test_question_answers_list);
+
+			String[] answers = question.answers.split("\n");
+
+			TextView tvLetter;
+			TextView tvAnswer;
+			View answerItem;
+			String answer;
+			String letter;
+			String[] tmp;
+
+			for (int i = 0; i < answers.length; i++) {
+				answerItem = inflater.inflate(R.layout.answers_list_item,
+						answersList, false);
+
+				tmp = answers[i].split(". ", 2);
+				if (tmp.length == 2) {
+					letter = tmp[0];
+					answer = tmp[1];
+				} else {
+					letter = "";
+					answer = "";
+					break;
+				}
+				tvAnswer = (TextView) answerItem
+						.findViewById(R.id.answer_item_text);
+				tvAnswer.setText(Html.fromHtml(answer, imgGetter, null));
+
+				tvLetter = (TextView) answerItem
+						.findViewById(R.id.answer_item_letter);
+				tvLetter.setText(Html.fromHtml(letter, imgGetter, null));
+
+				answersList.addView(answerItem);
+			}
+		}
+
+			break;
+		case Question.TYPE_2: {
+			v.findViewById(R.id.test_question_header).setVisibility(View.GONE);
+			TextView tvQuestion = (TextView) v
+					.findViewById(R.id.test_question_text);
+			tvQuestion.setText(Html.fromHtml(question.question));
+		}
+			break;
+		}
 
 		return v;
 	}
@@ -97,9 +149,9 @@ public class QuestionFragment extends Fragment implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		if (question.contains("href")) {
+		if (question.question.contains("href")) {
 			Matcher matcher = Pattern.compile("<img src=\"([^\"]+)").matcher(
-					question);
+					question.question);
 			while (matcher.find()) {
 				Intent viewImage = new Intent(getActivity(),
 						ViewImageActivity.class);

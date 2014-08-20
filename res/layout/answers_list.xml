@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:dividerPadding="10dp"
-    android:divider="@drawable/answers_list_divider"
-    android:showDividers="middle"
-    android:orientation="vertical">
-</LinearLayout>
