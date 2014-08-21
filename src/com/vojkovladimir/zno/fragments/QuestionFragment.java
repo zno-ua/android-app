@@ -1,6 +1,7 @@
 package com.vojkovladimir.zno.fragments;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +17,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.vojkovladimir.zno.FileManager;
@@ -25,15 +28,14 @@ import com.vojkovladimir.zno.ViewImageActivity;
 import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.models.Question;
 
-public class QuestionFragment extends Fragment implements OnClickListener {
+public class QuestionFragment extends Fragment {
 
 	Question question;
 	int taskAll;
 
 	FileManager fm;
 
-	public static QuestionFragment newIntstance(Context context,
-			Question question, int taskAll) {
+	public static QuestionFragment newIntstance(Context context, Question question, int taskAll) {
 		QuestionFragment f = new QuestionFragment();
 		f.question = question;
 		f.taskAll = taskAll;
@@ -46,67 +48,81 @@ public class QuestionFragment extends Fragment implements OnClickListener {
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.question, container, false);
 
+		View questionHeader = v.findViewById(R.id.test_question_header);
+		TextView questionNum = (TextView) v.findViewById(R.id.test_question_num);
+		TextView questionNumFull = (TextView) v.findViewById(R.id.test_question_num_full);
+		questionNum.setText(getResources().getString(R.string.question) + " " + question.idTestQuestion);
+		questionNumFull.setText(question.idTestQuestion + "/" + taskAll);
+		
+		TextView questionText = (TextView) v.findViewById(R.id.test_question_text);
+		LinearLayout answersList = (LinearLayout) v.findViewById(R.id.test_question_answers_list);
+		View answerItem;
+		TextView answerItemLetter;
+		TextView answerItemText;
+		TextView answerCoupleNum;
+		Spinner answersCoupleVars;
+		
 		switch (question.typeQuestion) {
 		case Question.TYPE_1: {
-			v.findViewById(R.id.test_question_header).setVisibility(
-					View.VISIBLE);
-
-			TextView tvId = (TextView) v.findViewById(R.id.test_question_num);
-			TextView tvTaskAll = (TextView) v
-					.findViewById(R.id.test_question_num_full);
-			TextView tvQuestion = (TextView) v
-					.findViewById(R.id.test_question_text);
-
-			tvId.setText(getResources().getString(R.string.question) + " "
-					+ question.idTestQuestion);
-			tvTaskAll.setText(question.idTestQuestion + "/" + taskAll);
-			tvQuestion.setText(Html
-					.fromHtml(question.question, imgGetter, null));
-			tvQuestion.setOnClickListener(this);
-
-			LinearLayout answersList = (LinearLayout) v
-					.findViewById(R.id.test_question_answers_list);
+			questionHeader.setVisibility(View.VISIBLE);
+			questionText.setText(Html.fromHtml(question.question, imgGetter, null));
+			questionText.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					if(question.question.contains("href")){
+						openImage(parseSRC(question.question));
+					}
+				}
+			});
 
 			String[] answers = question.answers.split("\n");
-
-			TextView tvLetter;
-			TextView tvAnswer;
-			View answerItem;
-			String answer;
-			String letter;
 			String[] tmp;
 
 			for (int i = 0; i < answers.length; i++) {
-				answerItem = inflater.inflate(R.layout.answers_list_item,
-						answersList, false);
+				answerItem = inflater.inflate(R.layout.answers_list_item,answersList, false);
 
 				tmp = answers[i].split(". ", 2);
-				if (tmp.length == 2) {
-					letter = tmp[0];
-					answer = tmp[1];
-				} else {
-					letter = "";
-					answer = "";
-					break;
-				}
-				tvAnswer = (TextView) answerItem
-						.findViewById(R.id.answer_item_text);
-				tvAnswer.setText(Html.fromHtml(answer, imgGetter, null));
-
-				tvLetter = (TextView) answerItem
-						.findViewById(R.id.answer_item_letter);
-				tvLetter.setText(Html.fromHtml(letter, imgGetter, null));
-
+				
+				answerItemLetter = (TextView) answerItem.findViewById(R.id.answer_item_letter);
+				answerItemText = (TextView) answerItem.findViewById(R.id.answer_item_text);
+				
+				answerItemLetter.setText(Html.fromHtml(tmp[0], imgGetter, null));
+				answerItemText.setText(Html.fromHtml(tmp[1], imgGetter, null));
+				
 				answersList.addView(answerItem);
 			}
 		}
 
 			break;
 		case Question.TYPE_2: {
-			v.findViewById(R.id.test_question_header).setVisibility(View.GONE);
-			TextView tvQuestion = (TextView) v
-					.findViewById(R.id.test_question_text);
-			tvQuestion.setText(Html.fromHtml(question.question));
+			questionHeader.setVisibility(View.GONE);
+			questionText.setText(Html.fromHtml(question.question));
+		}
+			break;
+		case Question.TYPE_3: {
+			questionHeader.setVisibility(View.VISIBLE);
+			questionText.setText(Html.fromHtml(question.question,imgGetter,null));
+			
+			int numCounts = Integer.parseInt(question.answers.split("-")[0]);
+			int varCounts = Integer.parseInt(question.answers.split("-")[1]);
+			
+			for (int i = 0; i < numCounts; i++) {
+				answerItem = inflater.inflate(R.layout.answers_list_item_couple,answersList, false);
+				
+				answerCoupleNum = (TextView)answerItem.findViewById(R.id.answer_couple_num);
+				answersCoupleVars = (Spinner) answerItem.findViewById(R.id.answer_couple_vars);
+				ArrayList<String> vars = new ArrayList<String>();
+				for(int j = 0; j< varCounts;j++){
+					vars.add(String.valueOf((char)('А'+j)) );
+				}
+				ArrayAdapter<String> varsAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item,vars);
+				answersCoupleVars.setAdapter(varsAdapter);
+				answerCoupleNum.setText(String.valueOf((i+1)+" - "));
+				
+				answersList.addView(answerItem);
+			}
+
 		}
 			break;
 		}
@@ -147,18 +163,21 @@ public class QuestionFragment extends Fragment implements OnClickListener {
 		}
 	};
 
-	@Override
-	public void onClick(View v) {
-		if (question.question.contains("href")) {
-			Matcher matcher = Pattern.compile("<img src=\"([^\"]+)").matcher(
-					question.question);
-			while (matcher.find()) {
-				Intent viewImage = new Intent(getActivity(),
-						ViewImageActivity.class);
-				viewImage.putExtra(ZNOApplication.ExtrasKeys.IMG_SOURCE,
-						matcher.group(1));
-				startActivity(viewImage);
-			}
+	private void openImage(String source){
+		if(source!=null){
+			Intent viewImage = new Intent(getActivity(),
+					ViewImageActivity.class);
+			viewImage.putExtra(ZNOApplication.ExtrasKeys.IMG_SOURCE,
+					source);
+			startActivity(viewImage);
 		}
+	}
+	
+	private String parseSRC(String text){
+		Matcher matcher = Pattern.compile("<img src=\"([^\"]+)").matcher(text);
+		if(matcher.find()){
+			return matcher.group(1);
+		}
+		return null;
 	}
 }
