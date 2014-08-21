@@ -62,7 +62,7 @@ public class QuestionFragment extends Fragment {
 		TextView answerItemText;
 		TextView answerCoupleNum;
 		Spinner answersCoupleVars;
-		EditText answerItemThreeCorrect;
+		EditText answerItemInput;
 		
 		switch (question.typeQuestion) {
 		case Question.TYPE_1: {
@@ -136,7 +136,16 @@ public class QuestionFragment extends Fragment {
 			questionHeader.setVisibility(View.VISIBLE);
 			questionText.setText(Html.fromHtml(question.question,imgGetter,null));
 			answerItem = inflater.inflate(R.layout.answer_three_correct, answersList, false);
-			answerItemThreeCorrect = (EditText) answerItem.findViewById(R.id.answer_item_three_correct);
+			answerItemInput = (EditText) answerItem.findViewById(R.id.answer_item_three_correct);
+			
+			answersList.addView(answerItem);			
+		}
+			break;
+		case Question.TYPE_5:{
+			questionHeader.setVisibility(View.VISIBLE);
+			questionText.setText(Html.fromHtml(question.question,imgGetter,null));
+			answerItem = inflater.inflate(R.layout.answer_item_short, answersList, false);
+			answerItemInput = (EditText) answerItem.findViewById(R.id.answer_item_input);
 			
 			answersList.addView(answerItem);			
 		}
