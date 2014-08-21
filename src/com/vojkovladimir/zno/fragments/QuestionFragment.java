@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -61,6 +62,7 @@ public class QuestionFragment extends Fragment {
 		TextView answerItemText;
 		TextView answerCoupleNum;
 		Spinner answersCoupleVars;
+		EditText answerItemThreeCorrect;
 		
 		switch (question.typeQuestion) {
 		case Question.TYPE_1: {
@@ -87,8 +89,13 @@ public class QuestionFragment extends Fragment {
 				answerItemLetter = (TextView) answerItem.findViewById(R.id.answer_item_letter);
 				answerItemText = (TextView) answerItem.findViewById(R.id.answer_item_text);
 				
-				answerItemLetter.setText(Html.fromHtml(tmp[0], imgGetter, null));
-				answerItemText.setText(Html.fromHtml(tmp[1], imgGetter, null));
+				if (tmp.length==2) {
+					answerItemLetter.setText(Html.fromHtml(tmp[0], imgGetter, null));
+					answerItemText.setText(Html.fromHtml(tmp[1], imgGetter, null));
+				}	else {
+					answerItemLetter.setText(Html.fromHtml(answers[i], imgGetter, null));
+					answerItemText.setText(Html.fromHtml(answers[i], imgGetter, null));
+				}
 				
 				answersList.addView(answerItem);
 			}
@@ -123,6 +130,15 @@ public class QuestionFragment extends Fragment {
 				answersList.addView(answerItem);
 			}
 
+		}
+			break;
+		case Question.TYPE_4:{
+			questionHeader.setVisibility(View.VISIBLE);
+			questionText.setText(Html.fromHtml(question.question,imgGetter,null));
+			answerItem = inflater.inflate(R.layout.answer_three_correct, answersList, false);
+			answerItemThreeCorrect = (EditText) answerItem.findViewById(R.id.answer_item_three_correct);
+			
+			answersList.addView(answerItem);			
 		}
 			break;
 		}
