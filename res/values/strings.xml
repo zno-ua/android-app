@@ -29,6 +29,7 @@
     <string name="skip_question_text">Пропустити запитання</string>
     <string name="question">Запитання</string>
     <string name="answer_three_correct">Введіть 3 цифри, які ви вважаєте вірними (в будь-якому порядку):</string>
+    <string name="answer_short">Введіть відповідь:</string>
     <string name="image_desription">Image</string>
     <string name="loren_ipsum_text">Lorem Ipsum - це текст-"риба", що використовується</string>
     
