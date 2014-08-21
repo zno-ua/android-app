@@ -17,7 +17,6 @@
         android:paddingTop="5dp" >
 
         <FrameLayout
-            android:id="@+id/test_question_num_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp" >
