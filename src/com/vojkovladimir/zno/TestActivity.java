@@ -66,10 +66,10 @@ public class TestActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			//Open questions list
+			finish();
 			return true;
 		case R.id.action_questions_list:
-			finish();
+			//Open questions list
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
