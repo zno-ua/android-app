@@ -15,9 +15,11 @@ public class Question {
 	public String correctAnswer;
 	public int balls;
 	public int typeQuestion;
+	public String answer;
 
 	public Question(int id, int idTestQuestion, String question,
-			String answers, String correctAnswer, int balls, int typeQuestion) {
+			String answers, String correctAnswer, int balls, int typeQuestion,
+			String answer) {
 		this.id = id;
 		this.idTestQuestion = idTestQuestion;
 		this.question = question;
@@ -25,6 +27,7 @@ public class Question {
 		this.correctAnswer = correctAnswer;
 		this.balls = balls;
 		this.typeQuestion = typeQuestion;
+		this.answer = (answer == null) ? new String() : answer;
 	}
 
 }

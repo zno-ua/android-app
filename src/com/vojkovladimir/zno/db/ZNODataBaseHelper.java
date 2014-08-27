@@ -391,7 +391,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 						.getInt(idTestQuestionIndex), c
 						.getString(questionIndex), c.getString(answersIndex), c
 						.getString(correctAnswerIndex), c.getInt(ballsIndex), c
-						.getInt(typeQuestionIndex));
+						.getInt(typeQuestionIndex),null);
 				
 				questionsAll.add(question);
 				if(question.idTestQuestion!=0){
