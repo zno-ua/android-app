@@ -1,18 +1,16 @@
 package com.vojkovladimir.zno;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.vojkovladimir.zno.adapters.QuestionFragmentAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
-import com.vojkovladimir.zno.fragments.QuestionFragment;
 import com.vojkovladimir.zno.models.Test;
 
 public class TestActivity extends Activity {
@@ -24,13 +22,16 @@ public class TestActivity extends Activity {
 
 	Test test;
 
-	FragmentManager manager;
-	FragmentTransaction transaction;
-	Fragment currentQuestion;
-
-	Button next;
-
-	int current;
+	QuestionFragmentAdapter questionsAdapter;
+	
+	Button nextBtn;
+	OnClickListener onNext = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			questionsAdapter.next();			
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,18 +41,16 @@ public class TestActivity extends Activity {
 		Log.i(LOG_TAG, "TestActivity: onCreate()");
 
 		Intent intent = getIntent();
+		String tableName = intent.getStringExtra(ZNOApplication.ExtrasKeys.TABLE_NAME);
 
 		app = ZNOApplication.getInstance();
 		db = app.getZnoDataBaseHelper();
-		manager = getFragmentManager();
-
-		String tableName = intent
-				.getStringExtra(ZNOApplication.ExtrasKeys.TABLE_NAME);
-
+		
+		nextBtn = (Button)findViewById(R.id.test_skip_btn);
+		nextBtn.setOnClickListener(onNext);
+		
 		test = db.getTest(tableName);
-		current = 0;
-
-		next = (Button) findViewById(R.id.test_skip_btn);
+		questionsAdapter = new QuestionFragmentAdapter(this, test, db);
 	}
 
 	@Override
@@ -88,7 +87,6 @@ public class TestActivity extends Activity {
 	@Override
 	protected void onResume() {
 		Log.i(LOG_TAG, "TestActivity: onResume()");
-		loadQuestion();
 		super.onResume();
 	}
 
@@ -104,37 +102,14 @@ public class TestActivity extends Activity {
 		super.onStop();
 	}
 
-	public void skip(View v) {
-
-		if (current < test.taskAll) {
-			current++;
-		} else {
-			// end of testing
-			// print result
-			current = 0;
-		}
-		loadQuestion();
-	}
-
 	@Override
 	public void onBackPressed() {
 		Log.i(LOG_TAG, "TestActivity: onBackPressed()");
-		if (current > 0) {
-			current--;
-			loadQuestion();
+		if (questionsAdapter.getCurrent() > 0) {
+			questionsAdapter.previous();
 		} else {
 			super.onBackPressed();
 		}
-	}
-
-	private void loadQuestion() {
-		transaction = manager.beginTransaction();
-
-		currentQuestion = QuestionFragment.newIntstance(this,
-				test.questions.get(current), test.taskAll);
-
-		transaction.replace(R.id.test_question_container, currentQuestion);
-		transaction.commit();
 	}
 
 }
