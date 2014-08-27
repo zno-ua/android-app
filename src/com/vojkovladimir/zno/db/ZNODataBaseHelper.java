@@ -367,6 +367,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	}
 
 	public Test getTest(String tableName) {
+		ArrayList<Question> questionsAll = new ArrayList<Question>();
 		ArrayList<Question> questions = new ArrayList<Question>();
 		TestInfo testInfo = null;
 		int id = Integer.parseInt(tableName.substring(
@@ -389,12 +390,18 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			int typeQuestionIndex = c.getColumnIndex(KEY_TYPE_QUESTION);
 			int testIndex = c.getColumnIndex(KEY_TEST);
 
+			Question question;
 			do {
-				questions.add(new Question(c.getInt(idIndex), c
+				question = new Question(c.getInt(idIndex), c
 						.getInt(idTestQuestionIndex), c
 						.getString(questionIndex), c.getString(answersIndex), c
 						.getString(correctAnswerIndex), c.getInt(ballsIndex), c
-						.getInt(typeQuestionIndex), c.getString(testIndex)));
+						.getInt(typeQuestionIndex), c.getString(testIndex));
+				
+				questionsAll.add(question);
+				if(question.idTestQuestion!=0){
+					questions.add(question);
+				}
 			} while (c.moveToNext());
 		}
 
@@ -424,7 +431,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		}
 
-		return new Test(testInfo, questions);
+		return new Test(testInfo, questionsAll,questions);
 	}
 
 	private JSONArray loadFromResources(int id) throws IOException,
