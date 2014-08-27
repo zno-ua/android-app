@@ -15,11 +15,9 @@ public class Question {
 	public String correctAnswer;
 	public int balls;
 	public int typeQuestion;
-	public String test;
 
 	public Question(int id, int idTestQuestion, String question,
-			String answers, String correctAnswer, int balls, int typeQuestion,
-			String test) {
+			String answers, String correctAnswer, int balls, int typeQuestion) {
 		this.id = id;
 		this.idTestQuestion = idTestQuestion;
 		this.question = question;
@@ -27,7 +25,6 @@ public class Question {
 		this.correctAnswer = correctAnswer;
 		this.balls = balls;
 		this.typeQuestion = typeQuestion;
-		this.test = test;
 	}
 
 }

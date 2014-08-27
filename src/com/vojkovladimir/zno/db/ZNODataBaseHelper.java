@@ -51,7 +51,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	public static final String KEY_ID_TEST_QUESTION = "id_test_question";
 	public static final String KEY_QUESTION = "question";
 	public static final String KEY_TYPE_QUESTION = "type_question";
-	public static final String KEY_TEST = "test";
 
 	private static final String CREATE_TABLE_LESSONS = "CREATE TABLE "
 			+ TABLE_LESSONS + " (" + KEY_ID + " INTEGER PRIMARY KEY, "
@@ -71,7 +70,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				+ " INTEGER PRIMARY KEY, " + KEY_ANSWERS + " TEXT, "
 				+ KEY_BALLS + " INTEGER, " + KEY_CORRECT_ANSWER + " STRING, "
 				+ KEY_ID_TEST_QUESTION + " INTEGER, " + KEY_QUESTION
-				+ " TEXT, " + KEY_TEST + " TEXT, " + KEY_TYPE_QUESTION
+				+ " TEXT, "+ KEY_TYPE_QUESTION
 				+ " INTEGER" + ");";
 
 	}
@@ -223,7 +222,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		int id;
 		int idTestQuestion;
 		String question;
-		String test;
 		int typeQuestion;
 
 		long status;
@@ -237,7 +235,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				id = questionItem.getInt(Api.Keys.ID_ON_TEST);
 				idTestQuestion = questionItem.getInt(Api.Keys.ID_TEST_QUESTION);
 				question = questionItem.getString(Api.Keys.QUESTION);
-				test = questionItem.getString(Api.Keys.TEST);
 				typeQuestion = questionItem.getInt(Api.Keys.TYPE_QUESTION);
 
 				values.clear();
@@ -247,7 +244,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				values.put(KEY_ID, id);
 				values.put(KEY_ID_TEST_QUESTION, idTestQuestion);
 				values.put(KEY_QUESTION, question);
-				values.put(KEY_TEST, test);
 				values.put(KEY_TYPE_QUESTION, typeQuestion);
 
 				status = db.insert(tableName, null, values);
@@ -377,7 +373,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		Cursor c = db.query(tableName, new String[] { KEY_ID,
 				KEY_ID_TEST_QUESTION, KEY_QUESTION, KEY_ANSWERS,
-				KEY_CORRECT_ANSWER, KEY_BALLS, KEY_TYPE_QUESTION, KEY_TEST },
+				KEY_CORRECT_ANSWER, KEY_BALLS, KEY_TYPE_QUESTION },
 				null, null, null, null, null);
 
 		if (c.moveToFirst()) {
@@ -388,7 +384,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			int correctAnswerIndex = c.getColumnIndex(KEY_CORRECT_ANSWER);
 			int ballsIndex = c.getColumnIndex(KEY_BALLS);
 			int typeQuestionIndex = c.getColumnIndex(KEY_TYPE_QUESTION);
-			int testIndex = c.getColumnIndex(KEY_TEST);
 
 			Question question;
 			do {
@@ -396,7 +391,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 						.getInt(idTestQuestionIndex), c
 						.getString(questionIndex), c.getString(answersIndex), c
 						.getString(correctAnswerIndex), c.getInt(ballsIndex), c
-						.getInt(typeQuestionIndex), c.getString(testIndex));
+						.getInt(typeQuestionIndex));
 				
 				questionsAll.add(question);
 				if(question.idTestQuestion!=0){

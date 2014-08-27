@@ -36,7 +36,6 @@ public class Api {
 		String CORRECT_ANSWER = "correct_answer";
 		String ID_TEST_QUESTION = "id_test_question";
 		String QUESTION = "question";
-		String TEST = "test";
 		String TYPE_QUESTION = "type_question";
 		String IMAGES_RELATIVE_URL = "images_relative_url";
 		
