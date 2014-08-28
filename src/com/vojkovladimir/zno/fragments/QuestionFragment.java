@@ -30,8 +30,6 @@ import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.models.Question;
 
 public class QuestionFragment extends Fragment {
-	
-	Pattern lettersPattern = Pattern.compile("(^.*?)(\\.\\s|\\s)(.*?$)");
 
 	Question question;
 	int taskAll;
@@ -59,7 +57,7 @@ public class QuestionFragment extends Fragment {
 		
 		TextView questionText = (TextView) v.findViewById(R.id.test_question_text);
 		LinearLayout answersList = (LinearLayout) v.findViewById(R.id.test_question_answers_list);
-		View answerItem;
+		final View[] answerItems;
 		TextView answerItemLetter;
 		TextView answerItemText;
 		TextView answerCoupleNum;
@@ -82,21 +80,41 @@ public class QuestionFragment extends Fragment {
 
 			String[] answers = question.answers.split("\n");
 			Matcher matcher;
+			answerItems = new View [answers.length];
 
 			for (int i = 0; i < answers.length; i++) {		
-				matcher = lettersPattern.matcher(answers[i]);
+				matcher = Pattern.compile("(^.*?)(\\.\\s|\\s)(.*?$)").matcher(answers[i]);
 
 				if(matcher.find()){
-					answerItem = inflater.inflate(R.layout.answers_list_item,answersList, false);
+					answerItems[i] = inflater.inflate(R.layout.answers_list_item,answersList, false);
 					
-					answerItemLetter = (TextView) answerItem.findViewById(R.id.answer_item_letter);
-					answerItemText = (TextView) answerItem.findViewById(R.id.answer_item_text);
+					answerItemLetter = (TextView) answerItems[i].findViewById(R.id.answer_item_letter);
+					answerItemText = (TextView) answerItems[i].findViewById(R.id.answer_item_text);
 					
 					answerItemLetter.setText(Html.fromHtml(matcher.group(1), imgGetter, null));
 					answerItemText.setText(Html.fromHtml(matcher.group(3), imgGetter, null));
 					
-					answersList.addView(answerItem);
+					final int num = i;
+					answerItems[i].setOnClickListener(new OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							if(!question.answer.isEmpty()){
+								int oldNum = Integer.valueOf(question.answer)-1;
+								answerItems[oldNum].setSelected(false);
+							}
+							answerItems[num].setSelected(true);
+							question.answer = String.valueOf((num+1));				
+						}
+					});
+					
+					answersList.addView(answerItems[i]);
 				} 
+			}
+			
+			if(!question.answer.isEmpty()){
+				int num = Integer.valueOf(question.answer)-1;
+				answerItems[num].setSelected(true);
 			}
 		}
 
@@ -113,11 +131,12 @@ public class QuestionFragment extends Fragment {
 			int numCounts = Integer.parseInt(question.answers.split("-")[0]);
 			int varCounts = Integer.parseInt(question.answers.split("-")[1]);
 			
+			answerItems = new View [numCounts];
 			for (int i = 0; i < numCounts; i++) {
-				answerItem = inflater.inflate(R.layout.answers_list_item_couple,answersList, false);
+				answerItems[i] = inflater.inflate(R.layout.answers_list_item_couple,answersList, false);
 				
-				answerCoupleNum = (TextView)answerItem.findViewById(R.id.answer_couple_num);
-				answersCoupleVars = (Spinner) answerItem.findViewById(R.id.answer_couple_vars);
+				answerCoupleNum = (TextView) answerItems[i].findViewById(R.id.answer_couple_num);
+				answersCoupleVars = (Spinner) answerItems[i].findViewById(R.id.answer_couple_vars);
 				ArrayList<String> vars = new ArrayList<String>();
 				for(int j = 0; j< varCounts;j++){
 					vars.add(String.valueOf((char)('А'+j)) );
@@ -126,7 +145,7 @@ public class QuestionFragment extends Fragment {
 				answersCoupleVars.setAdapter(varsAdapter);
 				answerCoupleNum.setText(String.valueOf((i+1)+" - "));
 				
-				answersList.addView(answerItem);
+				answersList.addView(answerItems[i]);
 			}
 
 		}
@@ -134,19 +153,23 @@ public class QuestionFragment extends Fragment {
 		case Question.TYPE_4:{
 			questionHeader.setVisibility(View.VISIBLE);
 			questionText.setText(Html.fromHtml(question.question,imgGetter,null));
-			answerItem = inflater.inflate(R.layout.answer_three_correct, answersList, false);
-			answerItemInput = (EditText) answerItem.findViewById(R.id.answer_item_three_correct);
+
+			answerItems = new View [1];
+			answerItems[0] = inflater.inflate(R.layout.answer_three_correct, answersList, false);
+			answerItemInput = (EditText) answerItems[0].findViewById(R.id.answer_item_three_correct);
 			
-			answersList.addView(answerItem);			
+			answersList.addView(answerItems[0]);			
 		}
 			break;
 		case Question.TYPE_5:{
 			questionHeader.setVisibility(View.VISIBLE);
 			questionText.setText(Html.fromHtml(question.question,imgGetter,null));
-			answerItem = inflater.inflate(R.layout.answer_item_short, answersList, false);
-			answerItemInput = (EditText) answerItem.findViewById(R.id.answer_item_input);
 			
-			answersList.addView(answerItem);			
+			answerItems = new View [1];
+			answerItems[0] = inflater.inflate(R.layout.answer_item_short, answersList, false);
+			answerItemInput = (EditText) answerItems[0].findViewById(R.id.answer_item_input);
+			
+			answersList.addView(answerItems[0]);			
 		}
 			break;
 		}
@@ -204,4 +227,5 @@ public class QuestionFragment extends Fragment {
 		}
 		return null;
 	}
+
 }
