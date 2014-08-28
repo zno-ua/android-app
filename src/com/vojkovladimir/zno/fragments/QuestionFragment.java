@@ -10,8 +10,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,7 +106,8 @@ public class QuestionFragment extends Fragment {
 								answerItems[oldNum].setSelected(false);
 							}
 							answerItems[num].setSelected(true);
-							question.answer = String.valueOf((num+1));				
+							question.answer = String.valueOf((num+1));
+							
 						}
 					});
 					
@@ -168,6 +171,27 @@ public class QuestionFragment extends Fragment {
 			answerItems = new View [1];
 			answerItems[0] = inflater.inflate(R.layout.answer_item_short, answersList, false);
 			answerItemInput = (EditText) answerItems[0].findViewById(R.id.answer_item_input);
+			
+			if (!question.answer.isEmpty()) {
+				answerItemInput.setText(question.answer);
+			}
+			
+			answerItemInput.addTextChangedListener(new TextWatcher() {
+				
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+				}
+				
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count,
+						int after) {
+				}
+				
+				@Override
+				public void afterTextChanged(Editable s) {
+					question.answer = s.toString();
+				}
+			});
 			
 			answersList.addView(answerItems[0]);			
 		}
