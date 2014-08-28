@@ -2,6 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:state_pressed="true" android:drawable="@drawable/letter_circle_pressed"></item>
+    <item android:state_selected="true" android:drawable="@drawable/letter_circle_pressed"></item>
     <item  android:drawable="@drawable/letter_circle_normal"></item>
 
 </selector>
