@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -64,7 +65,7 @@ public class QuestionFragment extends Fragment {
 		TextView answerItemText;
 		TextView answerCoupleNum;
 		Spinner answersCoupleVars;
-		EditText answerItemInput;
+		final EditText answerItemInput;
 		
 		switch (question.typeQuestion) {
 		case Question.TYPE_1: {
@@ -160,6 +161,31 @@ public class QuestionFragment extends Fragment {
 			answerItems = new View [1];
 			answerItems[0] = inflater.inflate(R.layout.answer_three_correct, answersList, false);
 			answerItemInput = (EditText) answerItems[0].findViewById(R.id.answer_item_three_correct);
+			
+			if (!question.answer.isEmpty()) {
+				answerItemInput.setText(question.answer);
+			}
+			
+			answerItemInput.addTextChangedListener(new TextWatcher() {
+				
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+				}
+				
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count,
+						int after) {
+				}
+				
+				@Override
+				public void afterTextChanged(Editable s) {
+					question.answer = s.toString();
+					if(s.length()==3){
+						InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+						inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+					}
+				}
+			});
 			
 			answersList.addView(answerItems[0]);			
 		}
