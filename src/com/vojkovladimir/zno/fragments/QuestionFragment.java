@@ -30,6 +30,8 @@ import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.models.Question;
 
 public class QuestionFragment extends Fragment {
+	
+	Pattern lettersPattern = Pattern.compile("(.*?)(.|\\w)(.*?)");
 
 	Question question;
 	int taskAll;
@@ -79,23 +81,18 @@ public class QuestionFragment extends Fragment {
 			});
 
 			String[] answers = question.answers.split("\n");
-			String[] tmp;
+			Matcher matcher;
 
 			for (int i = 0; i < answers.length; i++) {
 				answerItem = inflater.inflate(R.layout.answers_list_item,answersList, false);
-
-				tmp = answers[i].split(". ", 2);
+				
+				matcher = lettersPattern.matcher(answers[i]);
 				
 				answerItemLetter = (TextView) answerItem.findViewById(R.id.answer_item_letter);
 				answerItemText = (TextView) answerItem.findViewById(R.id.answer_item_text);
-				
-				if (tmp.length==2) {
-					answerItemLetter.setText(Html.fromHtml(tmp[0], imgGetter, null));
-					answerItemText.setText(Html.fromHtml(tmp[1], imgGetter, null));
-				}	else {
-					answerItemLetter.setText(Html.fromHtml(answers[i], imgGetter, null));
-					answerItemText.setText(Html.fromHtml(answers[i], imgGetter, null));
-				}
+
+				answerItemLetter.setText(Html.fromHtml(matcher.group(1), imgGetter, null));
+				answerItemText.setText(Html.fromHtml(matcher.group(3), imgGetter, null));
 				
 				answersList.addView(answerItem);
 			}
