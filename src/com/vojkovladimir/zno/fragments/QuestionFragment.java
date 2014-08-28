@@ -31,7 +31,7 @@ import com.vojkovladimir.zno.models.Question;
 
 public class QuestionFragment extends Fragment {
 	
-	Pattern lettersPattern = Pattern.compile("(.*?)(.|\\w)(.*?)");
+	Pattern lettersPattern = Pattern.compile("(^.*?)(\\.\\s|\\s)(.*?$)");
 
 	Question question;
 	int taskAll;
@@ -83,18 +83,20 @@ public class QuestionFragment extends Fragment {
 			String[] answers = question.answers.split("\n");
 			Matcher matcher;
 
-			for (int i = 0; i < answers.length; i++) {
-				answerItem = inflater.inflate(R.layout.answers_list_item,answersList, false);
-				
+			for (int i = 0; i < answers.length; i++) {		
 				matcher = lettersPattern.matcher(answers[i]);
-				
-				answerItemLetter = (TextView) answerItem.findViewById(R.id.answer_item_letter);
-				answerItemText = (TextView) answerItem.findViewById(R.id.answer_item_text);
 
-				answerItemLetter.setText(Html.fromHtml(matcher.group(1), imgGetter, null));
-				answerItemText.setText(Html.fromHtml(matcher.group(3), imgGetter, null));
-				
-				answersList.addView(answerItem);
+				if(matcher.find()){
+					answerItem = inflater.inflate(R.layout.answers_list_item,answersList, false);
+					
+					answerItemLetter = (TextView) answerItem.findViewById(R.id.answer_item_letter);
+					answerItemText = (TextView) answerItem.findViewById(R.id.answer_item_text);
+					
+					answerItemLetter.setText(Html.fromHtml(matcher.group(1), imgGetter, null));
+					answerItemText.setText(Html.fromHtml(matcher.group(3), imgGetter, null));
+					
+					answersList.addView(answerItem);
+				} 
 			}
 		}
 
