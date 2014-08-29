@@ -16,6 +16,7 @@ public class MainActivity extends Activity {
 	String[] quotes;
 	String quoteTitle;
 	TextView quote;
+	TextView logo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +24,8 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		quote = (TextView) findViewById(R.id.quote);
+		logo = (TextView) findViewById(R.id.app_logo);
+		ZNOApplication.buildLogo(logo, getResources(), getAssets());
 		quotes = getResources().getStringArray(R.array.quotes_2011);
 		quoteTitle = getResources().getString(R.string.quotes_2011_title);
 	}
