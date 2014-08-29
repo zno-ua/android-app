@@ -1,7 +1,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- App Theme -->
-    <style name="MainTheme" parent="@android:style/Theme.Holo.Light">
+    <style name="MainTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
 
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="android:windowBackground">@color/window_background_color</item>
@@ -16,7 +16,7 @@
     </style>
 
     <style name="ActionBarTitleStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/action_bar_text_color</item>
     </style>
 
     <!-- Button Styles -->
