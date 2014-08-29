@@ -21,5 +21,6 @@
     <color name="answer_text_pressed_color">#fff</color>
     <color name="action_bar_text_color">#99ffffff</color>
     <color name="view_image_bg_color">#A6000000</color>
+    <color name="app_logo_shadow_color">#33000000</color>
 
 </resources>
