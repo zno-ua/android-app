@@ -26,5 +26,11 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <!-- SplashActivity Theme -->
+    <style name="SplashActivityTheme" parent="@android:style/Theme.Black.NoTitleBar">
+
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="android:windowBackground">@color/window_background_color</item>
+    </style>
 
 </resources>
