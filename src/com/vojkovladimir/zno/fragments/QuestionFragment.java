@@ -30,17 +30,22 @@ import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.models.Question;
 
 public class QuestionFragment extends Fragment {
+	
+	private static final char ENG_LETTER = 'A';
+	private static final char UKR_LETTER = 'А';
 
 	Question question;
 	int taskAll;
+	char firstLetter;
 
 	FileManager fm;
 
-	public static QuestionFragment newIntstance(Context context, Question question, int taskAll) {
+	public static QuestionFragment newIntstance(Context context, Question question, int taskAll,int lessonId) {
 		QuestionFragment f = new QuestionFragment();
 		f.question = question;
 		f.taskAll = taskAll;
 		f.fm = new FileManager(context);
+		f.firstLetter = (lessonId==7)?ENG_LETTER:UKR_LETTER;
 		return f;
 	}
 
@@ -145,7 +150,7 @@ public class QuestionFragment extends Fragment {
 				for (int j = 0; j < answerLetters.length; j++) {
 					answerLetters[j] = inflater.inflate(R.layout.answers_list_item_cople_letter,answerLettersContainer, false);
 					answerItemLetter = (TextView) answerLetters[j].findViewById(R.id.answer_item_couple_letter);
-					answerItemLetter.setText(String.valueOf((char)('A'+j)));
+					answerItemLetter.setText(String.valueOf((char)(firstLetter+j)));
 					final int letterNum = j;
 					answerLetters[j].setOnClickListener(new OnClickListener() {
 						

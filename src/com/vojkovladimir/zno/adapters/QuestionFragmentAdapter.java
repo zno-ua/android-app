@@ -78,11 +78,11 @@ public class QuestionFragmentAdapter {
 			prevQuestionFragment = null;
 		}
 		
-		questionFragment = QuestionFragment.newIntstance(context, question, test.taskAll);
+		questionFragment = QuestionFragment.newIntstance(context, question, test.taskAll,test.lessonId);
 		
 		if(question.id > question.idTestQuestion){
 			if(current == 0 || (question.id - questions.get(current-1).id)>1){
-				prevQuestionFragment = QuestionFragment.newIntstance(context, questionsAll.get(question.id-2), test.taskAll);
+				prevQuestionFragment = QuestionFragment.newIntstance(context, questionsAll.get(question.id-2), test.taskAll,test.lessonId);
 				transaction.add(R.id.test_question_container, prevQuestionFragment);
 				transaction.add(R.id.test_question_container, questionFragment);
 			}else{
