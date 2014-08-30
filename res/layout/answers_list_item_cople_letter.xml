@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="36dp"
+    android:layout_height="36dp"
+    android:layout_weight="1"
+    android:background="@drawable/answer_item_bg_normal"
+    android:clickable="true" >
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:contentDescription="@string/image_desription"
+        android:src="@drawable/answer_letter_circle" />
+
+    <TextView
+        android:id="@+id/answer_item_couple_letter"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="@drawable/answers_list_item_text_color"
+        android:textSize="16sp" />
+
+</FrameLayout>

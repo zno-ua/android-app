@@ -1,7 +1,6 @@
 package com.vojkovladimir.zno.fragments;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,10 +19,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.vojkovladimir.zno.FileManager;
@@ -60,11 +57,11 @@ public class QuestionFragment extends Fragment {
 		
 		TextView questionText = (TextView) v.findViewById(R.id.test_question_text);
 		LinearLayout answersList = (LinearLayout) v.findViewById(R.id.test_question_answers_list);
+		LinearLayout answerLettersContainer;
 		final View[] answerItems;
 		TextView answerItemLetter;
 		TextView answerItemText;
 		TextView answerCoupleNum;
-		Spinner answersCoupleVars;
 		final EditText answerItemInput;
 		
 		switch (question.typeQuestion) {
@@ -138,17 +135,32 @@ public class QuestionFragment extends Fragment {
 			answerItems = new View [numCounts];
 			for (int i = 0; i < numCounts; i++) {
 				answerItems[i] = inflater.inflate(R.layout.answers_list_item_couple,answersList, false);
+				final View []answerLetters;
 				
 				answerCoupleNum = (TextView) answerItems[i].findViewById(R.id.answer_couple_num);
-				answersCoupleVars = (Spinner) answerItems[i].findViewById(R.id.answer_couple_vars);
-				ArrayList<String> vars = new ArrayList<String>();
-				for(int j = 0; j< varCounts;j++){
-					vars.add(String.valueOf((char)('А'+j)) );
-				}
-				ArrayAdapter<String> varsAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item,vars);
-				answersCoupleVars.setAdapter(varsAdapter);
-				answerCoupleNum.setText(String.valueOf((i+1)+" - "));
+				answerCoupleNum.setText(String.valueOf((i+1)));
+				answerLettersContainer = (LinearLayout)answerItems[i].findViewById(R.id.answer_couple_letters_container);
 				
+				answerLetters = new View [varCounts];
+				for (int j = 0; j < answerLetters.length; j++) {
+					answerLetters[j] = inflater.inflate(R.layout.answers_list_item_cople_letter,answerLettersContainer, false);
+					answerItemLetter = (TextView) answerLetters[j].findViewById(R.id.answer_item_couple_letter);
+					answerItemLetter.setText(String.valueOf((char)('A'+j)));
+					final int letterNum = j;
+					answerLetters[j].setOnClickListener(new OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							if(answerLetters[letterNum].isSelected()){
+								answerLetters[letterNum].setSelected(false);
+							} else {
+								answerLetters[letterNum].setSelected(true);
+							}
+						}
+					});
+					
+					answerLettersContainer.addView(answerLetters[j]);
+				}
 				answersList.addView(answerItems[i]);
 			}
 

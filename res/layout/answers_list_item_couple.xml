@@ -3,22 +3,32 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/answers_list_item_background"
-    android:clickable="true"
+    android:baselineAligned="true"
+    android:clickable="false"
     android:orientation="horizontal"
     android:padding="6dp" >
 
-    <TextView
-        android:id="@+id/answer_couple_num"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textColor="@drawable/answers_list_item_text_color"
-        android:textSize="16sp" />
+    <FrameLayout
+        android:layout_width="24dp"
+        android:layout_height="36dp"
+        android:layout_weight="0" >
 
-    <Spinner
-        android:id="@+id/answer_couple_vars"
+        <TextView
+            android:id="@+id/answer_couple_num"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="@drawable/answers_list_item_text_color"
+            android:textSize="16sp" />
+    </FrameLayout>
+
+    <LinearLayout
+         android:id="@+id/answer_couple_letters_container"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="36dp" />
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:clickable="false"
+        android:orientation="horizontal" />
 
 </LinearLayout>

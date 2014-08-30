@@ -6,5 +6,5 @@
         android:width="1dip"
         android:color="@color/answer_text_pressed_color" />
 
-    <solid android:color="@android:color/transparent" />
+    <solid android:color="@color/answer_selected_bg_color" />
 </shape>
