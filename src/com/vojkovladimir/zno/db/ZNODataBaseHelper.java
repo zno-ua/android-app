@@ -407,6 +407,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 		if (c.moveToFirst()) {
 			int idIndex = c.getColumnIndex(KEY_ID);
+			int lessonId = c.getColumnIndex(KEY_LESSON_ID);
 			int nameIndex = c.getColumnIndex(KEY_NAME);
 			int taskAllIndex = c.getColumnIndex(KEY_TASK_ALL);
 			int taskMatchesIndex = c.getColumnIndex(KEY_TASK_MATCHES);
@@ -417,7 +418,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			int yearIndex = c.getColumnIndex(KEY_YEAR);
 			int loadedIndex = c.getColumnIndex(KEY_LOADED);
 
-			testInfo = new TestInfo(c.getInt(idIndex), id,
+			testInfo = new TestInfo(c.getInt(idIndex), c.getInt(lessonId),
 					c.getString(nameIndex), c.getInt(taskAllIndex),
 					c.getInt(taskMatchesIndex), c.getInt(taskOpenAnswersIndex),
 					c.getInt(taskTestIndex), c.getInt(taskVarsIndex),
