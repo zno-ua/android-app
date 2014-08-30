@@ -14,6 +14,7 @@ import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -183,12 +184,13 @@ public class QuestionFragment extends Fragment {
 		int varCounts = Integer.parseInt(question.answers.split("-")[1]);
 
 		final View[] answerItems = new View[numCounts];
+		final View[][] answerItemLetters = new View[numCounts][varCounts];
 
 		LinearLayout answerLettersContainer;
 		TextView answerCoupleNum;
 		TextView answerItemLetter;
 
-		for (int i = 0; i < numCounts; i++) {
+		for (int i = 0; i < answerItems.length; i++) {
 			answerItems[i] = inflater.inflate(
 					R.layout.answers_list_item_couple, answersList, false);
 
@@ -198,29 +200,50 @@ public class QuestionFragment extends Fragment {
 			answerLettersContainer = (LinearLayout) answerItems[i]
 					.findViewById(R.id.answer_couple_letters_container);
 
-			final View[] answerItemLetters = new View[varCounts];
-			for (int j = 0; j < answerItemLetters.length; j++) {
-				answerItemLetters[j] = inflater.inflate(
+			final int num = i;
+			for (int j = 0; j < answerItemLetters[0].length; j++) {
+				answerItemLetters[i][j] = inflater.inflate(
 						R.layout.answers_list_item_cople_letter,
 						answerLettersContainer, false);
-				answerItemLetter = (TextView) answerItemLetters[j]
+				answerItemLetter = (TextView) answerItemLetters[i][j]
 						.findViewById(R.id.answer_item_couple_letter);
 				answerItemLetter.setText(String
 						.valueOf((char) (firstLetter + j)));
 				final int letterNum = j;
-				answerItemLetters[j].setOnClickListener(new OnClickListener() {
+				answerItemLetters[i][j]
+						.setOnClickListener(new OnClickListener() {
 
-					@Override
-					public void onClick(View v) {
-						if (answerItemLetters[letterNum].isSelected()) {
-							answerItemLetters[letterNum].setSelected(false);
-						} else {
-							answerItemLetters[letterNum].setSelected(true);
-						}
-					}
-				});
+							@Override
+							public void onClick(View v) {
+								StringBuilder sb = new StringBuilder(
+										question.answer);
+								char oldNumLetter = sb.charAt(num);
+								char newNumLetter = (char) ('0' + letterNum + 1);
+								if (oldNumLetter != '0') {
+									answerItemLetters[num][oldNumLetter - '0' - 1]
+											.setSelected(false);
+								}
+								int usedNumLetter = sb.indexOf(String
+										.valueOf(newNumLetter));
+								if (usedNumLetter != -1) {
+									answerItemLetters[usedNumLetter][letterNum]
+											.setSelected(false);
+									sb.setCharAt(usedNumLetter, '0');
+								}
 
-				answerLettersContainer.addView(answerItemLetters[j]);
+								sb.setCharAt(num, newNumLetter);
+								answerItemLetters[num][letterNum]
+										.setSelected(true);
+								question.answer = sb.toString();
+								Log.i("MyLogs", question.answer);
+							}
+						});
+
+				answerLettersContainer.addView(answerItemLetters[i][j]);
+			}
+			char oldNumLetter = question.answer.charAt(i);
+			if (oldNumLetter != '0') {
+				answerItemLetters[i][oldNumLetter - '0' - 1].setSelected(true);
 			}
 			answersList.addView(answerItems[i]);
 		}

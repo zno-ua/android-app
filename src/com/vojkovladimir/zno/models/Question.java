@@ -27,7 +27,16 @@ public class Question {
 		this.correctAnswer = correctAnswer;
 		this.balls = balls;
 		this.typeQuestion = typeQuestion;
-		this.answer = (answer == null) ? new String() : answer;
+		if (answer != null) {
+			this.answer = answer;
+		} else if (typeQuestion == TYPE_3) {
+			this.answer = "";
+			for (int i = 0; i < Integer.parseInt(this.answers.split("-")[0]); i++) {
+				this.answer += "0";
+			}
+		} else {
+			this.answer = new String();
+		}
 	}
 
 }
