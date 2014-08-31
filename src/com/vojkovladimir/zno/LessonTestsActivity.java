@@ -160,6 +160,7 @@ public class LessonTestsActivity extends Activity {
 							app.addToRequestQueue(Api.getTestRequest(test.id,
 									listener, errorListener));
 							downloadProgress.show();
+							downloadProgress.setCancelable(false);
 							break;
 						}
 					}
