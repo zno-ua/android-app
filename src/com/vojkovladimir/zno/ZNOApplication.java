@@ -1,5 +1,7 @@
 package com.vojkovladimir.zno;
 
+import java.util.Calendar;
+
 import android.app.Application;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -78,7 +80,8 @@ public class ZNOApplication extends Application {
 	
 	public static void buildLogo(TextView logoTextView,Resources resources,AssetManager assets){
 		String appName = resources.getString(R.string.app_name);
-		String year = "2015";
+		Calendar calendar = Calendar.getInstance();
+		String year = String.valueOf(calendar.get(Calendar.YEAR)+((calendar.get(Calendar.MONTH)<7)?0:1));
 		String logoText = appName+" "+year;
 		
 		SpannableString spannableString = new SpannableString(logoText);
