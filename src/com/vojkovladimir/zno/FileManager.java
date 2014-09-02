@@ -40,8 +40,13 @@ public class FileManager {
 			if (name.contains("png")) {
 				format = Bitmap.CompressFormat.PNG;
 			}
+			if (name.contains("gif")) {
+				fout.close();
+				return;
+			}
 			
 			bitmap.compress(format, 100, fout);
+			fout.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
