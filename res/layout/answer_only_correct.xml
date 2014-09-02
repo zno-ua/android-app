@@ -9,15 +9,17 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/answer_short"
+        android:text="@string/answer_three_correct"
         android:textColor="@drawable/answers_list_item_text_color"
         android:textSize="16sp" />
 
     <EditText
-        android:id="@+id/answer_item_input"
+        android:id="@+id/answer_only_correct_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="numberDecimal|numberSigned"
+        android:inputType="number"
+        android:maxLength="3"
+        android:minEms="3"
         android:textColor="@drawable/answers_list_item_text_color"
         android:textSize="16sp" />
 

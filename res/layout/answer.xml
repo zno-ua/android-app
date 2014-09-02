@@ -20,7 +20,7 @@
             android:src="@drawable/answer_letter_circle" />
 
         <TextView
-            android:id="@+id/answer_item_letter"
+            android:id="@+id/answer_letter"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
@@ -34,13 +34,12 @@
         android:layout_height="match_parent" />
 
     <TextView
-        android:id="@+id/answer_item_text"
+        android:id="@+id/answer_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center_vertical|start"
         android:minHeight="36dp"
-        android:text="@string/loren_ipsum_text"
         android:textColor="@drawable/answers_list_item_text_color"
         android:textSize="16sp" />
 

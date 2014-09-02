@@ -14,7 +14,7 @@
         android:src="@drawable/answer_letter_circle" />
 
     <TextView
-        android:id="@+id/answer_item_couple_letter"
+        android:id="@+id/answer_letter"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center"

@@ -4,25 +4,28 @@ import java.io.FileNotFoundException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 import com.vojkovladimir.zno.FileManager;
 import com.vojkovladimir.zno.R;
@@ -32,8 +35,8 @@ import com.vojkovladimir.zno.models.Question;
 
 public class QuestionFragment extends Fragment {
 
-	private static final char ENG_LETTER = 'A';
-	private static final char UKR_LETTER = 'А';
+	private static final char ENG_LETTER = 65;
+	private static final char UKR_LETTER = 1040;
 
 	Question question;
 	int taskAll;
@@ -41,64 +44,49 @@ public class QuestionFragment extends Fragment {
 
 	FileManager fm;
 
-	public static QuestionFragment newIntstance(Context context,
-			Question question, int taskAll, int lessonId) {
+	QuestionActions questionActions;
+
+	public static QuestionFragment newInstance(Context context, Question question, int taskAll,
+			int lessonId,QuestionActions questionActions) {
 		QuestionFragment f = new QuestionFragment();
 		f.question = question;
 		f.taskAll = taskAll;
 		f.fm = new FileManager(context);
 		f.firstLetter = (lessonId == 7) ? ENG_LETTER : UKR_LETTER;
+		f.questionActions = questionActions;
 		return f;
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		switch (question.typeQuestion) {
 		case Question.TYPE_1:
-			return onCreateTypeOneQuestionView(inflater, container);
+			return createTypeOneQuestionView(inflater, container);
 		case Question.TYPE_2:
-			return onCreateTypeTwoQuestionView(inflater, container);
+			return createTypeTwoQuestionView(inflater, container);
 		case Question.TYPE_3:
-			return onCreateTypeThreeQuestionView(inflater, container);
+			return createTypeThreeQuestionView(inflater, container);
 		case Question.TYPE_4:
-			return onCreateTypeFourQuestionView(inflater, container);
+			return createTypeFourQuestionView(inflater, container);
 		case Question.TYPE_5:
-			return onCreateTypeFiveQuestionView(inflater, container);
+			return createTypeFiveQuestionView(inflater, container);
 		default:
-			View v = inflater.inflate(R.layout.question, container, false);
+			View v = inflater.inflate(R.layout.test_question, container, false);
 			return v;
 		}
 	}
 
-	private View onCreateTypeOneQuestionView(LayoutInflater inflater,
-			ViewGroup container) {
-		View v = inflater.inflate(R.layout.question, container, false);
-
-		TextView questionNum = (TextView) v
-				.findViewById(R.id.test_question_num);
-		TextView questionNumFull = (TextView) v
-				.findViewById(R.id.test_question_num_full);
-		TextView questionText = (TextView) v
-				.findViewById(R.id.test_question_text);
-		LinearLayout answersList = (LinearLayout) v
-				.findViewById(R.id.test_question_answers_list);
-
-		questionNum.setText(getResources().getString(R.string.question) + " "
-				+ question.idTestQuestion);
-		questionNumFull.setText(question.idTestQuestion + "/" + taskAll);
-		questionText.setText(Html.fromHtml(question.question, imgGetter, null));
-		questionText.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (question.question.contains("href")) {
-					openImage(parseSRC(question.question));
-				}
-			}
-		});
-
+	private View createTypeOneQuestionView(LayoutInflater inflater, ViewGroup container) {
+		View v = inflater.inflate(R.layout.test_question, container, false);
+		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+		
+		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
+		questionContainer.addView(createQuestionText(inflater, questionContainer));
+		
+		LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
+		questionContainer.addView(answersContainer);
+				
 		String[] answers = question.answers.split("\n");
 		final View[] answerItems = new View[answers.length];
 		Pattern answerPattern = Pattern.compile("(^.*?)(\\.\\s|\\s)(.*?$)");
@@ -108,21 +96,16 @@ public class QuestionFragment extends Fragment {
 		TextView answerItemText;
 
 		for (int i = 0; i < answers.length; i++) {
-			answerItems[i] = inflater.inflate(R.layout.answers_list_item,
-					answersList, false);
+			answerItems[i] = inflater.inflate(R.layout.answer, answersContainer, false);
 
-			answerItemLetter = (TextView) answerItems[i]
-					.findViewById(R.id.answer_item_letter);
-			answerItemText = (TextView) answerItems[i]
-					.findViewById(R.id.answer_item_text);
+			answerItemLetter = (TextView) answerItems[i].findViewById(R.id.answer_letter);
+			answerItemText = (TextView) answerItems[i].findViewById(R.id.answer_text);
 
 			matcher = answerPattern.matcher(answers[i]);
 
 			if (matcher.find()) {
-				answerItemLetter.setText(Html.fromHtml(matcher.group(1),
-						imgGetter, null));
-				answerItemText.setText(Html.fromHtml(matcher.group(3),
-						imgGetter, null));
+				answerItemLetter.setText(Html.fromHtml(matcher.group(1), imgGetter, null));
+				answerItemText.setText(Html.fromHtml(matcher.group(3), imgGetter, null));
 
 				final int num = i;
 				answerItems[i].setOnClickListener(new OnClickListener() {
@@ -135,11 +118,11 @@ public class QuestionFragment extends Fragment {
 						}
 						answerItems[num].setSelected(true);
 						question.answer = String.valueOf((num + 1));
-
+						questionActions.onAnswerSelected();
 					}
 				});
 
-				answersList.addView(answerItems[i]);
+				answersContainer.addView(answerItems[i]);
 			}
 		}
 
@@ -151,34 +134,24 @@ public class QuestionFragment extends Fragment {
 		return v;
 	}
 
-	private View onCreateTypeTwoQuestionView(LayoutInflater inflater,
-			ViewGroup container) {
-		View v = inflater.inflate(R.layout.question, container, false);
-		View questionHeader = v.findViewById(R.id.test_question_header);
-		TextView questionText = (TextView) v
-				.findViewById(R.id.test_question_text);
-		questionHeader.setVisibility(View.GONE);
-		questionText.setText(Html.fromHtml(question.question));
+	private View createTypeTwoQuestionView(LayoutInflater inflater, ViewGroup container) {
+		View v = inflater.inflate(R.layout.test_question, container, false);
+		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+		
+		questionContainer.addView(createQuestionText(inflater, questionContainer));
+		
 		return v;
 	}
 
-	private View onCreateTypeThreeQuestionView(LayoutInflater inflater,
-			ViewGroup container) {
-		View v = inflater.inflate(R.layout.question, container, false);
+	private View createTypeThreeQuestionView(LayoutInflater inflater, ViewGroup container) {
+		View v = inflater.inflate(R.layout.test_question, container, false);
+		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
-		TextView questionNum = (TextView) v
-				.findViewById(R.id.test_question_num);
-		TextView questionNumFull = (TextView) v
-				.findViewById(R.id.test_question_num_full);
-		TextView questionText = (TextView) v
-				.findViewById(R.id.test_question_text);
-		LinearLayout answersList = (LinearLayout) v
-				.findViewById(R.id.test_question_answers_list);
-
-		questionNum.setText(getResources().getString(R.string.question) + " "
-				+ question.idTestQuestion);
-		questionNumFull.setText(question.idTestQuestion + "/" + taskAll);
-		questionText.setText(Html.fromHtml(question.question, imgGetter, null));
+		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
+		questionContainer.addView(createQuestionText(inflater, questionContainer));
+		
+		LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
+		questionContainer.addView(answersContainer);
 
 		int numCounts = Integer.parseInt(question.answers.split("-")[0]);
 		int varCounts = Integer.parseInt(question.answers.split("-")[1]);
@@ -191,51 +164,42 @@ public class QuestionFragment extends Fragment {
 		TextView answerItemLetter;
 
 		for (int i = 0; i < answerItems.length; i++) {
-			answerItems[i] = inflater.inflate(
-					R.layout.answers_list_item_couple, answersList, false);
+			answerItems[i] = inflater.inflate(R.layout.answers_connections, answersContainer, false);
 
-			answerCoupleNum = (TextView) answerItems[i]
-					.findViewById(R.id.answer_couple_num);
+			answerCoupleNum = (TextView) answerItems[i].findViewById(R.id.answer_couple_num);
 			answerCoupleNum.setText(String.valueOf((i + 1)));
-			answerLettersContainer = (LinearLayout) answerItems[i]
-					.findViewById(R.id.answer_couple_letters_container);
+			answerLettersContainer = (LinearLayout) answerItems[i].findViewById(R.id.answer_couple_letters_container);
 
 			final int num = i;
 			for (int j = 0; j < answerItemLetters[0].length; j++) {
-				answerItemLetters[i][j] = inflater.inflate(
-						R.layout.answers_list_item_cople_letter,
+				answerItemLetters[i][j] = inflater.inflate(R.layout.answers_letter,
 						answerLettersContainer, false);
-				answerItemLetter = (TextView) answerItemLetters[i][j]
-						.findViewById(R.id.answer_item_couple_letter);
-				answerItemLetter.setText(String
-						.valueOf((char) (firstLetter + j)));
+				answerItemLetter = (TextView) answerItemLetters[i][j].findViewById(R.id.answer_letter);
+				answerItemLetter.setText(String.valueOf((char) (firstLetter + j)));
 				final int letterNum = j;
 				answerItemLetters[i][j]
 						.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
-								StringBuilder sb = new StringBuilder(
-										question.answer);
+								StringBuilder sb = new StringBuilder(question.answer);
 								char oldNumLetter = sb.charAt(num);
 								char newNumLetter = (char) ('0' + letterNum + 1);
 								if (oldNumLetter != '0') {
-									answerItemLetters[num][oldNumLetter - '0' - 1]
-											.setSelected(false);
+									answerItemLetters[num][oldNumLetter - '0' - 1].setSelected(false);
 								}
-								int usedNumLetter = sb.indexOf(String
-										.valueOf(newNumLetter));
+								int usedNumLetter = sb.indexOf(String.valueOf(newNumLetter));
 								if (usedNumLetter != -1) {
-									answerItemLetters[usedNumLetter][letterNum]
-											.setSelected(false);
+									answerItemLetters[usedNumLetter][letterNum].setSelected(false);
 									sb.setCharAt(usedNumLetter, '0');
 								}
 
 								sb.setCharAt(num, newNumLetter);
-								answerItemLetters[num][letterNum]
-										.setSelected(true);
+								answerItemLetters[num][letterNum].setSelected(true);
 								question.answer = sb.toString();
-								Log.i("MyLogs", question.answer);
+								if (!question.answer.contains("0")) {
+									questionActions.onAnswerSelected();
+								}
 							}
 						});
 
@@ -245,34 +209,24 @@ public class QuestionFragment extends Fragment {
 			if (oldNumLetter != '0') {
 				answerItemLetters[i][oldNumLetter - '0' - 1].setSelected(true);
 			}
-			answersList.addView(answerItems[i]);
+			answersContainer.addView(answerItems[i]);
 		}
 
 		return v;
 	}
 
-	private View onCreateTypeFourQuestionView(LayoutInflater inflater,
-			ViewGroup container) {
-		View v = inflater.inflate(R.layout.question, container, false);
+	private View createTypeFourQuestionView(LayoutInflater inflater, ViewGroup container) {
+		View v = inflater.inflate(R.layout.test_question, container, false);
+		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
-		TextView questionNum = (TextView) v
-				.findViewById(R.id.test_question_num);
-		TextView questionNumFull = (TextView) v
-				.findViewById(R.id.test_question_num_full);
-		TextView questionText = (TextView) v
-				.findViewById(R.id.test_question_text);
-		LinearLayout answersList = (LinearLayout) v
-				.findViewById(R.id.test_question_answers_list);
-
-		questionNum.setText(getResources().getString(R.string.question) + " "
-				+ question.idTestQuestion);
-		questionNumFull.setText(question.idTestQuestion + "/" + taskAll);
-		questionText.setText(Html.fromHtml(question.question, imgGetter, null));
-
-		View answerItem = inflater.inflate(R.layout.answer_three_correct,
-				answersList, false);
-		EditText answerItemInput = (EditText) answerItem
-				.findViewById(R.id.answer_item_three_correct);
+		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
+		questionContainer.addView(createQuestionText(inflater, questionContainer));
+		
+		LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
+		questionContainer.addView(answersContainer);
+		
+		View answerItem = inflater.inflate(R.layout.answer_only_correct,answersContainer, false);
+		EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_only_correct_input);
 
 		if (!question.answer.isEmpty()) {
 			answerItemInput.setText(question.answer);
@@ -293,67 +247,125 @@ public class QuestionFragment extends Fragment {
 			@Override
 			public void afterTextChanged(Editable s) {
 				question.answer = s.toString();
-				if (s.length() == 3) {
-					InputMethodManager inputManager = (InputMethodManager) getActivity()
-							.getSystemService(Context.INPUT_METHOD_SERVICE);
-					inputManager.hideSoftInputFromWindow(getActivity()
-							.getCurrentFocus().getWindowToken(),
-							InputMethodManager.HIDE_NOT_ALWAYS);
+			}
+		});
+		
+		answerItemInput.setOnEditorActionListener(new OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE
+						|| event.getAction() == KeyEvent.ACTION_DOWN
+						&& event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+					hideKeyboard();
+					if (question.answer.length() == 3) {
+						questionActions.onAnswerSelected();
+					}
+					return true;
+				}
+				return false;
+			}
+		});
+
+
+		answersContainer.addView(answerItem);
+		return v;
+	}
+
+	private View createTypeFiveQuestionView(LayoutInflater inflater,
+			ViewGroup container) {
+		View v = inflater.inflate(R.layout.test_question, container, false);
+		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+
+		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
+		questionContainer.addView(createQuestionText(inflater, questionContainer));
+		
+		LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
+		questionContainer.addView(answersContainer);
+
+		View answerItem = inflater.inflate(R.layout.answer_short, answersContainer, false);
+		EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_input);
+
+		if (!question.answer.isEmpty()) {
+			answerItemInput.setText(question.answer);
+		}
+
+		answerItemInput.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				question.answer = s.toString();
+			}
+		});
+
+		answerItemInput.setOnEditorActionListener(new OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE
+						|| event.getAction() == KeyEvent.ACTION_DOWN
+						&& event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+					hideKeyboard();
+					if (!question.answer.isEmpty()) {
+						new Handler().postDelayed(new Runnable() {
+
+							@Override
+							public void run() {
+								questionActions.onAnswerSelected();
+							}
+							
+						}, 200);
+					}
+					return true;
+				}
+				return false;
+			}
+		});
+
+		answersContainer.addView(answerItem);
+		return v;
+	}
+	
+	private View createQuestionHeaderView(LayoutInflater inflater, ViewGroup container) {
+		View v = inflater.inflate(R.layout.test_question_header, container, false);
+		
+		TextView questionId = (TextView) v.findViewById(R.id.test_question_id);
+		TextView questionTaskAll = (TextView) v.findViewById(R.id.test_question_task_all);
+		
+		questionId.setText(getResources().getString(R.string.question) + " " + question.idTestQuestion);
+		questionTaskAll.setText(question.idTestQuestion + "/" + taskAll);
+		
+		return v;
+	}
+	
+	private View createQuestionText(LayoutInflater inflater, ViewGroup container){		
+		TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
+		questionText.setText(Html.fromHtml(question.question, imgGetter, null));
+		questionText.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				if (question.question.contains("href")) {
+					openImage(parseSRC(question.question));
 				}
 			}
-		});
-
-		answersList.addView(answerItem);
-		return v;
+		});		
+		
+		return questionText;
 	}
-
-	private View onCreateTypeFiveQuestionView(LayoutInflater inflater,
-			ViewGroup container) {
-		View v = inflater.inflate(R.layout.question, container, false);
-
-		TextView questionNum = (TextView) v
-				.findViewById(R.id.test_question_num);
-		TextView questionNumFull = (TextView) v
-				.findViewById(R.id.test_question_num_full);
-		TextView questionText = (TextView) v
-				.findViewById(R.id.test_question_text);
-		LinearLayout answersList = (LinearLayout) v
-				.findViewById(R.id.test_question_answers_list);
-
-		questionNum.setText(getResources().getString(R.string.question) + " "
-				+ question.idTestQuestion);
-		questionNumFull.setText(question.idTestQuestion + "/" + taskAll);
-		questionText.setText(Html.fromHtml(question.question, imgGetter, null));
-
-		View answerItem = inflater.inflate(R.layout.answer_item_short,
-				answersList, false);
-		EditText answerItemInput = (EditText) answerItem
-				.findViewById(R.id.answer_item_input);
-
-		if (!question.answer.isEmpty()) {
-			answerItemInput.setText(question.answer);
-		}
-
-		answerItemInput.addTextChangedListener(new TextWatcher() {
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				question.answer = s.toString();
-			}
-		});
-
-		answersList.addView(answerItem);
-		return v;
+	
+	private LinearLayout createAnswersContainer(LayoutInflater inflater, ViewGroup container){		
+		return (LinearLayout) inflater.inflate(R.layout.test_question_answers, container, false);
 	}
 
 	private ImageGetter imgGetter = new ImageGetter() {
@@ -364,9 +376,9 @@ public class QuestionFragment extends Fragment {
 			try {
 				drawable = fm.openDrawable(source);
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+					e.printStackTrace();
 			}
-
+			
 			if (drawable == null) {
 				drawable = getResources().getDrawable(R.drawable.emo_im_crying);
 			}
@@ -391,8 +403,7 @@ public class QuestionFragment extends Fragment {
 
 	private void openImage(String source) {
 		if (source != null) {
-			Intent viewImage = new Intent(getActivity(),
-					ViewImageActivity.class);
+			Intent viewImage = new Intent(getActivity(), ViewImageActivity.class);
 			viewImage.putExtra(ZNOApplication.ExtrasKeys.IMG_SOURCE, source);
 			startActivity(viewImage);
 		}
@@ -404,6 +415,15 @@ public class QuestionFragment extends Fragment {
 			return matcher.group(1);
 		}
 		return null;
+	}
+
+	public interface QuestionActions {
+		void onAnswerSelected();
+	}
+	
+	private void hideKeyboard(){
+		InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 
 }

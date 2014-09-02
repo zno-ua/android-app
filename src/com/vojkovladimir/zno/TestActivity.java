@@ -1,21 +1,23 @@
 package com.vojkovladimir.zno;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 
-import com.vojkovladimir.zno.adapters.QuestionFragmentAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
+import com.vojkovladimir.zno.fragments.QuestionFragment;
 import com.vojkovladimir.zno.models.Test;
 
-public class TestActivity extends Activity {
+public class TestActivity extends FragmentActivity {
 
 	public static String LOG_TAG = "MyLogs";
 
@@ -24,16 +26,8 @@ public class TestActivity extends Activity {
 
 	Test test;
 
-	QuestionFragmentAdapter questionsAdapter;
-	
-	Button nextBtn;
-	OnClickListener onNext = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			questionsAdapter.next();			
-		}
-	};
+	private ViewPager mPager;
+	private PagerAdapter mPagerAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,21 +41,21 @@ public class TestActivity extends Activity {
 
 		app = ZNOApplication.getInstance();
 		db = app.getZnoDataBaseHelper();
-		
-		nextBtn = (Button)findViewById(R.id.test_skip_btn);
-		nextBtn.setOnClickListener(onNext);
-		
+
 		test = db.getTest(tableName);
-		questionsAdapter = new QuestionFragmentAdapter(this, test, db);
+
+		mPager = (ViewPager) findViewById(R.id.test_question_pager);
+		mPagerAdapter = new QuestionsAdapter(getSupportFragmentManager());
+		mPager.setAdapter(mPagerAdapter);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    // Inflate the menu items for use in the action bar
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.test_menu, menu);
-	    return super.onCreateOptionsMenu(menu);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.test_menu, menu);
+		return super.onCreateOptionsMenu(menu);
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -69,28 +63,13 @@ public class TestActivity extends Activity {
 			finish();
 			return true;
 		case R.id.action_questions_list:
-			//Open questions list
+			// Open questions list
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-		
-	}
 
-	//
-	// @Override
-	// protected void onSaveInstanceState(Bundle outState) {
-	// outState.putInt(KEY_CURRENT, current);
-	// Log.i(LOG_TAG, "TestActivity: onSaveInstanceState()");
-	// super.onSaveInstanceState(outState);
-	// }
-	//
-	// @Override
-	// protected void onRestoreInstanceState(Bundle savedInstanceState) {
-	// Log.i(LOG_TAG, "TestActivity: onRestoreInstanceState()");
-	// current = savedInstanceState.getInt(KEY_CURRENT);
-	// super.onRestoreInstanceState(savedInstanceState);
-	// }
+	}
 
 	@Override
 	protected void onStart() {
@@ -118,12 +97,37 @@ public class TestActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
-		Log.i(LOG_TAG, "TestActivity: onBackPressed()");
-		if (questionsAdapter.getCurrent() > 0) {
-			questionsAdapter.previous();
+		if (mPager.getCurrentItem() != 0) {
+			mPager.setCurrentItem(mPager.getCurrentItem() - 1);
 		} else {
 			super.onBackPressed();
 		}
+	}
+
+	private class QuestionsAdapter extends FragmentStatePagerAdapter implements
+			QuestionFragment.QuestionActions {
+
+		public QuestionsAdapter(FragmentManager fm) {
+			super(fm);
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			return QuestionFragment.newInstance(getApplicationContext(), test.questions.get(position), test.taskAll, test.lessonId,	this);
+		}
+
+		@Override
+		public int getCount() {
+			return test.taskAll;
+		}
+
+		@Override
+		public void onAnswerSelected() {
+			if (mPager.getCurrentItem() + 1 < test.questions.size()) {
+				mPager.setCurrentItem(mPager.getCurrentItem() + 1);
+			}
+		}
+
 	}
 
 }
