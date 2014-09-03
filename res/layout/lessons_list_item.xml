@@ -28,7 +28,7 @@
             android:lines="1"
             android:singleLine="true"
             android:text="@string/loren_ipsum_text"
-            android:textColor="@color/item_text_color"
+            android:textColor="@color/list_item_text_color"
             android:textSize="18sp" />
 
         <TextView

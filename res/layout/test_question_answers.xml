@@ -3,7 +3,7 @@
     android:id="@+id/test_question_answers_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:divider="@drawable/answers_list_divider"
+    android:divider="@drawable/list_divider"
     android:dividerPadding="10dp"
     android:orientation="vertical"
     android:showDividers="middle" />

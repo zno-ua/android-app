@@ -1,5 +1,6 @@
 package com.vojkovladimir.zno;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,12 +10,21 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.TextView;
 
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.fragments.QuestionFragment;
+import com.vojkovladimir.zno.models.Question;
 import com.vojkovladimir.zno.models.Test;
 
 public class TestActivity extends FragmentActivity {
@@ -28,6 +38,9 @@ public class TestActivity extends FragmentActivity {
 
 	private ViewPager mPager;
 	private PagerAdapter mPagerAdapter;
+	private GridView questionsGride;
+	
+	boolean questionsGrideVisible = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +60,17 @@ public class TestActivity extends FragmentActivity {
 		mPager = (ViewPager) findViewById(R.id.test_question_pager);
 		mPagerAdapter = new QuestionsAdapter(getSupportFragmentManager());
 		mPager.setAdapter(mPagerAdapter);
+		
+		questionsGride = (GridView) findViewById(R.id.test_questions);
+		questionsGride.setAdapter(new QuestionsGrideAdapter());
+		questionsGride.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				mPager.setCurrentItem(position);
+				hideQuestionsGride();
+			}
+		});
 	}
 
 	@Override
@@ -63,12 +87,30 @@ public class TestActivity extends FragmentActivity {
 			finish();
 			return true;
 		case R.id.action_questions_list:
-			// Open questions list
+			if (questionsGrideVisible) {
+				hideQuestionsGride();
+			} else {
+				showQuestionsGride();
+			}
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 
+	}
+	
+	private void showQuestionsGride() {
+		questionsGride.invalidateViews();
+		questionsGride.bringToFront();
+		questionsGride.setVisibility(View.VISIBLE);
+		mPager.setVisibility(View.INVISIBLE);
+		questionsGrideVisible = true;
+	}
+	
+	private void hideQuestionsGride() {
+		questionsGride.setVisibility(View.INVISIBLE);
+		mPager.setVisibility(View.VISIBLE);
+		questionsGrideVisible = false;
 	}
 
 	@Override
@@ -113,7 +155,7 @@ public class TestActivity extends FragmentActivity {
 
 		@Override
 		public Fragment getItem(int position) {
-			return QuestionFragment.newInstance(getApplicationContext(), test.questions.get(position), test.taskAll, test.lessonId,	this);
+			return QuestionFragment.newInstance(getApplicationContext(), test.questions.get(position), test.taskAll, test.lessonId, this);
 		}
 
 		@Override
@@ -126,6 +168,63 @@ public class TestActivity extends FragmentActivity {
 			if (mPager.getCurrentItem() + 1 < test.questions.size()) {
 				mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 			}
+		}
+
+	}
+
+	static class ViewHolder {
+		TextView questionNum;
+	}
+	
+	class QuestionsGrideAdapter extends BaseAdapter {
+
+		private LayoutInflater inflater;
+
+		public QuestionsGrideAdapter() {
+			inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+
+		@Override
+		public int getCount() {
+			return test.taskAll;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return position;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder holder;
+			
+			if (convertView == null) {
+				convertView = inflater.inflate(R.layout.test_questions_gride_item, parent, false);
+				holder = new ViewHolder();
+				holder.questionNum = (TextView) convertView.findViewById(R.id.test_questions_gride_item_num);
+				convertView.setTag(holder);
+			} else {
+				holder = (ViewHolder) convertView.getTag();
+			}
+			
+			Question question = test.questions.get(position);
+			
+			if (question.answer.isEmpty() || (question.typeQuestion == Question.TYPE_3 && question.answer.contains("0"))) {
+				convertView.setBackgroundResource(R.drawable.item_background_unselected);
+				holder.questionNum.setTextColor(getResources().getColorStateList(R.color.item_text_color));
+			} else {
+				convertView.setBackgroundResource(R.drawable.item_background_selected);
+				holder.questionNum.setTextColor(getResources().getColorStateList(R.color.item_text_color_selected));
+			}
+			
+			holder.questionNum.setText(String.valueOf(position + 1));
+			
+			return convertView;
 		}
 
 	}

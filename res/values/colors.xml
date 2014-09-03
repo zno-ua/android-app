@@ -8,13 +8,14 @@
     <color name="quote_divider_color">#c1c1c1</color>
     <color name="chooser_text_color">#999999</color>
     <color name="chooser_divider_color">#a9a9a9</color>
-    <color name="item_text_color">#222222</color>
+    <color name="list_item_text_color">#222222</color>
     <color name="sub_item_text_color">#777777</color>
     <color name="download_divider_color">#dbdbdb</color>
     <color name="question_num_text_color">@color/chooser_text_color</color>
     <color name="question_underline_color">#b2b2b2</color>
     <color name="question_text_color">@color/quote_color</color>
     <color name="question_bg_color">#fff</color>
+    <color name="question_bg_color_selected">#27b255</color>
     <color name="answer_bg_color">@color/question_bg_color</color>
     <color name="answer_selected_bg_color">@color/blue</color>
     <color name="answer_text_color">@color/question_text_color</color>

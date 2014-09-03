@@ -3,7 +3,7 @@
     android:layout_width="36dp"
     android:layout_height="36dp"
     android:layout_weight="1"
-    android:background="@drawable/answer_item_bg_normal"
+    android:background="@drawable/item_bg_normal"
     android:clickable="true" >
 
     <ImageView
@@ -11,7 +11,7 @@
         android:layout_height="30dp"
         android:layout_gravity="center"
         android:contentDescription="@string/image_desription"
-        android:src="@drawable/answer_letter_circle" />
+        android:src="@drawable/letter_circle" />
 
     <TextView
         android:id="@+id/answer_letter"
@@ -19,7 +19,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center"
-        android:textColor="@drawable/answers_list_item_text_color"
+        android:textColor="@color/item_text_color"
         android:textSize="16sp" />
 
 </FrameLayout>
