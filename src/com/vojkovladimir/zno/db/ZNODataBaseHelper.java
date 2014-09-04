@@ -51,6 +51,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	public static final String KEY_ID_TEST_QUESTION = "id_test_question";
 	public static final String KEY_QUESTION = "question";
 	public static final String KEY_TYPE_QUESTION = "type_question";
+	public static final String KEY_LAST_UPDATE = "last_update";
 
 	private static final String CREATE_TABLE_LESSONS = "CREATE TABLE "
 			+ TABLE_LESSONS + " (" + KEY_ID + " INTEGER PRIMARY KEY, "
@@ -62,7 +63,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			+ KEY_TASK_ALL + " INTEGER, " + KEY_TASK_MATCHES + " INTEGER, "
 			+ KEY_TASK_OPEN_ANSWER + " INTEGER, " + KEY_TASK_TEST
 			+ " INTEGER, " + KEY_TASK_VARS + " INTEGER, " + KEY_TIME
-			+ " INTEGER, " + KEY_YEAR + " INTEGER, " + KEY_LOADED
+			+ " INTEGER, " + KEY_YEAR + " INTEGER, " + KEY_LAST_UPDATE + " INTEGER, " + KEY_LOADED
 			+ " INTEGER);";
 
 	private static final String createTableTest(String tableName) {
@@ -161,6 +162,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		int taskVars;
 		int time;
 		int year;
+		int lastUpdate;
 
 		long status;
 
@@ -179,6 +181,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				taskVars = test.getInt(Api.Keys.TASK_VARS);
 				time = test.getInt(Api.Keys.TIME);
 				year = test.getInt(Api.Keys.YEAR);
+				lastUpdate = test.getInt(Api.Keys.LAST_UPDATE);
 
 				values.clear();
 				values.put(KEY_ID, id);
@@ -192,12 +195,12 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				values.put(KEY_TIME, time);
 				values.put(KEY_YEAR, year);
 				values.put(KEY_LOADED, 0);
+				values.put(KEY_LAST_UPDATE, lastUpdate);
 
 				status = db.insert(TABLE_TESTS, null, values);
 
 				if (status == -1) {
-					Log.e(LOG_TAG, "Error while inserting test! test id: " + id
-							+ ".");
+					Log.e(LOG_TAG, "Error while inserting test! test id: " + id	+ ".");
 				}
 			} catch (JSONException e) {
 			}
