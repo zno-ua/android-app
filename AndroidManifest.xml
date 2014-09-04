@@ -56,6 +56,13 @@
         <activity
             android:name=".ViewImageActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <data android:scheme="open.image" />
+            </intent-filter>
         </activity>
     </application>
 

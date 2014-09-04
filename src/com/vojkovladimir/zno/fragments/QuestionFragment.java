@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +13,7 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -29,8 +29,6 @@ import android.widget.TextView.OnEditorActionListener;
 
 import com.vojkovladimir.zno.FileManager;
 import com.vojkovladimir.zno.R;
-import com.vojkovladimir.zno.ViewImageActivity;
-import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.models.Question;
 
 public class QuestionFragment extends Fragment {
@@ -351,15 +349,16 @@ public class QuestionFragment extends Fragment {
 	private View createQuestionText(LayoutInflater inflater, ViewGroup container){		
 		TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
 		questionText.setText(Html.fromHtml(question.question, imgGetter, null));
-		questionText.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (question.question.contains("href")) {
-					openImage(parseSRC(question.question));
-				}
-			}
-		});		
+		questionText.setMovementMethod(LinkMovementMethod.getInstance());
+//		questionText.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View v) {
+//				if (question.question.contains("href")) {
+//					openImage(parseSRC(question.question));
+//				}
+//			}
+//		});		
 		
 		return questionText;
 	}
@@ -400,22 +399,6 @@ public class QuestionFragment extends Fragment {
 			return drawable;
 		}
 	};
-
-	private void openImage(String source) {
-		if (source != null) {
-			Intent viewImage = new Intent(getActivity(), ViewImageActivity.class);
-			viewImage.putExtra(ZNOApplication.ExtrasKeys.IMG_SOURCE, source);
-			startActivity(viewImage);
-		}
-	}
-
-	private String parseSRC(String text) {
-		Matcher matcher = Pattern.compile("<img src=\"([^\"]+)").matcher(text);
-		if (matcher.find()) {
-			return matcher.group(1);
-		}
-		return null;
-	}
 
 	public interface QuestionActions {
 		void onAnswerSelected();

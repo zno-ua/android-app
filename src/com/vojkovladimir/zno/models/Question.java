@@ -22,7 +22,7 @@ public class Question {
 			String answer) {
 		this.id = id;
 		this.idTestQuestion = idTestQuestion;
-		this.question = question;
+		this.question = question.replace("<a href=\"", "<a href=\"open.image://?src=");;
 		this.answers = answers;
 		this.correctAnswer = correctAnswer;
 		this.balls = balls;

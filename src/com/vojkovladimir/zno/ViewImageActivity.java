@@ -3,10 +3,12 @@ package com.vojkovladimir.zno;
 import java.io.FileNotFoundException;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -38,8 +40,14 @@ public class ViewImageActivity extends Activity implements OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_view_image);
-		source = getIntent().getStringExtra(
-				ZNOApplication.ExtrasKeys.IMG_SOURCE);
+		Intent intent = getIntent();
+		Uri data = intent.getData();
+		
+		if (data == null ) {
+			finish();
+		} else {
+			source = data.getQueryParameter("src");
+		}
 
 		fm = new FileManager(this);
 		img = (ImageView) findViewById(R.id.view_image_img);
