@@ -64,6 +64,17 @@
                 <data android:scheme="open.image" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.ApiService"
+            android:enabled="true"
+            android:exported="false" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="api.download.test" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

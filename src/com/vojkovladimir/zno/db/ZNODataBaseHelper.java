@@ -17,15 +17,15 @@ import android.util.Log;
 
 import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.ZNOApplication;
-import com.vojkovladimir.zno.api.Api;
 import com.vojkovladimir.zno.models.Lesson;
 import com.vojkovladimir.zno.models.Question;
 import com.vojkovladimir.zno.models.Test;
 import com.vojkovladimir.zno.models.TestInfo;
+import com.vojkovladimir.zno.service.ApiService;
 
 public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
-	private static String LOG_TAG = "ZNODataBase";
+	private static String LOG_TAG = "MyLogs";
 
 	private static final String DATABASE_NAME = "ZNOTests.db";
 	private static final int DATABASE_VERSION = 1;
@@ -125,9 +125,9 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			try {
 				lesson = lessons.getJSONObject(i);
 
-				id = lesson.getInt(Api.Keys.ID);
-				link = lesson.getString(Api.Keys.LINK).replace("-", "_");
-				name = lesson.getString(Api.Keys.NAME);
+				id = lesson.getInt(ApiService.Keys.ID);
+				link = lesson.getString(ApiService.Keys.LINK).replace("-", "_");
+				name = lesson.getString(ApiService.Keys.NAME);
 
 				values.clear();
 				values.put(KEY_ID, id);
@@ -150,6 +150,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TESTS);
 		db.execSQL(CREATE_TABLE_TESTS);
 		ContentValues values = new ContentValues();
+		
+		Log.i(LOG_TAG, "fillInTableTests, tests count = "+tests.length());
 
 		JSONObject test;
 		int id;
@@ -170,18 +172,18 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			try {
 				test = tests.getJSONObject(i);
 
-				id = test.getInt(Api.Keys.ID);
-				lessonId = test.getInt(Api.Keys.LESSON_ID);
+				id = test.getInt(ApiService.Keys.ID);
+				lessonId = test.getInt(ApiService.Keys.LESSON_ID);
 				;
-				name = test.getString(Api.Keys.NAME);
-				taskAll = test.getInt(Api.Keys.TASK_ALL);
-				taskMatches = test.getInt(Api.Keys.TASK_MATCHES);
-				taskOpenAnswers = test.getInt(Api.Keys.TASK_OPEN_ANSWER);
-				taskTest = test.getInt(Api.Keys.TASK_TEST);
-				taskVars = test.getInt(Api.Keys.TASK_VARS);
-				time = test.getInt(Api.Keys.TIME);
-				year = test.getInt(Api.Keys.YEAR);
-				lastUpdate = test.getInt(Api.Keys.LAST_UPDATE);
+				name = test.getString(ApiService.Keys.NAME);
+				taskAll = test.getInt(ApiService.Keys.TASK_ALL);
+				taskMatches = test.getInt(ApiService.Keys.TASK_MATCHES);
+				taskOpenAnswers = test.getInt(ApiService.Keys.TASK_OPEN_ANSWER);
+				taskTest = test.getInt(ApiService.Keys.TASK_TEST);
+				taskVars = test.getInt(ApiService.Keys.TASK_VARS);
+				time = test.getInt(ApiService.Keys.TIME);
+				year = test.getInt(ApiService.Keys.YEAR);
+				lastUpdate = test.getInt(ApiService.Keys.LAST_UPDATE);
 
 				values.clear();
 				values.put(KEY_ID, id);
@@ -203,6 +205,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 					Log.e(LOG_TAG, "Error while inserting test! test id: " + id	+ ".");
 				}
 			} catch (JSONException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -212,8 +215,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		fillInTableTests(db, tests);
 	}
 
-	private void fillInTableTest(SQLiteDatabase db, JSONArray questions,
-			String tableName) {
+	private void fillInTableTest(SQLiteDatabase db, JSONArray questions, String tableName) {
 		db.execSQL("DROP TABLE IF EXISTS " + tableName);
 		db.execSQL(createTableTest(tableName));
 		ContentValues values = new ContentValues();
@@ -232,13 +234,13 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 			for (int i = 0; i < questions.length(); i++) {
 				questionItem = questions.getJSONObject(i);
 
-				answers = questionItem.getString(Api.Keys.ANSWERS);
-				balls = questionItem.getInt(Api.Keys.BALLS);
-				correctAnswer = questionItem.getString(Api.Keys.CORRECT_ANSWER);
-				id = questionItem.getInt(Api.Keys.ID_ON_TEST);
-				idTestQuestion = questionItem.getInt(Api.Keys.ID_TEST_QUESTION);
-				question = questionItem.getString(Api.Keys.QUESTION);
-				typeQuestion = questionItem.getInt(Api.Keys.TYPE_QUESTION);
+				answers = questionItem.getString(ApiService.Keys.ANSWERS);
+				balls = questionItem.getInt(ApiService.Keys.BALLS);
+				correctAnswer = questionItem.getString(ApiService.Keys.CORRECT_ANSWER);
+				id = questionItem.getInt(ApiService.Keys.ID_ON_TEST);
+				idTestQuestion = questionItem.getInt(ApiService.Keys.ID_TEST_QUESTION);
+				question = questionItem.getString(ApiService.Keys.QUESTION);
+				typeQuestion = questionItem.getInt(ApiService.Keys.TYPE_QUESTION);
 
 				values.clear();
 				values.put(KEY_ANSWERS, answers);
@@ -252,11 +254,10 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				status = db.insert(tableName, null, values);
 
 				if (status == -1) {
-					Log.e(LOG_TAG, "Error while inserting question! "
-							+ tableName + " id: " + id + ".");
+					Log.e(LOG_TAG, "Error while inserting question! " + tableName + " id: " + id + ".");
 				}
 			}
-
+			Log.i(LOG_TAG, "fillInTableTest, tests count = "+tableName);
 		} catch (JSONException e) {
 
 		}
