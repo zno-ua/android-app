@@ -1,5 +1,7 @@
 package com.vojkovladimir.zno.service;
 
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,14 +24,15 @@ import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 
 public class ApiService extends Service {
 
-	public static String LOG_TAG = "MyLogs";
-	public static final String DOWNLOAD_TEST_ACTION = "api.download.test";
-
 	private static final String SITE_URL = "http://new.zno-ua.net";
 	private static final String API_URL = SITE_URL + "/api/v1/";
 //	private static final String GET_TESTS = "test/?format=json";
 	private static final String GET_TEST = "question/?format=json&test=";
 	
+	public static final String DOWNLOAD_TEST_ACTION = "api.download.test";
+	public static final String LOG_TAG = "MyLogs";
+	public static final String REQUEST_TAG = "api_request";
+
 	public static interface Keys {
 		String OBJECTS = "objects";
 		String IMAGES = "images";
@@ -57,9 +60,11 @@ public class ApiService extends Service {
 		String STATUS = "status";
 	}
 	
-	public interface OnTestLoadedListener {
-		void onTestLoad();
-		void onError();
+	public interface TestDownloadingFeedBack {
+		void onTestLoaded();
+		void onError(Exception e);
+		void onExtraDownloadingStart(int max);
+		void onExtraDownloadingProgressInc();
 	}
 	
 	private final IBinder mBinder = new ApiBinder();
@@ -77,12 +82,14 @@ public class ApiService extends Service {
 		super.onCreate();
 	}
 	
-	public void downLoadTest(final OnTestLoadedListener onTestLoadedListener,final String link, final int year, final int id) {
-		ErrorListener errorListener = new ErrorListener() {
+	public void downLoadTest(final TestDownloadingFeedBack feedBack,final String link, final int year, final int id) {
+		final ErrorListener errorListener = new ErrorListener() {
 
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				onTestLoadedListener.onError();
+				Log.i(LOG_TAG, error.toString());
+				app.getRequestQueue().cancelAll(REQUEST_TAG);
+				feedBack.onError(error);
 			}
 		};
 		
@@ -91,40 +98,65 @@ public class ApiService extends Service {
 			@Override
 			public void onResponse(final JSONObject responce) {
 				try {
-					final JSONArray questions = responce.getJSONArray(ApiService.Keys.OBJECTS);
-					
+					Log.i(LOG_TAG, link+"_"+year+"_"+id+" downloading start");
+					final JSONArray questions = responce.getJSONArray(Keys.OBJECTS);
+					JSONObject question = null;
+					JSONArray images = null;
+					ArrayList<String> imageUrls = new ArrayList<String>();
+					Log.i(LOG_TAG, imageUrls.size()+" images count");
 					for (int i = 0; i < questions.length(); i++) {
-						final JSONArray images = questions.getJSONObject(i).optJSONArray(ApiService.Keys.IMAGES);
+						question = questions.getJSONObject(i);
+						images = question.optJSONArray(Keys.IMAGES);
 						if (images != null) {
-							final String path = questions.getJSONObject(i).getString(ApiService.Keys.IMAGES_RELATIVE_URL);
-							
-							for (int j = 0; j < images.length(); j++) {
-								final String name = images.getJSONObject(j).getString(ApiService.Keys.NAME);
-								
-								final Listener<Bitmap> imageListener = new Listener<Bitmap>() {
-
-									@Override
-									public void onResponse(Bitmap image) {
-										fm.saveBitmap(path, name, image);
-									}
-								};
-								
-								ImageRequest imageRequest = new ImageRequest(ApiService.SITE_URL + path +"/"+ name,
-										imageListener, 0, 0, null, null);
-								app.addToRequestQueue(imageRequest);
-							}
+							final String path = question.getString(Keys.IMAGES_RELATIVE_URL);
+							final String name = images.getJSONObject(0).getString(ApiService.Keys.NAME);
+							imageUrls.add(path +"/"+ name);
 						}
 					}
-					new Thread(new Runnable() {
+					Log.i(LOG_TAG, imageUrls.size()+" images count");
+					
+					final Thread onTestLoaded = new Thread(new Runnable() {
+							
+							@Override
+							public void run() {
+								db.updateTableTest(link, year, id, questions);
+								feedBack.onTestLoaded();
+							}
+						});
+					
+					if (imageUrls.size() != 0) {
+						final RequestsCounter counter = new RequestsCounter(imageUrls.size(),onTestLoaded, feedBack);
 						
-						@Override
-						public void run() {
-							db.updateTableTest(link, year, id, questions);
-							onTestLoadedListener.onTestLoad();
+						for (final String url:imageUrls) {
+							ErrorListener errorListener = new ErrorListener() {
+
+								@Override
+								public void onErrorResponse(VolleyError error) {
+									Log.i(LOG_TAG, error.toString());
+									app.getRequestQueue().cancelAll(REQUEST_TAG);
+									feedBack.onError(error);
+								}
+							};
+							Listener<Bitmap> imageListener = new Listener<Bitmap>() {
+								
+								@Override
+								public void onResponse(Bitmap image) {
+									String path = url.substring(0, url.lastIndexOf('/'));
+									String name = url.substring(url.lastIndexOf('/')+1);
+									boolean bitmapSaveStatus = fm.saveBitmap(path, name, image);
+									Log.i(LOG_TAG, path+"/"+name+" saved status: "+bitmapSaveStatus);
+									counter.requestFinished();
+								}
+							};
+							ImageRequest imageRequest = new ImageRequest(ApiService.SITE_URL + url, imageListener, 0, 0, null, errorListener);
+							app.addToRequestQueue(imageRequest,REQUEST_TAG);
 						}
-					}).start();
+					} else {
+						onTestLoaded.start();
+					}
+					
 				} catch (JSONException e) {
-					onTestLoadedListener.onError();
+					feedBack.onError(e);
 				}
 			}
 		};
@@ -132,7 +164,7 @@ public class ApiService extends Service {
 		JsonObjectRequest request = new JsonObjectRequest(API_URL + GET_TEST + id, null, responceListener, errorListener);
 		app.addToRequestQueue(request);
 	}
-
+	
 	@Override
 	public void onDestroy() {
 		Log.i(LOG_TAG, "ApiService: stoped");
@@ -145,15 +177,32 @@ public class ApiService extends Service {
 		return mBinder;
 	}
 	
-	@Override
-	public void onRebind(Intent intent) {
-		Log.i(LOG_TAG, "ApiService: rebind");
-		super.onRebind(intent);
-	}
-	
 	public class ApiBinder extends Binder {
         public ApiService getService() {
             return ApiService.this;
         }
     }
+	
+	private class RequestsCounter {
+		
+		int pendingRequests = 0;
+		TestDownloadingFeedBack feedBack;
+		Thread onTestLoaded;
+		
+		public RequestsCounter(int pendingRequests,Thread onTestLoaded,TestDownloadingFeedBack feedBack) {
+			this.feedBack = feedBack;
+			this.onTestLoaded = onTestLoaded;
+			this.pendingRequests = pendingRequests;
+			feedBack.onExtraDownloadingStart(pendingRequests);
+		}
+		
+		public void requestFinished() {
+			pendingRequests--;
+			feedBack.onExtraDownloadingProgressInc();
+			if (pendingRequests == 0) {
+				onTestLoaded.start();
+			}
+		}
+		
+	}
 }

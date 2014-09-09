@@ -2,6 +2,8 @@ package com.vojkovladimir.zno;
 
 import java.util.ArrayList;
 
+import org.json.JSONException;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -19,13 +21,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.android.volley.NoConnectionError;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
 import com.vojkovladimir.zno.adapters.TestsListAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.models.TestInfo;
 import com.vojkovladimir.zno.service.ApiService;
 import com.vojkovladimir.zno.service.ApiService.ApiBinder;
-import com.vojkovladimir.zno.service.ApiService.OnTestLoadedListener;
+import com.vojkovladimir.zno.service.ApiService.TestDownloadingFeedBack;
 
 public class LessonTestsActivity extends Activity {
 
@@ -82,31 +88,50 @@ public class LessonTestsActivity extends Activity {
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
 						case DialogInterface.BUTTON_POSITIVE:
-							downloadProgress.show();
+							downloadProgress = new ProgressDialog(context);
 							downloadProgress.setCancelable(false);
-							apiService.downLoadTest(new OnTestLoadedListener() {
+							downloadProgress.setMessage(getResources().getString(R.string.progress_test_load));
+							downloadProgress.show();
+							apiService.downLoadTest(new TestDownloadingFeedBack() {
 								
 								@Override
-								public void onTestLoad() {
+								public void onTestLoaded() {
 									runOnUiThread(new Runnable() {
-										
-										@Override
 										public void run() {
-											downloadProgress.cancel();
-											invalidate();											
+											invalidate();
 										}
 									});
+									downloadProgress.dismiss();
 								}
 								
 								@Override
-								public void onError() {
-									runOnUiThread(new Runnable() {
-										
-										@Override
-										public void run() {
-											downloadProgress.cancel();
+								public void onError(Exception e) {
+									downloadProgress.dismiss();
+									if (e instanceof VolleyError) {
+										if ( e instanceof NoConnectionError) {
+											Toast.makeText(context, getResources().getString(R.string.error_no_connection), Toast.LENGTH_SHORT).show();
+										}else if (e instanceof TimeoutError) {
+											Toast.makeText(context, getResources().getString(R.string.error_timeout), Toast.LENGTH_SHORT).show();
 										}
-									});
+									} else if (e instanceof JSONException) {
+									}
+								}
+
+								@Override
+								public void onExtraDownloadingStart(int max) {
+									downloadProgress.dismiss();
+									downloadProgress = new ProgressDialog(context);
+									downloadProgress.setCancelable(false);
+									downloadProgress.setMessage(getResources().getString(R.string.progress_test_load_images));
+									downloadProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+									downloadProgress.setMax(max);
+									downloadProgress.setProgress(0);
+									downloadProgress.show();
+								}
+
+								@Override
+								public void onExtraDownloadingProgressInc() {
+									downloadProgress.incrementProgressBy(1);
 								}
 							}, link, test.year, test.id);
 							break;
@@ -139,8 +164,6 @@ public class LessonTestsActivity extends Activity {
 		testsListView = (ListView) findViewById(R.id.tests_list_view);
 		testsListView.setAdapter(testsListAdapter);
 		testsListView.setOnItemClickListener(itemListener);
-		downloadProgress = new ProgressDialog(context);
-		downloadProgress.setMessage(getResources().getString(R.string.progress_test_load));
 	}
 
 	@Override
@@ -174,5 +197,4 @@ public class LessonTestsActivity extends Activity {
 		testsListAdapter.setTestsList(tests);
 		testsListView.invalidateViews();
 	}
-	
 }
