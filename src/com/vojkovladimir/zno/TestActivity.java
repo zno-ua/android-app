@@ -160,7 +160,7 @@ public class TestActivity extends FragmentActivity {
 
 		@Override
 		public int getCount() {
-			return test.taskAll;
+			return test.questions.size();
 		}
 
 		@Override
@@ -186,7 +186,7 @@ public class TestActivity extends FragmentActivity {
 
 		@Override
 		public int getCount() {
-			return test.taskAll;
+			return test.questions.size();
 		}
 
 		@Override

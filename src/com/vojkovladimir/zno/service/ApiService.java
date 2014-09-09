@@ -58,6 +58,7 @@ public class ApiService extends Service {
 		String IMAGES_RELATIVE_URL = "images_relative_url";
 		String LAST_UPDATE = "last_update";
 		String STATUS = "status";
+		String PARENT_QUESTION = "parent_question";
 	}
 	
 	public interface TestDownloadingFeedBack {

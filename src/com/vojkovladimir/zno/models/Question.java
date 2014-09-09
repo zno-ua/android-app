@@ -1,5 +1,6 @@
 package com.vojkovladimir.zno.models;
 
+
 public class Question {
 
 	public static final int TYPE_1 = 1;
@@ -11,18 +12,20 @@ public class Question {
 	public int id;
 	public int idTestQuestion;
 	public String question;
+	public String parentQuestion;
 	public String answers;
 	public String correctAnswer;
 	public int balls;
 	public int typeQuestion;
 	public String answer;
 
-	public Question(int id, int idTestQuestion, String question,
+	public Question(int id, int idTestQuestion, String question,String parentQuestion,
 			String answers, String correctAnswer, int balls, int typeQuestion,
 			String answer) {
 		this.id = id;
 		this.idTestQuestion = idTestQuestion;
-		this.question = question.replace("<a href=\"", "<a href=\"open.image://?src=");;
+		this.question = question.replace("<a href=\"", "<a href=\"open.image://?src=");
+		this.parentQuestion = parentQuestion;
 		this.answers = answers;
 		this.correctAnswer = correctAnswer;
 		this.balls = balls;

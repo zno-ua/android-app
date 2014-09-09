@@ -79,6 +79,9 @@ public class QuestionFragment extends Fragment {
 		View v = inflater.inflate(R.layout.test_question, container, false);
 		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 		
+		if (!question.parentQuestion.isEmpty()) {
+			questionContainer.addView(createParentQuestionText(inflater, questionContainer));
+		}
 		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
 		questionContainer.addView(createQuestionText(inflater, questionContainer));
 		
@@ -145,6 +148,9 @@ public class QuestionFragment extends Fragment {
 		View v = inflater.inflate(R.layout.test_question, container, false);
 		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
+		if (!question.parentQuestion.isEmpty()) {
+			questionContainer.addView(createParentQuestionText(inflater, questionContainer));
+		}
 		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
 		questionContainer.addView(createQuestionText(inflater, questionContainer));
 		
@@ -217,6 +223,9 @@ public class QuestionFragment extends Fragment {
 		View v = inflater.inflate(R.layout.test_question, container, false);
 		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
+		if (!question.parentQuestion.isEmpty()) {
+			questionContainer.addView(createParentQuestionText(inflater, questionContainer));
+		}
 		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
 		questionContainer.addView(createQuestionText(inflater, questionContainer));
 		
@@ -275,6 +284,9 @@ public class QuestionFragment extends Fragment {
 		View v = inflater.inflate(R.layout.test_question, container, false);
 		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
+		if (!question.parentQuestion.isEmpty()) {
+			questionContainer.addView(createParentQuestionText(inflater, questionContainer));
+		}
 		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
 		questionContainer.addView(createQuestionText(inflater, questionContainer));
 		
@@ -350,15 +362,14 @@ public class QuestionFragment extends Fragment {
 		TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
 		questionText.setText(Html.fromHtml(question.question, imgGetter, null));
 		questionText.setMovementMethod(LinkMovementMethod.getInstance());
-//		questionText.setOnClickListener(new OnClickListener() {
-//
-//			@Override
-//			public void onClick(View v) {
-//				if (question.question.contains("href")) {
-//					openImage(parseSRC(question.question));
-//				}
-//			}
-//		});		
+		
+		return questionText;
+	}
+	
+	private View createParentQuestionText(LayoutInflater inflater, ViewGroup container){		
+		TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
+		questionText.setText(Html.fromHtml(question.parentQuestion, imgGetter, null));
+		questionText.setMovementMethod(LinkMovementMethod.getInstance());
 		
 		return questionText;
 	}
