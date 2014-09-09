@@ -104,14 +104,15 @@ public class ApiService extends Service {
 					JSONObject question = null;
 					JSONArray images = null;
 					ArrayList<String> imageUrls = new ArrayList<String>();
-					Log.i(LOG_TAG, imageUrls.size()+" images count");
 					for (int i = 0; i < questions.length(); i++) {
 						question = questions.getJSONObject(i);
 						images = question.optJSONArray(Keys.IMAGES);
 						if (images != null) {
 							final String path = question.getString(Keys.IMAGES_RELATIVE_URL);
-							final String name = images.getJSONObject(0).getString(ApiService.Keys.NAME);
-							imageUrls.add(path +"/"+ name);
+							for (int j = 0; j < images.length(); j++) {
+								final String name = images.getJSONObject(j).getString(ApiService.Keys.NAME);
+								imageUrls.add(path +"/"+ name);
+							}
 						}
 					}
 					Log.i(LOG_TAG, imageUrls.size()+" images count");
