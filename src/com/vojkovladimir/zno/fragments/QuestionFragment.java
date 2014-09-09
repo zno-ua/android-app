@@ -367,9 +367,23 @@ public class QuestionFragment extends Fragment {
 	}
 	
 	private View createParentQuestionText(LayoutInflater inflater, ViewGroup container){		
-		TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
-		questionText.setText(Html.fromHtml(question.parentQuestion, imgGetter, null));
+		final TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
+		questionText.setText(Html.fromHtml(getResources().getString(R.string.parent_question_text_show), imgGetter, null));
 		questionText.setMovementMethod(LinkMovementMethod.getInstance());
+		questionText.setSelected(true);
+		questionText.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if (v.isSelected()) {
+					v.setSelected(false);
+					questionText.setText(Html.fromHtml(question.parentQuestion, imgGetter, null));
+				} else {
+					v.setSelected(true);
+					questionText.setText(Html.fromHtml(getResources().getString(R.string.parent_question_text_show), imgGetter, null));
+				}
+			}
+		});
 		
 		return questionText;
 	}
