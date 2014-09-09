@@ -22,7 +22,8 @@ public class FileManager {
 		FILES_PATH = context.getFilesDir().getAbsolutePath();
 	}
 
-	public void saveBitmap(String path, String name, Bitmap bitmap) {
+	public boolean saveBitmap(String path, String name, Bitmap bitmap) {
+		boolean result = false;
 		File dir = new File(path);
 		if (!dir.exists()) {
 			createFolder(path);
@@ -42,14 +43,16 @@ public class FileManager {
 			}
 			if (name.contains("gif")) {
 				fout.close();
-				return;
+				return false;
 			}
 			
-			bitmap.compress(format, 100, fout);
+			result = bitmap.compress(format, 100, fout);
 			fout.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return result;
 	}
 
 	public Drawable openDrawable(String path) throws FileNotFoundException {
