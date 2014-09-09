@@ -30,6 +30,7 @@
     <string name="answer_three_correct">Введіть 3 цифри, які ви вважаєте вірними (в будь-якому порядку):</string>
     <string name="answer_short">Введіть відповідь:</string>
     <string name="action_questions_list">Список питань</string>
+    <string name="parent_question_text_show">Натисніть для відображення тексту.</string>
     <string name="image_desription">Image</string>
     <string name="loren_ipsum_text">Lorem Ipsum - це текст-"риба", що використовується</string>
     
