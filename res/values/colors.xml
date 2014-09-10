@@ -24,4 +24,8 @@
     <color name="view_image_bg_color">#A6000000</color>
     <color name="app_logo_shadow_color">#33000000</color>
 
+    <!-- SeekBar -->
+    <color name="seekbar_stroke_color">#4D666666</color>
+    <color name="seekbar_bg_color">#fafafa</color>
+
 </resources>
