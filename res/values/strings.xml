@@ -31,6 +31,8 @@
     <string name="answer_short">Введіть відповідь:</string>
     <string name="action_questions_list">Список питань</string>
     <string name="parent_question_text_show">Натисніть для відображення тексту.</string>
+    <string name="choose_ball">Оберіть бал, на який розраховуєте:</string>
+    <string name="choosed_ball">Обраний бал — </string>
     <string name="image_desription">Image</string>
     <string name="loren_ipsum_text">Lorem Ipsum - це текст-"риба", що використовується</string>
     

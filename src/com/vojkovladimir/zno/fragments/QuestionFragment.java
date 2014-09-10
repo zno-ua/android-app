@@ -24,6 +24,8 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
@@ -139,7 +141,11 @@ public class QuestionFragment extends Fragment {
 		View v = inflater.inflate(R.layout.test_question, container, false);
 		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 		
-		questionContainer.addView(createQuestionText(inflater, questionContainer));
+		if (question.balls == 0) {
+			questionContainer.addView(createQuestionText(inflater, questionContainer));
+		} else {
+			questionContainer.addView(createStatementQuestionText(inflater, questionContainer));
+		}
 		
 		return v;
 	}
@@ -364,6 +370,38 @@ public class QuestionFragment extends Fragment {
 		questionText.setMovementMethod(LinkMovementMethod.getInstance());
 		
 		return questionText;
+	}
+	
+	private View createStatementQuestionText(LayoutInflater inflater, ViewGroup container){	
+		View v = inflater.inflate(R.layout.test_question_statement, container, false);
+		TextView questionText = (TextView) v.findViewById(R.id.test_question_statement_text);
+		SeekBar ballsSeekBar = (SeekBar) v.findViewById(R.id.question_statement_balls_seekbar);
+		final TextView balls = (TextView) v.findViewById(R.id.test_question_statement_balls);
+		questionText.setText(Html.fromHtml(question.question + getResources().getString(R.string.choose_ball), imgGetter, null));
+		questionText.setMovementMethod(LinkMovementMethod.getInstance());
+		balls.setText(getResources().getString(R.string.choosed_ball) + " " + String.valueOf(question.balls/2));
+		ballsSeekBar.setMax(question.balls);
+		ballsSeekBar.setProgress(question.balls/2);
+		ballsSeekBar.setSecondaryProgress(0);
+		ballsSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				question.answer = String.valueOf(seekBar.getProgress());
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				balls.setText(getResources().getString(R.string.choosed_ball) + " " + String.valueOf(progress));
+			}
+		});
+		
+		return v;
 	}
 	
 	private View createParentQuestionText(LayoutInflater inflater, ViewGroup container){		
