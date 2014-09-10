@@ -22,6 +22,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.vojkovladimir.zno.ZNOApplication.ExtrasKeys;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.fragments.QuestionFragment;
 import com.vojkovladimir.zno.models.Question;
@@ -50,12 +51,12 @@ public class TestActivity extends FragmentActivity {
 		Log.i(LOG_TAG, "TestActivity: onCreate()");
 
 		Intent intent = getIntent();
-		String tableName = intent.getStringExtra(ZNOApplication.ExtrasKeys.TABLE_NAME);
+		int testId = intent.getIntExtra(ExtrasKeys.ID_TEST, -1);
 
 		app = ZNOApplication.getInstance();
 		db = app.getZnoDataBaseHelper();
 
-		test = db.getTest(tableName);
+		test = db.getTest(testId);
 
 		mPager = (ViewPager) findViewById(R.id.test_question_pager);
 		mPagerAdapter = new QuestionsAdapter(getSupportFragmentManager());

@@ -28,11 +28,8 @@ public class ZNOApplication extends Application {
 
 	public interface ExtrasKeys {
 		String LESSON_NAME = "lesson_name";
-		String LINK = "link";
 		String ID_LESSON = "id_lesson";
 		String ID_TEST = "id_test";
-		String TABLE_NAME= "table_name";
-		String IMG_SOURCE = "src";
 	}
 
 	@Override

@@ -64,7 +64,6 @@ public class LessonTestsActivity extends Activity {
 		
 	};
 	
-	String link;
 	int idLesson;
 	
 	OnItemClickListener itemListener = new OnItemClickListener() {
@@ -74,9 +73,7 @@ public class LessonTestsActivity extends Activity {
 
 			if (test.loaded) {
 				Intent testActivity = new Intent(getApplicationContext(), TestActivity.class);
-
-				testActivity.putExtra(ZNOApplication.ExtrasKeys.TABLE_NAME, link + "_" + test.year + "_" + test.id);
-				testActivity.putExtra(ZNOApplication.ExtrasKeys.ID_TEST, "" + test.id);
+				testActivity.putExtra(ZNOApplication.ExtrasKeys.ID_TEST, test.id);
 				startActivity(testActivity);
 			} else {
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
@@ -133,7 +130,7 @@ public class LessonTestsActivity extends Activity {
 								public void onExtraDownloadingProgressInc() {
 									downloadProgress.incrementProgressBy(1);
 								}
-							}, link, test.year, test.id);
+							}, test.id);
 							break;
 						}
 					}
@@ -157,7 +154,6 @@ public class LessonTestsActivity extends Activity {
 
 		setTitle(intent.getStringExtra(ZNOApplication.ExtrasKeys.LESSON_NAME));
 		idLesson = intent.getIntExtra(ZNOApplication.ExtrasKeys.ID_LESSON, -1);
-		link = intent.getStringExtra(ZNOApplication.ExtrasKeys.LINK);
 		tests = new ArrayList<TestInfo>();
 		tests = db.getLessonTests(idLesson);
 		testsListAdapter = new TestsListAdapter(this, tests);

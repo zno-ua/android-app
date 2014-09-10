@@ -83,7 +83,7 @@ public class ApiService extends Service {
 		super.onCreate();
 	}
 	
-	public void downLoadTest(final TestDownloadingFeedBack feedBack,final String link, final int year, final int id) {
+	public void downLoadTest(final TestDownloadingFeedBack feedBack, final int id) {
 		final ErrorListener errorListener = new ErrorListener() {
 
 			@Override
@@ -99,7 +99,6 @@ public class ApiService extends Service {
 			@Override
 			public void onResponse(final JSONObject responce) {
 				try {
-					Log.i(LOG_TAG, link+"_"+year+"_"+id+" downloading start");
 					final JSONArray questions = responce.getJSONArray(Keys.OBJECTS);
 					JSONObject question = null;
 					JSONArray images = null;
@@ -121,8 +120,17 @@ public class ApiService extends Service {
 							
 							@Override
 							public void run() {
-								db.updateTableTest(link, year, id, questions);
-								feedBack.onTestLoaded();
+								try {
+									if (db.updateQuestions(id, questions)) {
+										feedBack.onTestLoaded();
+									} else {
+										app.getRequestQueue().cancelAll(REQUEST_TAG);
+										feedBack.onError(new Exception("update test error"));
+									}
+								} catch (JSONException e) {
+									feedBack.onError(e);
+									e.printStackTrace();
+								}
 							}
 						});
 					

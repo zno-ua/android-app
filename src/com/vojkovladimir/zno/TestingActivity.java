@@ -28,16 +28,10 @@ public class TestingActivity extends Activity {
 
 	OnItemClickListener itemListener = new OnItemClickListener() {
 		@Override
-		public void onItemClick(AdapterView<?> parent, View v, int position,
-				long id) {
-			Intent testsList = new Intent(getApplicationContext(),
-					LessonTestsActivity.class);
-			testsList.putExtra(ZNOApplication.ExtrasKeys.ID_LESSON,
-					lessons.get(position).id);
-			testsList.putExtra(ZNOApplication.ExtrasKeys.LESSON_NAME,
-					lessons.get(position).name);
-			testsList.putExtra(ZNOApplication.ExtrasKeys.LINK,
-					lessons.get(position).link);
+		public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+			Intent testsList = new Intent(getApplicationContext(), LessonTestsActivity.class);
+			testsList.putExtra(ZNOApplication.ExtrasKeys.ID_LESSON, lessons.get(position).id);
+			testsList.putExtra(ZNOApplication.ExtrasKeys.LESSON_NAME, lessons.get(position).name);
 			startActivity(testsList);
 		}
 	};
@@ -49,8 +43,7 @@ public class TestingActivity extends Activity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		lessons = new ArrayList<Lesson>();
-		lessons = ZNOApplication.getInstance().getZnoDataBaseHelper()
-				.getLessons();
+		lessons = ZNOApplication.getInstance().getZnoDataBaseHelper().getLessons();
 		lessonsListAdapter = new LessonsListAdapter(this, lessons);
 		lessonsListView = (ListView) findViewById(R.id.lessons_list_view);
 		lessonsListView.setAdapter(lessonsListAdapter);

@@ -3,6 +3,7 @@ package com.vojkovladimir.zno.db;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,57 +28,74 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 	private static String LOG_TAG = "MyLogs";
 
-	private static final String DATABASE_NAME = "ZNOTests.db";
+	private static final String DATABASE_NAME = "ZNO.db";
 	private static final int DATABASE_VERSION = 1;
 
-	public static final String TABLE_LESSONS = "lessons";
-	public static final String TABLE_TESTS = "tests";
+	private static final String TABLE_LESSONS = "lessons";
+	private static final String TABLE_TESTS = "tests";
+	private static final String TABLE_QUESTIONS = "questions";
+	private static final String TABLE_SQLITE_MASTER =  "sqlite_master";
+	private static final String TABLE_ANDROID_META_DATA = "android_metadata";
+	private static final String TABLE_SQLITE_SEQUENCE = "sqlite_sequence";
 
-	public static final String KEY_ID = "id";
-	public static final String KEY_LESSON_ID = "lesson_id";
-	public static final String KEY_LINK = "link";
-	public static final String KEY_NAME = "name";
-	public static final String KEY_TASK_ALL = "task_all";
-	public static final String KEY_TASK_MATCHES = "task_matches";
-	public static final String KEY_TASK_OPEN_ANSWER = "task_open_answer";
-	public static final String KEY_TASK_TEST = "task_test";
-	public static final String KEY_TASK_VARS = "task_vars";
-	public static final String KEY_TIME = "time";
-	public static final String KEY_YEAR = "year";
-	public static final String KEY_LOADED = "loaded";
-	public static final String KEY_ANSWERS = "answers";
-	public static final String KEY_BALLS = "balls";
-	public static final String KEY_CORRECT_ANSWER = "correct_answer";
-	public static final String KEY_ID_TEST_QUESTION = "id_test_question";
-	public static final String KEY_QUESTION = "question";
-	public static final String KEY_TYPE_QUESTION = "type_question";
-	public static final String KEY_LAST_UPDATE = "last_update";
-	public static final String KEY_PARENT_QUESTION = "parent_question";
+	private static final String KEY_ID = "id";
+	private static final String KEY_LESSON_ID = "lesson_id";
+	private static final String KEY_TEST_ID = "test_id";
+	private static final String KEY_ID_ON_TEST = "id_on_test";
+	private static final String KEY_ID_TEST_QUESTION = "id_test_question";
+	private static final String KEY_LINK = "link";
+	private static final String KEY_NAME = "name";
+	private static final String KEY_TASK_ALL = "task_all";
+	private static final String KEY_TASK_MATCHES = "task_matches";
+	private static final String KEY_TASK_OPEN_ANSWER = "task_open_answer";
+	private static final String KEY_TASK_TEST = "task_test";
+	private static final String KEY_TASK_VARS = "task_vars";
+	private static final String KEY_TIME = "time";
+	private static final String KEY_YEAR = "year";
+	private static final String KEY_LOADED = "loaded";
+	private static final String KEY_ANSWERS = "answers";
+	private static final String KEY_BALLS = "balls";
+	private static final String KEY_CORRECT_ANSWER = "correct_answer";
+	private static final String KEY_QUESTION = "question";
+	private static final String KEY_TYPE_QUESTION = "type_question";
+	private static final String KEY_LAST_UPDATE = "last_update";
+	private static final String KEY_PARENT_QUESTION = "parent_question";
+	private static final String KEY_TYPE = "type";
 
-	private static final String CREATE_TABLE_LESSONS = "CREATE TABLE "
-			+ TABLE_LESSONS + " (" + KEY_ID + " INTEGER PRIMARY KEY, "
-			+ KEY_LINK + " TEXT, " + KEY_NAME + " TEXT);";
+	private static final String CREATE_TABLE_LESSONS =
+			"CREATE TABLE " + TABLE_LESSONS + " ("
+			+ KEY_ID + " INTEGER PRIMARY KEY, "
+			+ KEY_LINK + " TEXT, "
+			+ KEY_NAME + " TEXT);";
 
-	private static final String CREATE_TABLE_TESTS = "CREATE TABLE "
-			+ TABLE_TESTS + " (" + KEY_ID + " INTEGER PRIMARY KEY, "
-			+ KEY_LESSON_ID + " INTEGER, " + KEY_NAME + " TEXT, "
-			+ KEY_TASK_ALL + " INTEGER, " + KEY_TASK_MATCHES + " INTEGER, "
-			+ KEY_TASK_OPEN_ANSWER + " INTEGER, " + KEY_TASK_TEST
-			+ " INTEGER, " + KEY_TASK_VARS + " INTEGER, " + KEY_TIME
-			+ " INTEGER, " + KEY_YEAR + " INTEGER, " + KEY_LAST_UPDATE + " INTEGER, " + KEY_LOADED
-			+ " INTEGER);";
-
-	private static final String createTableTest(String tableName) {
-		return "CREATE TABLE " + tableName + " (" + KEY_ID
-				+ " INTEGER PRIMARY KEY, " + KEY_ANSWERS + " TEXT, "
-				+ KEY_BALLS + " INTEGER, " + KEY_CORRECT_ANSWER + " STRING, "
-				+ KEY_ID_TEST_QUESTION + " INTEGER, " + KEY_QUESTION
-				+ " TEXT, " + KEY_PARENT_QUESTION
-				+ " TEXT, " + KEY_TYPE_QUESTION
-				+ " INTEGER" + ");";
-
-	}
-
+	private static final String CREATE_TABLE_TESTS =
+			"CREATE TABLE " + TABLE_TESTS + " ("
+			+ KEY_ID + " INTEGER PRIMARY KEY, "
+			+ KEY_LESSON_ID + " INTEGER, "
+			+ KEY_NAME + " TEXT, "
+			+ KEY_TASK_ALL + " INTEGER, "
+			+ KEY_TASK_MATCHES + " INTEGER, "
+			+ KEY_TASK_OPEN_ANSWER + " INTEGER, "
+			+ KEY_TASK_TEST + " INTEGER, "
+			+ KEY_TASK_VARS + " INTEGER, "
+			+ KEY_TIME + " INTEGER, "
+			+ KEY_YEAR + " INTEGER, "
+			+ KEY_LAST_UPDATE + " INTEGER, "
+			+ KEY_LOADED + " INTEGER);";
+	
+	private static final String CREATE_TABLE_QUESTIONS =
+			"CREATE TABLE " + TABLE_QUESTIONS + " ("
+			+ KEY_ID + " INTEGER PRIMARY KEY, "
+			+ KEY_ID_ON_TEST + " INTEGER, "
+			+ KEY_ID_TEST_QUESTION + " INTEGER, "
+			+ KEY_TEST_ID + " INTEGER, "
+			+ KEY_PARENT_QUESTION + " TEXT, "
+			+ KEY_QUESTION + " TEXT, "
+			+ KEY_ANSWERS + " TEXT, "
+			+ KEY_CORRECT_ANSWER + " STRING, "
+			+ KEY_BALLS + " INTEGER, "
+			+ KEY_TYPE_QUESTION + " INTEGER" + ");";
+	
 	public ZNODataBaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -86,6 +104,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CREATE_TABLE_LESSONS);
 		db.execSQL(CREATE_TABLE_TESTS);
+		db.execSQL(CREATE_TABLE_QUESTIONS);
 
 		try {
 			JSONArray lessons = loadFromResources(R.raw.lessons);
@@ -108,8 +127,21 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_LESSONS);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TESTS);
+		Log.e(LOG_TAG, "onUpgrade");
+		List<String> tables = new ArrayList<String>();
+		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_SQLITE_MASTER +" WHERE " + KEY_TYPE + "='table';", null);
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+		    String tableName = cursor.getString(1);
+		    if (!tableName.equals(TABLE_ANDROID_META_DATA) && !tableName.equals(TABLE_SQLITE_SEQUENCE))
+		        tables.add(tableName);
+		    cursor.moveToNext();
+		}
+		cursor.close();
+
+		for(String tableName:tables) {
+		    db.execSQL("DROP TABLE IF EXISTS " + tableName);
+		}
 		onCreate(db);
 	}
 
@@ -139,8 +171,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 				status = db.insert(TABLE_LESSONS, null, values);
 
 				if (status == -1) {
-					Log.e(LOG_TAG, "Error while inserting lesson! Lesson id: "
-							+ id + ".");
+					Log.e(LOG_TAG, "Error while inserting lesson! Lesson id: " + id + ".");
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -153,8 +184,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		db.execSQL(CREATE_TABLE_TESTS);
 		ContentValues values = new ContentValues();
 		
-		Log.i(LOG_TAG, "fillInTableTests, tests count = "+tests.length());
-
 		JSONObject test;
 		int id;
 		int lessonId;
@@ -176,7 +205,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 				id = test.getInt(ApiService.Keys.ID);
 				lessonId = test.getInt(ApiService.Keys.LESSON_ID);
-				;
 				name = test.getString(ApiService.Keys.NAME);
 				taskAll = test.getInt(ApiService.Keys.TASK_ALL);
 				taskMatches = test.getInt(ApiService.Keys.TASK_MATCHES);
@@ -217,84 +245,63 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		fillInTableTests(db, tests);
 	}
 
-	private void fillInTableTest(SQLiteDatabase db, JSONArray questions, String tableName) {
-		db.execSQL("DROP TABLE IF EXISTS " + tableName);
-		db.execSQL(createTableTest(tableName));
-		ContentValues values = new ContentValues();
-
-		JSONObject questionItem;
-		String answers;
-		int balls;
-		String correctAnswer;
-		int id;
-		int idTestQuestion;
-		String question;
-		String parentQuestion;
-		int typeQuestion;
-
+	public boolean updateQuestions(int testId,JSONArray questions) throws JSONException {
 		long status;
-		try {
-			for (int i = 0; i < questions.length(); i++) {
-				questionItem = questions.getJSONObject(i);
+		SQLiteDatabase db = getWritableDatabase();
+		ContentValues values = new ContentValues();
+		
+		JSONObject question;
+		int typeQuestion;
+		int balls;
+		
+		for (int i = 0; i < questions.length(); i++) {
+			question = questions.getJSONObject(i);
+			typeQuestion = question.getInt(ApiService.Keys.TYPE_QUESTION);
+			balls = question.getInt(ApiService.Keys.BALLS);
+			
+			if (!(balls == 0 && typeQuestion == 2)) {
+				values.clear();
+				values.put(KEY_ID, question.getInt(ApiService.Keys.ID));
+				values.put(KEY_ID_ON_TEST, question.getInt(ApiService.Keys.ID_ON_TEST));
+				values.put(KEY_ID_TEST_QUESTION, question.getInt(ApiService.Keys.ID_TEST_QUESTION));
+				values.put(KEY_TEST_ID, testId);
+				values.put(KEY_PARENT_QUESTION, question.optString(ApiService.Keys.PARENT_QUESTION, ""));
+				values.put(KEY_QUESTION, question.getString(ApiService.Keys.QUESTION));
+				values.put(KEY_ANSWERS, question.getString(ApiService.Keys.ANSWERS));
+				values.put(KEY_CORRECT_ANSWER, question.getString(ApiService.Keys.CORRECT_ANSWER));
+				values.put(KEY_BALLS, balls);
+				values.put(KEY_TYPE_QUESTION, typeQuestion);
 
-				typeQuestion = questionItem.getInt(ApiService.Keys.TYPE_QUESTION);
-				balls = questionItem.getInt(ApiService.Keys.BALLS);
-				
-				if (!(balls == 0 && typeQuestion == 2)) {
-					answers = questionItem.getString(ApiService.Keys.ANSWERS);
-					correctAnswer = questionItem.getString(ApiService.Keys.CORRECT_ANSWER);
-					id = questionItem.getInt(ApiService.Keys.ID_ON_TEST);
-					idTestQuestion = questionItem.getInt(ApiService.Keys.ID_TEST_QUESTION);
-					question = questionItem.getString(ApiService.Keys.QUESTION);
-					parentQuestion = questionItem.optString(ApiService.Keys.PARENT_QUESTION, "");
-
-					values.clear();
-					values.put(KEY_ANSWERS, answers);
-					values.put(KEY_BALLS, balls);
-					values.put(KEY_CORRECT_ANSWER, correctAnswer);
-					values.put(KEY_ID, id);
-					values.put(KEY_ID_TEST_QUESTION, idTestQuestion);
-					values.put(KEY_QUESTION, question);
-					values.put(KEY_TYPE_QUESTION, typeQuestion);
-					values.put(KEY_PARENT_QUESTION, parentQuestion);
-
-					status = db.insert(tableName, null, values);
-					if (status == -1) {
-						Log.e(LOG_TAG, "Error while inserting question! " + tableName + " id: " + id + ".");
-					}
+				status = db.insertWithOnConflict(TABLE_QUESTIONS, "", values, SQLiteDatabase.CONFLICT_REPLACE);
+				if (status == -1) {
+					Log.e(LOG_TAG, "Error while inserting question, test # "+testId);
+					db.close();
+					return false;
 				}
 			}
-			Log.i(LOG_TAG, "fillInTableTest, tests count = "+tableName);
-		} catch (JSONException e) {
-
 		}
-
-	}
-
-	public void updateTableTest(String lesson, int year, int id, JSONArray questions) {
-		SQLiteDatabase db = getWritableDatabase();
-
-		Cursor c = db.query(TABLE_TESTS, new String[] { KEY_ID, KEY_LOADED },
-				KEY_ID + "=" + id, null, null, null, null);
+		
+		Cursor c = db.query(TABLE_TESTS, new String[] { KEY_ID, KEY_LOADED }, KEY_ID + "=" + testId, null, null, null, null);
 
 		if (c.moveToNext()) {
 			int loadedIndex = c.getColumnIndex(KEY_LOADED);
 
 			if (c.getInt(loadedIndex) == 0) {
-				ContentValues values = new ContentValues();
+				values.clear();
 				values.put(KEY_LOADED, 1);
-				db.update(TABLE_TESTS, values, KEY_ID + "=" + id, null);
+				db.update(TABLE_TESTS, values, KEY_ID + "=" + testId, null);
 			}
 		}
-		fillInTableTest(db, questions, lesson + "_" + year + "_" + id);
+		
+		db.close();
+		return true;
 	}
 
 	public ArrayList<Lesson> getLessons() {
 		ArrayList<Lesson> lessons = new ArrayList<Lesson>();
 
 		SQLiteDatabase db = getWritableDatabase();
-		Cursor c = db.query(TABLE_LESSONS, new String[] { KEY_ID, KEY_NAME,
-				KEY_LINK }, null, null, null, null, null);
+		Cursor c = db.query(TABLE_LESSONS, new String[] { KEY_ID, KEY_NAME, KEY_LINK }, null, null, null, null, null);
 		Lesson lesson;
 		int id;
 
@@ -305,8 +312,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 			do {
 				id = c.getInt(idIndex);
-				lesson = new Lesson(id, c.getString(nameIndex),
-						c.getString(linkIndex), getLessonTestsCount(id));
+				lesson = new Lesson(id, c.getString(nameIndex), c.getString(linkIndex), getLessonTestsCount(id));
 				lessons.add(lesson);
 			} while (c.moveToNext());
 		}
@@ -316,8 +322,9 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 	public int getLessonTestsCount(int id) {
 		SQLiteDatabase db = getWritableDatabase();
-		return (db.query(TABLE_TESTS, new String[] { KEY_LESSON_ID },
-				KEY_LESSON_ID + " = " + id, null, null, null, null)).getCount();
+		int count = (db.query(TABLE_TESTS, new String[] { KEY_LESSON_ID }, KEY_LESSON_ID + " = " + id, null, null, null, null)).getCount();
+		db.close();
+		return count;
 	}
 
 	public ArrayList<TestInfo> getLessonTests(int id) {
@@ -372,21 +379,16 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		return testsList;
 	}
 
-	public Test getTest(String tableName) {
+	public Test getTest(int id) {
 		ArrayList<Question> questions = new ArrayList<Question>();
 		TestInfo testInfo = null;
-		int id = Integer.parseInt(tableName.substring(
-				tableName.lastIndexOf('_') + 1, tableName.length()));
 
 		SQLiteDatabase db = getWritableDatabase();
 
-		Cursor c = db.query(tableName, new String[] { KEY_ID,
-				KEY_ID_TEST_QUESTION, KEY_QUESTION, KEY_PARENT_QUESTION, KEY_ANSWERS,
-				KEY_CORRECT_ANSWER, KEY_BALLS, KEY_TYPE_QUESTION },
-				null, null, null, null, null);
+		Cursor c = db.query(TABLE_QUESTIONS, new String[] { KEY_ID_TEST_QUESTION, KEY_QUESTION, KEY_PARENT_QUESTION, KEY_ANSWERS,
+				KEY_CORRECT_ANSWER, KEY_BALLS, KEY_TYPE_QUESTION, KEY_TEST_ID }, KEY_TEST_ID + "=" + id, null, null, null, null);
 
 		if (c.moveToFirst()) {
-			int idIndex = c.getColumnIndex(KEY_ID);
 			int idTestQuestionIndex = c.getColumnIndex(KEY_ID_TEST_QUESTION);
 			int questionIndex = c.getColumnIndex(KEY_QUESTION);
 			int parentQuestionIndex = c.getColumnIndex(KEY_PARENT_QUESTION);
@@ -397,18 +399,19 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 			Question question;
 			do {
-				question = new Question(c.getInt(idIndex),
-						c.getInt(idTestQuestionIndex),
+				question = new Question(c.getInt(idTestQuestionIndex),
 						c.getString(questionIndex),
 						c.getString(parentQuestionIndex),
 						c.getString(answersIndex),
 						c.getString(correctAnswerIndex),
 						c.getInt(ballsIndex),
-						c.getInt(typeQuestionIndex),null);
+						c.getInt(typeQuestionIndex),
+						null);
 				questions.add(question);
 			} while (c.moveToNext());
 		}
-
+		c.close();
+		
 		c = db.query(TABLE_TESTS, new String[] { KEY_ID, KEY_LESSON_ID,
 				KEY_NAME, KEY_TASK_ALL, KEY_TASK_MATCHES, KEY_TASK_OPEN_ANSWER,
 				KEY_TASK_TEST, KEY_TASK_VARS, KEY_TIME, KEY_YEAR, KEY_LOADED },
@@ -439,10 +442,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 		return new Test(testInfo, questions);
 	}
 
-	private JSONArray loadFromResources(int id) throws IOException,
-			JSONException {
-		InputStream is = ZNOApplication.getInstance().getResources()
-				.openRawResource(id);
+	private JSONArray loadFromResources(int id) throws IOException, JSONException {
+		InputStream is = ZNOApplication.getInstance().getResources().openRawResource(id);
 		byte[] buf = new byte[is.available()];
 		is.read(buf);
 		is.close();
