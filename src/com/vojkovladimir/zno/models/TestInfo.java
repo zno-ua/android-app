@@ -1,6 +1,9 @@
 package com.vojkovladimir.zno.models;
 
 public class TestInfo {
+
+    public static final String TASK_ALL = "task_all";
+
 	public int id;
 	public int lessonId;
 	public String name;

@@ -12,7 +12,6 @@ import android.text.Html.ImageGetter;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +29,7 @@ import android.widget.TextView.OnEditorActionListener;
 import com.vojkovladimir.zno.FileManager;
 import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.models.Question;
+import com.vojkovladimir.zno.models.Test;
 
 import java.io.FileNotFoundException;
 import java.util.regex.Matcher;
@@ -39,7 +39,6 @@ public class QuestionFragment extends Fragment {
 
     private static final char ENG_LETTER = 65;
     private static final char UKR_LETTER = 1040;
-    private static final String TASK_ALL = "task_all";
     private static final String FIRST_LETTER = "first_letter";
     private static final String ID_ON_TEST = "id_on_test";
 
@@ -62,7 +61,7 @@ public class QuestionFragment extends Fragment {
         void onAnswerSelected(int id, String answer);
     }
 
-    public static QuestionFragment newInstance(int idOnTest,Question question, int taskAll, int lessonId) {
+    public static QuestionFragment newInstance(int idOnTest, Question question, int taskAll, int lessonId) {
         QuestionFragment f = new QuestionFragment();
         f.idOnTest = idOnTest;
         f.id = question.id;
@@ -90,7 +89,7 @@ public class QuestionFragment extends Fragment {
         if (savedInstanceState != null) {
             idOnTest = savedInstanceState.getInt(ID_ON_TEST);
             id = savedInstanceState.getInt(Question.ID);
-            taskAll = savedInstanceState.getInt(TASK_ALL);
+            taskAll = savedInstanceState.getInt(Test.TASK_ALL);
             question = savedInstanceState.getString(Question.QUESTION);
             parentQuestion = savedInstanceState.getString(Question.PARENT_QUESTION);
             answers = savedInstanceState.getString(Question.ANSWERS);
@@ -105,7 +104,7 @@ public class QuestionFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(ID_ON_TEST, idOnTest);
         outState.putInt(Question.ID, id);
-        outState.putInt(TASK_ALL, taskAll);
+        outState.putInt(Test.TASK_ALL, taskAll);
         outState.putString(Question.QUESTION, question);
         outState.putString(Question.PARENT_QUESTION, parentQuestion);
         outState.putString(Question.ANSWERS, answers);
@@ -180,7 +179,7 @@ public class QuestionFragment extends Fragment {
                         }
                         answerItems[num].setSelected(true);
                         answer = String.valueOf((num + 1));
-                        callBack.onAnswerSelected(idOnTest,answer);
+                        callBack.onAnswerSelected(idOnTest, answer);
                     }
                 });
 
@@ -267,7 +266,7 @@ public class QuestionFragment extends Fragment {
                                 answerItemLetters[num][letterNum].setSelected(true);
                                 answer = sb.toString();
                                 if (!answer.contains("0")) {
-                                    callBack.onAnswerSelected(idOnTest,answer);
+                                    callBack.onAnswerSelected(idOnTest, answer);
                                 }
                             }
                         });
@@ -331,7 +330,7 @@ public class QuestionFragment extends Fragment {
                         && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     hideKeyboard();
                     if (answer.length() == 3) {
-                        callBack.onAnswerSelected(idOnTest,answer);
+                        callBack.onAnswerSelected(idOnTest, answer);
                     }
                     return true;
                 }
@@ -396,7 +395,7 @@ public class QuestionFragment extends Fragment {
 
                             @Override
                             public void run() {
-                                callBack.onAnswerSelected(idOnTest,answer);
+                                callBack.onAnswerSelected(idOnTest, answer);
                             }
 
                         }, 200);
