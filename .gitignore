@@ -16,6 +16,15 @@ gen/
 .gradle/
 build/
 
+# Eclipse project files
+.classpath
+.project
+
+# Intellij project files
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+
 # Local configuration file (sdk path, etc)
 local.properties
 
