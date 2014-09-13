@@ -1,9 +1,6 @@
 package com.vojkovladimir.zno.fragments;
 
-import java.io.FileNotFoundException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,6 +12,7 @@ import android.text.Html.ImageGetter;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,443 +31,503 @@ import com.vojkovladimir.zno.FileManager;
 import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.models.Question;
 
+import java.io.FileNotFoundException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class QuestionFragment extends Fragment {
 
-	private static final char ENG_LETTER = 65;
-	private static final char UKR_LETTER = 1040;
+    private static final char ENG_LETTER = 65;
+    private static final char UKR_LETTER = 1040;
+    private static final String TASK_ALL = "task_all";
+    private static final String FIRST_LETTER = "first_letter";
+    private static final String ID_ON_TEST = "id_on_test";
 
-	Question question;
-	int taskAll;
-	char firstLetter;
+    int idOnTest;
+    int id;
+    int taskAll;
+    String question;
+    String parentQuestion;
+    String answers;
+    String answer;
+    int type;
+    int balls;
+    char firstLetter;
 
-	FileManager fm;
+    FileManager fm;
 
-	QuestionActions questionActions;
+    OnAnswerSelectedListener callBack;
 
-	public static QuestionFragment newInstance(Context context, Question question, int taskAll,
-			int lessonId,QuestionActions questionActions) {
-		QuestionFragment f = new QuestionFragment();
-		f.question = question;
-		f.taskAll = taskAll;
-		f.fm = new FileManager(context);
-		f.firstLetter = (lessonId == 7) ? ENG_LETTER : UKR_LETTER;
-		f.questionActions = questionActions;
-		return f;
-	}
+    public interface OnAnswerSelectedListener {
+        void onAnswerSelected(int id, String answer);
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public static QuestionFragment newInstance(int idOnTest,Question question, int taskAll, int lessonId) {
+        QuestionFragment f = new QuestionFragment();
+        f.idOnTest = idOnTest;
+        f.id = question.id;
+        f.taskAll = taskAll;
+        f.firstLetter = (lessonId == 7) ? ENG_LETTER : UKR_LETTER;
+        f.question = question.question;
+        f.parentQuestion = question.parentQuestion;
+        f.answers = question.answers;
+        f.answer = question.answer;
+        f.type = question.type;
+        f.balls = question.balls;
+        return f;
+    }
 
-		switch (question.typeQuestion) {
-		case Question.TYPE_1:
-			return createTypeOneQuestionView(inflater, container);
-		case Question.TYPE_2:
-			return createTypeTwoQuestionView(inflater, container);
-		case Question.TYPE_3:
-			return createTypeThreeQuestionView(inflater, container);
-		case Question.TYPE_4:
-			return createTypeFourQuestionView(inflater, container);
-		case Question.TYPE_5:
-			return createTypeFiveQuestionView(inflater, container);
-		default:
-			View v = inflater.inflate(R.layout.test_question, container, false);
-			return v;
-		}
-	}
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        fm = new FileManager(activity);
+        callBack = (OnAnswerSelectedListener) activity;
+    }
 
-	private View createTypeOneQuestionView(LayoutInflater inflater, ViewGroup container) {
-		View v = inflater.inflate(R.layout.test_question, container, false);
-		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
-		
-		if (!question.parentQuestion.isEmpty()) {
-			questionContainer.addView(createParentQuestionText(inflater, questionContainer));
-		}
-		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
-		questionContainer.addView(createQuestionText(inflater, questionContainer));
-		
-		LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
-		questionContainer.addView(answersContainer);
-				
-		String[] answers = question.answers.split("\n");
-		final View[] answerItems = new View[answers.length];
-		Pattern answerPattern = Pattern.compile("(^.*?)(\\.\\s|\\s)(.*?$)");
-		Matcher matcher;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            idOnTest = savedInstanceState.getInt(ID_ON_TEST);
+            id = savedInstanceState.getInt(Question.ID);
+            taskAll = savedInstanceState.getInt(TASK_ALL);
+            question = savedInstanceState.getString(Question.QUESTION);
+            parentQuestion = savedInstanceState.getString(Question.PARENT_QUESTION);
+            answers = savedInstanceState.getString(Question.ANSWERS);
+            answer = savedInstanceState.getString(Question.ANSWER);
+            type = savedInstanceState.getInt(Question.TYPE);
+            balls = savedInstanceState.getInt(Question.BALLS);
+            firstLetter = savedInstanceState.getChar(FIRST_LETTER);
+        }
+    }
 
-		TextView answerItemLetter;
-		TextView answerItemText;
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(ID_ON_TEST, idOnTest);
+        outState.putInt(Question.ID, id);
+        outState.putInt(TASK_ALL, taskAll);
+        outState.putString(Question.QUESTION, question);
+        outState.putString(Question.PARENT_QUESTION, parentQuestion);
+        outState.putString(Question.ANSWERS, answers);
+        outState.putString(Question.ANSWER, answer);
+        outState.putInt(Question.TYPE, type);
+        outState.putInt(Question.BALLS, balls);
+        outState.putChar(FIRST_LETTER, firstLetter);
+        super.onSaveInstanceState(outState);
+    }
 
-		for (int i = 0; i < answers.length; i++) {
-			answerItems[i] = inflater.inflate(R.layout.answer, answersContainer, false);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-			answerItemLetter = (TextView) answerItems[i].findViewById(R.id.answer_letter);
-			answerItemText = (TextView) answerItems[i].findViewById(R.id.answer_text);
+        switch (type) {
+            case Question.TYPE_1:
+                return createTypeOneQuestionView(inflater, container);
+            case Question.TYPE_2:
+                return createTypeTwoQuestionView(inflater, container);
+            case Question.TYPE_3:
+                return createTypeThreeQuestionView(inflater, container);
+            case Question.TYPE_4:
+                return createTypeFourQuestionView(inflater, container);
+            case Question.TYPE_5:
+                return createTypeFiveQuestionView(inflater, container);
+            default:
+                View v = inflater.inflate(R.layout.test_question, container, false);
+                return v;
+        }
+    }
 
-			matcher = answerPattern.matcher(answers[i]);
+    private View createTypeOneQuestionView(LayoutInflater inflater, ViewGroup container) {
+        View v = inflater.inflate(R.layout.test_question, container, false);
+        LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
-			if (matcher.find()) {
-				answerItemLetter.setText(Html.fromHtml(matcher.group(1), imgGetter, null));
-				answerItemText.setText(Html.fromHtml(matcher.group(3), imgGetter, null));
+        if (!parentQuestion.isEmpty()) {
+            questionContainer.addView(createParentQuestionText(inflater, questionContainer));
+        }
+        questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
+        questionContainer.addView(createQuestionText(inflater, questionContainer));
 
-				final int num = i;
-				answerItems[i].setOnClickListener(new OnClickListener() {
+        LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
+        questionContainer.addView(answersContainer);
 
-					@Override
-					public void onClick(View v) {
-						if (!question.answer.isEmpty()) {
-							int oldNum = Integer.valueOf(question.answer) - 1;
-							answerItems[oldNum].setSelected(false);
-						}
-						answerItems[num].setSelected(true);
-						question.answer = String.valueOf((num + 1));
-						questionActions.onAnswerSelected();
-					}
-				});
+        String[] answers = this.answers.split("\n");
+        final View[] answerItems = new View[answers.length];
+        Pattern answerPattern = Pattern.compile("(^.*?)(\\.\\s|\\s)(.*?$)");
+        Matcher matcher;
 
-				answersContainer.addView(answerItems[i]);
-			}
-		}
+        TextView answerItemLetter;
+        TextView answerItemText;
 
-		if (!question.answer.isEmpty()) {
-			int num = Integer.valueOf(question.answer) - 1;
-			answerItems[num].setSelected(true);
-		}
+        for (int i = 0; i < answers.length; i++) {
+            answerItems[i] = inflater.inflate(R.layout.answer, answersContainer, false);
 
-		return v;
-	}
+            answerItemLetter = (TextView) answerItems[i].findViewById(R.id.answer_letter);
+            answerItemText = (TextView) answerItems[i].findViewById(R.id.answer_text);
 
-	private View createTypeTwoQuestionView(LayoutInflater inflater, ViewGroup container) {
-		View v = inflater.inflate(R.layout.test_question, container, false);
-		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
-		
-		if (question.balls == 0) {
-			questionContainer.addView(createQuestionText(inflater, questionContainer));
-		} else {
-			questionContainer.addView(createStatementQuestionText(inflater, questionContainer));
-		}
-		
-		return v;
-	}
+            matcher = answerPattern.matcher(answers[i]);
 
-	private View createTypeThreeQuestionView(LayoutInflater inflater, ViewGroup container) {
-		View v = inflater.inflate(R.layout.test_question, container, false);
-		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+            if (matcher.find()) {
+                answerItemLetter.setText(Html.fromHtml(matcher.group(1), imgGetter, null));
+                answerItemText.setText(Html.fromHtml(matcher.group(3), imgGetter, null));
 
-		if (!question.parentQuestion.isEmpty()) {
-			questionContainer.addView(createParentQuestionText(inflater, questionContainer));
-		}
-		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
-		questionContainer.addView(createQuestionText(inflater, questionContainer));
-		
-		LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
-		questionContainer.addView(answersContainer);
+                final int num = i;
+                answerItems[i].setOnClickListener(new OnClickListener() {
 
-		int numCounts = Integer.parseInt(question.answers.split("-")[0]);
-		int varCounts = Integer.parseInt(question.answers.split("-")[1]);
+                    @Override
+                    public void onClick(View v) {
+                        if (!answer.isEmpty()) {
+                            int oldNum = Integer.valueOf(answer) - 1;
+                            answerItems[oldNum].setSelected(false);
+                        }
+                        answerItems[num].setSelected(true);
+                        answer = String.valueOf((num + 1));
+                        callBack.onAnswerSelected(idOnTest,answer);
+                    }
+                });
 
-		final View[] answerItems = new View[numCounts];
-		final View[][] answerItemLetters = new View[numCounts][varCounts];
+                answersContainer.addView(answerItems[i]);
+            }
+        }
 
-		LinearLayout answerLettersContainer;
-		TextView answerCoupleNum;
-		TextView answerItemLetter;
+        if (!answer.isEmpty()) {
+            int num = Integer.valueOf(answer) - 1;
+            answerItems[num].setSelected(true);
+        }
 
-		for (int i = 0; i < answerItems.length; i++) {
-			answerItems[i] = inflater.inflate(R.layout.answers_connections, answersContainer, false);
+        return v;
+    }
 
-			answerCoupleNum = (TextView) answerItems[i].findViewById(R.id.answer_couple_num);
-			answerCoupleNum.setText(String.valueOf((i + 1)));
-			answerLettersContainer = (LinearLayout) answerItems[i].findViewById(R.id.answer_couple_letters_container);
+    private View createTypeTwoQuestionView(LayoutInflater inflater, ViewGroup container) {
+        View v = inflater.inflate(R.layout.test_question, container, false);
+        LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
-			final int num = i;
-			for (int j = 0; j < answerItemLetters[0].length; j++) {
-				answerItemLetters[i][j] = inflater.inflate(R.layout.answers_letter,
-						answerLettersContainer, false);
-				answerItemLetter = (TextView) answerItemLetters[i][j].findViewById(R.id.answer_letter);
-				answerItemLetter.setText(String.valueOf((char) (firstLetter + j)));
-				final int letterNum = j;
-				answerItemLetters[i][j]
-						.setOnClickListener(new OnClickListener() {
+        if (balls == 0) {
+            questionContainer.addView(createQuestionText(inflater, questionContainer));
+        } else {
+            questionContainer.addView(createStatementQuestionText(inflater, questionContainer));
+        }
 
-							@Override
-							public void onClick(View v) {
-								StringBuilder sb = new StringBuilder(question.answer);
-								char oldNumLetter = sb.charAt(num);
-								char newNumLetter = (char) ('0' + letterNum + 1);
-								if (oldNumLetter != '0') {
-									answerItemLetters[num][oldNumLetter - '0' - 1].setSelected(false);
-								}
-								int usedNumLetter = sb.indexOf(String.valueOf(newNumLetter));
-								if (usedNumLetter != -1) {
-									answerItemLetters[usedNumLetter][letterNum].setSelected(false);
-									sb.setCharAt(usedNumLetter, '0');
-								}
+        return v;
+    }
 
-								sb.setCharAt(num, newNumLetter);
-								answerItemLetters[num][letterNum].setSelected(true);
-								question.answer = sb.toString();
-								if (!question.answer.contains("0")) {
-									questionActions.onAnswerSelected();
-								}
-							}
-						});
+    private View createTypeThreeQuestionView(LayoutInflater inflater, ViewGroup container) {
+        View v = inflater.inflate(R.layout.test_question, container, false);
+        LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
-				answerLettersContainer.addView(answerItemLetters[i][j]);
-			}
-			char oldNumLetter = question.answer.charAt(i);
-			if (oldNumLetter != '0') {
-				answerItemLetters[i][oldNumLetter - '0' - 1].setSelected(true);
-			}
-			answersContainer.addView(answerItems[i]);
-		}
+        if (!parentQuestion.isEmpty()) {
+            questionContainer.addView(createParentQuestionText(inflater, questionContainer));
+        }
+        questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
+        questionContainer.addView(createQuestionText(inflater, questionContainer));
 
-		return v;
-	}
+        LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
+        questionContainer.addView(answersContainer);
 
-	private View createTypeFourQuestionView(LayoutInflater inflater, ViewGroup container) {
-		View v = inflater.inflate(R.layout.test_question, container, false);
-		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+        int numCounts = Integer.parseInt(answers.split("-")[0]);
+        int varCounts = Integer.parseInt(answers.split("-")[1]);
 
-		if (!question.parentQuestion.isEmpty()) {
-			questionContainer.addView(createParentQuestionText(inflater, questionContainer));
-		}
-		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
-		questionContainer.addView(createQuestionText(inflater, questionContainer));
-		
-		LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
-		questionContainer.addView(answersContainer);
-		
-		View answerItem = inflater.inflate(R.layout.answer_only_correct,answersContainer, false);
-		EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_only_correct_input);
+        final View[] answerItems = new View[numCounts];
+        final View[][] answerItemLetters = new View[numCounts][varCounts];
 
-		if (!question.answer.isEmpty()) {
-			answerItemInput.setText(question.answer);
-		}
+        LinearLayout answerLettersContainer;
+        TextView answerCoupleNum;
+        TextView answerItemLetter;
 
-		answerItemInput.addTextChangedListener(new TextWatcher() {
+        for (int i = 0; i < answerItems.length; i++) {
+            answerItems[i] = inflater.inflate(R.layout.answers_connections, answersContainer, false);
 
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
+            answerCoupleNum = (TextView) answerItems[i].findViewById(R.id.answer_couple_num);
+            answerCoupleNum.setText(String.valueOf((i + 1)));
+            answerLettersContainer = (LinearLayout) answerItems[i].findViewById(R.id.answer_couple_letters_container);
 
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
+            final int num = i;
+            for (int j = 0; j < answerItemLetters[0].length; j++) {
+                answerItemLetters[i][j] = inflater.inflate(R.layout.answers_letter,
+                        answerLettersContainer, false);
+                answerItemLetter = (TextView) answerItemLetters[i][j].findViewById(R.id.answer_letter);
+                answerItemLetter.setText(String.valueOf((char) (firstLetter + j)));
+                final int letterNum = j;
+                answerItemLetters[i][j]
+                        .setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void afterTextChanged(Editable s) {
-				question.answer = s.toString();
-			}
-		});
-		
-		answerItemInput.setOnEditorActionListener(new OnEditorActionListener() {
+                            @Override
+                            public void onClick(View v) {
+                                StringBuilder sb = new StringBuilder(answer);
+                                char oldNumLetter = sb.charAt(num);
+                                char newNumLetter = (char) ('0' + letterNum + 1);
+                                if (oldNumLetter != '0') {
+                                    answerItemLetters[num][oldNumLetter - '0' - 1].setSelected(false);
+                                }
+                                int usedNumLetter = sb.indexOf(String.valueOf(newNumLetter));
+                                if (usedNumLetter != -1) {
+                                    answerItemLetters[usedNumLetter][letterNum].setSelected(false);
+                                    sb.setCharAt(usedNumLetter, '0');
+                                }
 
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE
-						|| event.getAction() == KeyEvent.ACTION_DOWN
-						&& event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-					hideKeyboard();
-					if (question.answer.length() == 3) {
-						questionActions.onAnswerSelected();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
+                                sb.setCharAt(num, newNumLetter);
+                                answerItemLetters[num][letterNum].setSelected(true);
+                                answer = sb.toString();
+                                if (!answer.contains("0")) {
+                                    callBack.onAnswerSelected(idOnTest,answer);
+                                }
+                            }
+                        });
+
+                answerLettersContainer.addView(answerItemLetters[i][j]);
+            }
+            char oldNumLetter = answer.charAt(i);
+            if (oldNumLetter != '0') {
+                answerItemLetters[i][oldNumLetter - '0' - 1].setSelected(true);
+            }
+            answersContainer.addView(answerItems[i]);
+        }
+
+        return v;
+    }
+
+    private View createTypeFourQuestionView(LayoutInflater inflater, ViewGroup container) {
+        View v = inflater.inflate(R.layout.test_question, container, false);
+        LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+
+        if (!parentQuestion.isEmpty()) {
+            questionContainer.addView(createParentQuestionText(inflater, questionContainer));
+        }
+        questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
+        questionContainer.addView(createQuestionText(inflater, questionContainer));
+
+        LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
+        questionContainer.addView(answersContainer);
+
+        View answerItem = inflater.inflate(R.layout.answer_only_correct, answersContainer, false);
+        EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_only_correct_input);
+
+        if (!answer.isEmpty()) {
+            answerItemInput.setText(answer);
+        }
+
+        answerItemInput.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                answer = s.toString();
+            }
+        });
+
+        answerItemInput.setOnEditorActionListener(new OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE
+                        || event.getAction() == KeyEvent.ACTION_DOWN
+                        && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    hideKeyboard();
+                    if (answer.length() == 3) {
+                        callBack.onAnswerSelected(idOnTest,answer);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
 
 
-		answersContainer.addView(answerItem);
-		return v;
-	}
+        answersContainer.addView(answerItem);
+        return v;
+    }
 
-	private View createTypeFiveQuestionView(LayoutInflater inflater,
-			ViewGroup container) {
-		View v = inflater.inflate(R.layout.test_question, container, false);
-		LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+    private View createTypeFiveQuestionView(LayoutInflater inflater,
+                                            ViewGroup container) {
+        View v = inflater.inflate(R.layout.test_question, container, false);
+        LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
-		if (!question.parentQuestion.isEmpty()) {
-			questionContainer.addView(createParentQuestionText(inflater, questionContainer));
-		}
-		questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
-		questionContainer.addView(createQuestionText(inflater, questionContainer));
-		
-		LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
-		questionContainer.addView(answersContainer);
+        if (!parentQuestion.isEmpty()) {
+            questionContainer.addView(createParentQuestionText(inflater, questionContainer));
+        }
+        questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
+        questionContainer.addView(createQuestionText(inflater, questionContainer));
 
-		View answerItem = inflater.inflate(R.layout.answer_short, answersContainer, false);
-		EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_input);
+        LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
+        questionContainer.addView(answersContainer);
 
-		if (!question.answer.isEmpty()) {
-			answerItemInput.setText(question.answer);
-		}
+        View answerItem = inflater.inflate(R.layout.answer_short, answersContainer, false);
+        EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_input);
 
-		answerItemInput.addTextChangedListener(new TextWatcher() {
+        if (!answer.isEmpty()) {
+            answerItemInput.setText(answer);
+        }
 
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
+        answerItemInput.addTextChangedListener(new TextWatcher() {
 
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+            }
 
-			@Override
-			public void afterTextChanged(Editable s) {
-				question.answer = s.toString();
-			}
-		});
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+            }
 
-		answerItemInput.setOnEditorActionListener(new OnEditorActionListener() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                answer = s.toString();
+            }
+        });
 
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE
-						|| event.getAction() == KeyEvent.ACTION_DOWN
-						&& event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-					hideKeyboard();
-					if (!question.answer.isEmpty()) {
-						new Handler().postDelayed(new Runnable() {
+        answerItemInput.setOnEditorActionListener(new OnEditorActionListener() {
 
-							@Override
-							public void run() {
-								questionActions.onAnswerSelected();
-							}
-							
-						}, 200);
-					}
-					return true;
-				}
-				return false;
-			}
-		});
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE
+                        || event.getAction() == KeyEvent.ACTION_DOWN
+                        && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    hideKeyboard();
+                    if (!answer.isEmpty()) {
+                        new Handler().postDelayed(new Runnable() {
 
-		answersContainer.addView(answerItem);
-		return v;
-	}
-	
-	private View createQuestionHeaderView(LayoutInflater inflater, ViewGroup container) {
-		View v = inflater.inflate(R.layout.test_question_header, container, false);
-		
-		TextView questionId = (TextView) v.findViewById(R.id.test_question_id);
-		TextView questionTaskAll = (TextView) v.findViewById(R.id.test_question_task_all);
-		
-		questionId.setText(getResources().getString(R.string.question) + " " + question.idTestQuestion);
-		questionTaskAll.setText(question.idTestQuestion + "/" + taskAll);
-		
-		return v;
-	}
-	
-	private View createQuestionText(LayoutInflater inflater, ViewGroup container){		
-		TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
-		questionText.setText(Html.fromHtml(question.question, imgGetter, null));
-		questionText.setMovementMethod(LinkMovementMethod.getInstance());
-		
-		return questionText;
-	}
-	
-	private View createStatementQuestionText(LayoutInflater inflater, ViewGroup container){	
-		View v = inflater.inflate(R.layout.test_question_statement, container, false);
-		TextView questionText = (TextView) v.findViewById(R.id.test_question_statement_text);
-		SeekBar ballsSeekBar = (SeekBar) v.findViewById(R.id.question_statement_balls_seekbar);
-		final TextView balls = (TextView) v.findViewById(R.id.test_question_statement_balls);
-		questionText.setText(Html.fromHtml(question.question + getResources().getString(R.string.choose_ball), imgGetter, null));
-		questionText.setMovementMethod(LinkMovementMethod.getInstance());
-		balls.setText(getResources().getString(R.string.choosed_ball) + " " + String.valueOf(question.balls/2));
-		ballsSeekBar.setMax(question.balls);
-		ballsSeekBar.setProgress(question.balls/2);
-		ballsSeekBar.setSecondaryProgress(0);
-		ballsSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-			
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				question.answer = String.valueOf(seekBar.getProgress());
-			}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-				
-			}
-			
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				balls.setText(getResources().getString(R.string.choosed_ball) + " " + String.valueOf(progress));
-			}
-		});
-		
-		return v;
-	}
-	
-	private View createParentQuestionText(LayoutInflater inflater, ViewGroup container){		
-		final TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
-		questionText.setText(Html.fromHtml(getResources().getString(R.string.parent_question_text_show), imgGetter, null));
-		questionText.setMovementMethod(LinkMovementMethod.getInstance());
-		questionText.setSelected(true);
-		questionText.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				if (v.isSelected()) {
-					v.setSelected(false);
-					questionText.setText(Html.fromHtml(question.parentQuestion, imgGetter, null));
-				} else {
-					v.setSelected(true);
-					questionText.setText(Html.fromHtml(getResources().getString(R.string.parent_question_text_show), imgGetter, null));
-				}
-			}
-		});
-		
-		return questionText;
-	}
-	
-	private LinearLayout createAnswersContainer(LayoutInflater inflater, ViewGroup container){		
-		return (LinearLayout) inflater.inflate(R.layout.test_question_answers, container, false);
-	}
+                            @Override
+                            public void run() {
+                                callBack.onAnswerSelected(idOnTest,answer);
+                            }
 
-	private ImageGetter imgGetter = new ImageGetter() {
+                        }, 200);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
 
-		public Drawable getDrawable(String source) {
-			Drawable drawable = null;
+        answersContainer.addView(answerItem);
+        return v;
+    }
 
-			try {
-				drawable = fm.openDrawable(source);
-			} catch (FileNotFoundException e) {
-					e.printStackTrace();
-			}
-			
-			if (drawable == null) {
-				drawable = getResources().getDrawable(R.drawable.emo_im_crying);
-			}
+    private View createQuestionHeaderView(LayoutInflater inflater, ViewGroup container) {
+        View v = inflater.inflate(R.layout.test_question_header, container, false);
 
-			DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        TextView questionId = (TextView) v.findViewById(R.id.test_question_id);
+        TextView questionTaskAll = (TextView) v.findViewById(R.id.test_question_task_all);
 
-			int width = (int) (drawable.getIntrinsicWidth() * displayMetrics.scaledDensity);
-			int heigth = (int) (drawable.getIntrinsicHeight() * displayMetrics.scaledDensity);
-			int maxWidth = (int) (displayMetrics.widthPixels * 0.75f);
+        questionId.setText(getResources().getString(R.string.question) + " " + id);
+        questionTaskAll.setText(id + "/" + taskAll);
 
-			if (width > maxWidth) {
-				float scale = (float) maxWidth / (float) width;
-				width = maxWidth;
-				heigth = (int) (heigth * scale);
-			}
+        return v;
+    }
 
-			drawable.setBounds(0, 0, width, heigth);
+    private View createQuestionText(LayoutInflater inflater, ViewGroup container) {
+        TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
+        questionText.setText(Html.fromHtml(question, imgGetter, null));
+        questionText.setMovementMethod(LinkMovementMethod.getInstance());
 
-			return drawable;
-		}
-	};
+        return questionText;
+    }
 
-	public interface QuestionActions {
-		void onAnswerSelected();
-	}
-	
-	private void hideKeyboard(){
-		InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
-	}
+    private View createStatementQuestionText(LayoutInflater inflater, ViewGroup container) {
+        View v = inflater.inflate(R.layout.test_question_statement, container, false);
+
+        TextView questionText = (TextView) v.findViewById(R.id.test_question_statement_text);
+        questionText.setText(Html.fromHtml(question + getResources().getString(R.string.choose_ball), imgGetter, null));
+        questionText.setMovementMethod(LinkMovementMethod.getInstance());
+
+        final TextView ballsText = (TextView) v.findViewById(R.id.test_question_statement_balls);
+        ballsText.setText(getResources().getString(R.string.choosed_ball) + " " + String.valueOf(balls / 2));
+
+        SeekBar ballsSeekBar = (SeekBar) v.findViewById(R.id.question_statement_balls_seekbar);
+        ballsSeekBar.setMax(balls);
+        ballsSeekBar.setProgress(balls / 2);
+        ballsSeekBar.setSecondaryProgress(0);
+        ballsSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                answer = String.valueOf(seekBar.getProgress());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                ballsText.setText(getResources().getString(R.string.choosed_ball) + " " + String.valueOf(progress));
+            }
+        });
+
+        return v;
+    }
+
+    private View createParentQuestionText(LayoutInflater inflater, ViewGroup container) {
+        final TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
+        questionText.setText(Html.fromHtml(getResources().getString(R.string.parent_question_text_show), imgGetter, null));
+        questionText.setMovementMethod(LinkMovementMethod.getInstance());
+        questionText.setSelected(true);
+        questionText.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (v.isSelected()) {
+                    v.setSelected(false);
+                    questionText.setText(Html.fromHtml(parentQuestion, imgGetter, null));
+                } else {
+                    v.setSelected(true);
+                    questionText.setText(Html.fromHtml(getResources().getString(R.string.parent_question_text_show), imgGetter, null));
+                }
+            }
+        });
+
+        return questionText;
+    }
+
+    private LinearLayout createAnswersContainer(LayoutInflater inflater, ViewGroup container) {
+        return (LinearLayout) inflater.inflate(R.layout.test_question_answers, container, false);
+    }
+
+    private ImageGetter imgGetter = new ImageGetter() {
+
+        public Drawable getDrawable(String source) {
+            Drawable drawable = null;
+
+            try {
+                drawable = fm.openDrawable(source);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            if (drawable == null) {
+                drawable = getResources().getDrawable(R.drawable.emo_im_crying);
+            }
+
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+
+            int width = (int) (drawable.getIntrinsicWidth() * displayMetrics.scaledDensity);
+            int height = (int) (drawable.getIntrinsicHeight() * displayMetrics.scaledDensity);
+            int maxWidth = (int) (displayMetrics.widthPixels * 0.75f);
+
+            if (width > maxWidth) {
+                float scale = (float) maxWidth / (float) width;
+                width = maxWidth;
+                height = (int) (height * scale);
+            }
+
+            drawable.setBounds(0, 0, width, height);
+
+            return drawable;
+        }
+    };
+
+    private void hideKeyboard() {
+        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }
 
 }
