@@ -21,9 +21,10 @@ build/
 .project
 
 # Intellij project files
+*.iml
+*.ipr
 *.iws
-.idea/workspace.xml
-.idea/tasks.xml
+.idea/
 
 # Local configuration file (sdk path, etc)
 local.properties
