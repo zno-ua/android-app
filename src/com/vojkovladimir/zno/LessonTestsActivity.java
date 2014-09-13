@@ -72,9 +72,9 @@ public class LessonTestsActivity extends Activity {
 			final TestInfo test = tests.get(position);
 
 			if (test.loaded) {
-				Intent testActivity = new Intent(getApplicationContext(), TestActivity.class);
-				testActivity.putExtra(ZNOApplication.ExtrasKeys.ID_TEST, test.id);
-				startActivity(testActivity);
+                Intent passTest = new Intent(TestActivity.Action.PASS_TEST);
+                passTest.putExtra(TestActivity.Extra.TEST_ID,test.id);
+				startActivity(passTest);
 			} else {
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
 

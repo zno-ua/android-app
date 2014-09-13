@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
-import com.vojkovladimir.zno.ZNOApplication.ExtrasKeys;
 import com.vojkovladimir.zno.adapters.QuestionsAdapter;
 import com.vojkovladimir.zno.adapters.QuestionsGridAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
@@ -24,15 +22,25 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     public static String LOG_TAG = "MyLogs";
 
-    private static final String TEST_ID = "test_id";
-    private static final String USER_TEST_ID = "user_test_id";
-    private static final String QUESTIONS_GRID_VISIBILITY = "q_gride_visibility";
+    public interface Action {
+        String VIEW_TEST = "com.vojkovladimir.zno.VIEW_TEST";
+        String PASS_TEST = "com.vojkovladimir.zno.PASS_TEST";
+        String CONTINUE_PASSAGE_TEST = "com.vojkovladimir.zno.CONTINUE_PASSAGE_TEST";
+    }
+
+    public interface Extra {
+        String TEST_ID = "test_id";
+        String USER_ANSWERS_ID = "user_answers_id";
+        String QUESTIONS_GRID_VISIBILITY = "q_grid_visibility";
+        String VIEW_MODE = "view_mode";
+    }
 
     private ZNOApplication app;
     private ZNODataBaseHelper db;
 
+    private boolean viewMode;
     private Test test;
-    private long userTestId = -1;
+    private long userAnswersId = -1;
     private boolean questionsGridVisible;
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
@@ -43,50 +51,62 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        Log.i(LOG_TAG, "TestActivity: onCreate()");
 
         app = ZNOApplication.getInstance();
         db = app.getZnoDataBaseHelper();
 
         if (savedInstanceState == null) {
-            int testId = getIntent().getIntExtra(ExtrasKeys.ID_TEST, -1);
-            test = db.getTest(testId);
-            questionsGridVisible = false;
+            String action = getIntent().getAction();
+            if (action.equals(Action.PASS_TEST)) {
+                int testId = getIntent().getIntExtra(Extra.TEST_ID, -1);
+                test = db.getTest(testId);
+            } else if (action.equals(Action.CONTINUE_PASSAGE_TEST)) {
+                userAnswersId = getIntent().getIntExtra(Extra.USER_ANSWERS_ID, -1);
+            } else if (action.equals(Action.VIEW_TEST)) {
+                int testId = getIntent().getIntExtra(Extra.TEST_ID, -1);
+                userAnswersId = getIntent().getIntExtra(Extra.USER_ANSWERS_ID, -1);
+                test = db.getTest(testId);
+                test.putAnswers(db.getSavedAnswers(userAnswersId));
+                viewMode = true;
+            } else {
+                finish();
+            }
         } else {
-            int testId = savedInstanceState.getInt(TEST_ID);
-            userTestId = savedInstanceState.getLong(USER_TEST_ID);
+            int testId = savedInstanceState.getInt(Extra.TEST_ID);
+            userAnswersId = savedInstanceState.getLong(Extra.USER_ANSWERS_ID);
             test = db.getTest(testId);
-            test.putAnswers(db.getSavedAnswers(userTestId));
-            questionsGridVisible = savedInstanceState.getBoolean(QUESTIONS_GRID_VISIBILITY);
-            Log.i(LOG_TAG, "TestActivity: restore");
+            test.putAnswers(db.getSavedAnswers(userAnswersId));
+            questionsGridVisible = savedInstanceState.getBoolean(Extra.QUESTIONS_GRID_VISIBILITY);
+            viewMode = savedInstanceState.getBoolean(Extra.VIEW_MODE);
         }
 
         mPager = (ViewPager) findViewById(R.id.test_question_pager);
-        mPagerAdapter = new QuestionsAdapter(getApplicationContext(),getSupportFragmentManager(),test);
+        mPagerAdapter = new QuestionsAdapter(getApplicationContext(), getSupportFragmentManager(), test);
         mPager.setAdapter(mPagerAdapter);
 
         questionsGrid = (GridView) findViewById(R.id.test_questions);
-        questionsGrid.setAdapter(new QuestionsGridAdapter(getApplicationContext(),test));
+        questionsGrid.setAdapter(new QuestionsGridAdapter(getApplicationContext(), test));
         questionsGrid.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mPager.setCurrentItem(position);
-                hideQuestionsGride();
+                hideQuestionsGrid();
             }
         });
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(TEST_ID, test.id);
-        outState.putBoolean(QUESTIONS_GRID_VISIBILITY, questionsGridVisible);
-        if (userTestId == -1) {
-            userTestId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
+        outState.putInt(Extra.TEST_ID, test.id);
+        outState.putBoolean(Extra.QUESTIONS_GRID_VISIBILITY, questionsGridVisible);
+        if (userAnswersId == -1) {
+            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
         } else {
-            db.updateUserAnswers(userTestId, test.lessonId, test.id, test.getAnswers());
+            db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers());
         }
-        outState.putLong(USER_TEST_ID, userTestId);
+        outState.putLong(Extra.USER_ANSWERS_ID, userAnswersId);
+        outState.putBoolean(Extra.VIEW_MODE, viewMode);
         super.onSaveInstanceState(outState);
     }
 
@@ -105,9 +125,9 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 return true;
             case R.id.action_questions_list:
                 if (questionsGridVisible) {
-                    hideQuestionsGride();
+                    hideQuestionsGrid();
                 } else {
-                    showQuestionsGride();
+                    showQuestionsGrid();
                 }
                 return true;
             default:
@@ -116,7 +136,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     }
 
-    private void showQuestionsGride() {
+    private void showQuestionsGrid() {
         questionsGrid.invalidateViews();
         questionsGrid.bringToFront();
         questionsGrid.setVisibility(View.VISIBLE);
@@ -124,7 +144,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         questionsGridVisible = true;
     }
 
-    private void hideQuestionsGride() {
+    private void hideQuestionsGrid() {
         questionsGrid.setVisibility(View.INVISIBLE);
         mPager.setVisibility(View.VISIBLE);
         questionsGridVisible = false;
@@ -138,7 +158,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     @Override
     public void onAnswerSelected(int id, String answer) {
         if (mPager.getCurrentItem() + 1 < test.questions.size()) {
-                mPager.setCurrentItem(mPager.getCurrentItem() + 1);
+            mPager.setCurrentItem(mPager.getCurrentItem() + 1);
         }
         test.questions.get(id).answer = answer;
     }
