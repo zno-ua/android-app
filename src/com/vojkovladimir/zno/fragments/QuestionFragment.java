@@ -2,6 +2,7 @@ package com.vojkovladimir.zno.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,8 +10,10 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -58,11 +61,12 @@ public class QuestionFragment extends Fragment {
     boolean viewMode;
 
     FileManager fm;
+    Resources res;
 
     OnAnswerSelectedListener callBack;
 
     public interface OnAnswerSelectedListener {
-        void onAnswerSelected(int id, String answer);
+        void onAnswerSelected(int id, String answer, boolean switchToNext);
     }
 
     public static QuestionFragment newInstance(boolean viewMode, int idOnTest, Question question, int taskAll, int lessonId) {
@@ -87,6 +91,7 @@ public class QuestionFragment extends Fragment {
         super.onAttach(activity);
         fm = new FileManager(activity);
         callBack = (OnAnswerSelectedListener) activity;
+        res = activity.getResources();
     }
 
     @Override
@@ -188,14 +193,14 @@ public class QuestionFragment extends Fragment {
                 if (viewMode) {
                     if (correctAnswer.equals(String.valueOf(i + 1))) {
                         answerItems[i].setBackgroundResource(R.drawable.item_bg_green);
-                        answerItemLetter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
-                        answerItemText.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                        answerItemLetter.setTextColor(res.getColor(R.color.item_text_color_selected));
+                        answerItemText.setTextColor(res.getColor(R.color.item_text_color_selected));
                         ImageView circle = (ImageView) answerItems[i].findViewById(R.id.answer_letter_circle);
                         circle.setImageResource(R.drawable.letter_circle_pressed);
                     } else if (userAnswer.equals(String.valueOf(i + 1))) {
                         answerItems[i].setBackgroundResource(R.drawable.item_bg_orange);
-                        answerItemLetter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
-                        answerItemText.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                        answerItemLetter.setTextColor(res.getColor(R.color.item_text_color_selected));
+                        answerItemText.setTextColor(res.getColor(R.color.item_text_color_selected));
                         ImageView circle = (ImageView) answerItems[i].findViewById(R.id.answer_letter_circle);
                         circle.setImageResource(R.drawable.letter_circle_pressed);
                     }
@@ -212,7 +217,7 @@ public class QuestionFragment extends Fragment {
                             }
                             answerItems[num].setSelected(true);
                             userAnswer = String.valueOf((num + 1));
-                            callBack.onAnswerSelected(idOnTest, userAnswer);
+                            callBack.onAnswerSelected(idOnTest, userAnswer, true);
                         }
                     });
                 }
@@ -302,7 +307,7 @@ public class QuestionFragment extends Fragment {
                             answerItemLetters[num][letterNum].setSelected(true);
                             userAnswer = sb.toString();
                             if (!userAnswer.contains("0")) {
-                                callBack.onAnswerSelected(idOnTest, userAnswer);
+                                callBack.onAnswerSelected(idOnTest, userAnswer, true);
                             }
                         }
                     });
@@ -316,16 +321,16 @@ public class QuestionFragment extends Fragment {
                 char correctAnswerChar = correctAnswer.charAt(i);
                 if (userAnswerChar == '0') {
                     answerItems[i].setBackgroundResource(R.drawable.item_bg_orange);
-                    answerCoupleNum.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                    answerCoupleNum.setTextColor(res.getColor(R.color.item_text_color_selected));
                     for (int j = 0; j < answerItemLetters[i].length; j++) {
                         ImageView circle = (ImageView) answerItemLetters[i][j].findViewById(R.id.answer_letter_circle);
                         TextView letter = (TextView) answerItemLetters[i][j].findViewById(R.id.answer_letter);
                         if (j == correctAnswerChar - '0' - 1) {
                             circle.setImageResource(R.drawable.letter_circle_green);
-                            letter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                            letter.setTextColor(res.getColor(R.color.item_text_color_selected));
                         } else {
                             circle.setImageResource(R.drawable.letter_circle_inverted);
-                            letter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                            letter.setTextColor(res.getColor(R.color.item_text_color_selected));
                         }
                     }
                 } else {
@@ -333,14 +338,14 @@ public class QuestionFragment extends Fragment {
                     TextView letter = (TextView) answerItemLetters[i][correctAnswerChar - '0' - 1].findViewById(R.id.answer_letter);
 
                     circle.setImageResource(R.drawable.letter_circle_green);
-                    letter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                    letter.setTextColor(res.getColor(R.color.item_text_color_selected));
 
                     if (userAnswerChar != correctAnswerChar) {
                         circle = (ImageView) answerItemLetters[i][userAnswerChar - '0' - 1].findViewById(R.id.answer_letter_circle);
                         letter = (TextView) answerItemLetters[i][userAnswerChar - '0' - 1].findViewById(R.id.answer_letter);
 
                         circle.setImageResource(R.drawable.letter_circle_orange);
-                        letter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                        letter.setTextColor(res.getColor(R.color.item_text_color_selected));
                     }
 
                 }
@@ -369,50 +374,80 @@ public class QuestionFragment extends Fragment {
         LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
         questionContainer.addView(answersContainer);
 
-        View answerItem = inflater.inflate(R.layout.answer_only_correct, answersContainer, false);
-        EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_only_correct_input);
+        View answerItem;
 
-        if (!userAnswer.isEmpty()) {
-            answerItemInput.setText(userAnswer);
-        }
+        if (viewMode) {
+            answerItem = inflater.inflate(R.layout.answer_only_correct_view_mode, answersContainer, false);
+            TextView userAnswerText = (TextView) answerItem.findViewById(R.id.vm_answer_short_user);
+            TextView correctAnswerText = (TextView) answerItem.findViewById(R.id.vm_answer_short_correct);
 
-        answerItemInput.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before,
-                                      int count) {
+            String correctAnswerCombination = new String();
+            for (int i = 0; i < correctAnswer.length(); i++) {
+                correctAnswerCombination += correctAnswer.charAt(i)+" ";
             }
+            correctAnswerText.setText(correctAnswerCombination);
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-            }
+            if (userAnswer.isEmpty()) {
+                userAnswerText.setText(R.string.unanswered_question_warning);
+                userAnswerText.setTextColor(res.getColor(R.color.question_bg_color_orange));
+            } else {
+                SpannableStringBuilder userAnswerCombination = new SpannableStringBuilder();
+                for (int i = 0; i < userAnswer.length(); i++) {
+                    char userAnswerChar = userAnswer.charAt(i);
+                    userAnswerCombination.insert(i * 2, userAnswerChar + " ");
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                userAnswer = s.toString();
-            }
-        });
-
-        answerItemInput.setOnEditorActionListener(new OnEditorActionListener() {
-
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE
-                        || event.getAction() == KeyEvent.ACTION_DOWN
-                        && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    hideKeyboard();
-                    if (userAnswer.length() == 3) {
-                        callBack.onAnswerSelected(idOnTest, userAnswer);
+                    if (correctAnswer.indexOf(userAnswerChar) == -1) {
+                        userAnswerCombination.setSpan(new ForegroundColorSpan(res.getColor(R.color.question_bg_color_orange)),i*2,i*2+2,0);
+                    } else {
+                        userAnswerCombination.setSpan(new ForegroundColorSpan(res.getColor(R.color.question_bg_color_green)),i*2,i*2+2,0);
                     }
-                    return true;
                 }
-                return false;
+                userAnswerText.setText(userAnswerCombination);
             }
-        });
+        } else {
+            answerItem = inflater.inflate(R.layout.answer_only_correct, answersContainer, false);
+            EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_only_correct_input);
 
+            if (!userAnswer.isEmpty()) {
+                answerItemInput.setText(userAnswer);
+            }
 
+            answerItemInput.addTextChangedListener(new TextWatcher() {
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    userAnswer = s.toString();
+                    callBack.onAnswerSelected(idOnTest, userAnswer, false);
+                }
+            });
+
+            answerItemInput.setOnEditorActionListener(new OnEditorActionListener() {
+
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE
+                            || event.getAction() == KeyEvent.ACTION_DOWN
+                            && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                        hideKeyboard();
+                        if (userAnswer.length() == 3) {
+                            callBack.onAnswerSelected(idOnTest, userAnswer, true);
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
         answersContainer.addView(answerItem);
+
         return v;
     }
 
@@ -432,20 +467,20 @@ public class QuestionFragment extends Fragment {
 
         if (viewMode) {
             View answerItem = inflater.inflate(R.layout.answer_short_view_mode, answersContainer, false);
-            TextView userAnswer = (TextView) answerItem.findViewById(R.id.vm_answer_short_user);
-            TextView correctAnswer = (TextView) answerItem.findViewById(R.id.vm_answer_short_correct);
+            TextView userAnswerText = (TextView) answerItem.findViewById(R.id.vm_answer_short_user);
+            TextView correctAnswerText = (TextView) answerItem.findViewById(R.id.vm_answer_short_correct);
 
-            correctAnswer.setText(this.correctAnswer);
-            if (this.userAnswer.isEmpty()) {
-                userAnswer.setText(R.string.unanswered_question_warning);
+            correctAnswerText.setText(correctAnswer);
+            if (userAnswer.isEmpty()) {
+                userAnswerText.setText(R.string.unanswered_question_warning);
             } else {
-                userAnswer.setText(this.userAnswer);
+                userAnswerText.setText(userAnswer);
             }
 
-            if (this.correctAnswer.equals(this.userAnswer)) {
-                userAnswer.setTextColor(getResources().getColor(R.color.question_bg_color_green));
+            if (correctAnswer.equals(userAnswer)) {
+                userAnswerText.setTextColor(res.getColor(R.color.question_bg_color_green));
             } else {
-                userAnswer.setTextColor(getResources().getColor(R.color.question_bg_color_orange));
+                userAnswerText.setTextColor(res.getColor(R.color.question_bg_color_orange));
             }
 
             answersContainer.addView(answerItem);
@@ -472,6 +507,7 @@ public class QuestionFragment extends Fragment {
                 @Override
                 public void afterTextChanged(Editable s) {
                     userAnswer = s.toString();
+                    callBack.onAnswerSelected(idOnTest, userAnswer, false);
                 }
             });
 
@@ -488,7 +524,7 @@ public class QuestionFragment extends Fragment {
 
                                 @Override
                                 public void run() {
-                                    callBack.onAnswerSelected(idOnTest, userAnswer);
+                                    callBack.onAnswerSelected(idOnTest, userAnswer, true);
                                 }
 
                             }, 200);
@@ -510,7 +546,7 @@ public class QuestionFragment extends Fragment {
         TextView questionId = (TextView) v.findViewById(R.id.test_question_id);
         TextView questionTaskAll = (TextView) v.findViewById(R.id.test_question_task_all);
 
-        questionId.setText(getResources().getString(R.string.question) + " " + id);
+        questionId.setText(res.getString(R.string.question) + " " + id);
         questionTaskAll.setText(id + "/" + taskAll);
 
         return v;
@@ -528,11 +564,11 @@ public class QuestionFragment extends Fragment {
         View v = inflater.inflate(R.layout.test_question_statement, container, false);
 
         TextView questionText = (TextView) v.findViewById(R.id.test_question_statement_text);
-        questionText.setText(Html.fromHtml(question + getResources().getString(R.string.choose_ball), imgGetter, null));
+        questionText.setText(Html.fromHtml(question + res.getString(R.string.choose_ball), imgGetter, null));
         questionText.setMovementMethod(LinkMovementMethod.getInstance());
 
         final TextView ballsText = (TextView) v.findViewById(R.id.test_question_statement_balls);
-        ballsText.setText(getResources().getString(R.string.choosed_ball) + " " + String.valueOf(balls / 2));
+        ballsText.setText(res.getString(R.string.choosed_ball) + " " + String.valueOf(balls / 2));
 
         SeekBar ballsSeekBar = (SeekBar) v.findViewById(R.id.question_statement_balls_seekbar);
         ballsSeekBar.setMax(balls);
@@ -552,7 +588,7 @@ public class QuestionFragment extends Fragment {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                ballsText.setText(getResources().getString(R.string.choosed_ball) + " " + String.valueOf(progress));
+                ballsText.setText(res.getString(R.string.choosed_ball) + " " + String.valueOf(progress));
             }
         });
 
@@ -561,7 +597,7 @@ public class QuestionFragment extends Fragment {
 
     private View createParentQuestionText(LayoutInflater inflater, ViewGroup container) {
         final TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
-        questionText.setText(Html.fromHtml(getResources().getString(R.string.parent_question_text_show), imgGetter, null));
+        questionText.setText(Html.fromHtml(res.getString(R.string.parent_question_text_show), imgGetter, null));
         questionText.setMovementMethod(LinkMovementMethod.getInstance());
         questionText.setSelected(true);
         questionText.setOnClickListener(new OnClickListener() {
@@ -573,7 +609,7 @@ public class QuestionFragment extends Fragment {
                     questionText.setText(Html.fromHtml(parentQuestion, imgGetter, null));
                 } else {
                     v.setSelected(true);
-                    questionText.setText(Html.fromHtml(getResources().getString(R.string.parent_question_text_show), imgGetter, null));
+                    questionText.setText(Html.fromHtml(res.getString(R.string.parent_question_text_show), imgGetter, null));
                 }
             }
         });
@@ -597,10 +633,10 @@ public class QuestionFragment extends Fragment {
             }
 
             if (drawable == null) {
-                drawable = getResources().getDrawable(R.drawable.emo_im_crying);
+                drawable = res.getDrawable(R.drawable.emo_im_crying);
             }
 
-            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            DisplayMetrics displayMetrics = res.getDisplayMetrics();
 
             int width = (int) (drawable.getIntrinsicWidth() * displayMetrics.scaledDensity);
             int height = (int) (drawable.getIntrinsicHeight() * displayMetrics.scaledDensity);

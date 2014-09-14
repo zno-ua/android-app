@@ -158,9 +158,11 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     }
 
     @Override
-    public void onAnswerSelected(int id, String answer) {
-        if (mPager.getCurrentItem() + 1 < test.questions.size()) {
-            mPager.setCurrentItem(mPager.getCurrentItem() + 1);
+    public void onAnswerSelected(int id, String answer, boolean switchToNext) {
+        if (switchToNext) {
+            if (mPager.getCurrentItem() + 1 < test.questions.size()) {
+                mPager.setCurrentItem(mPager.getCurrentItem() + 1);
+            }
         }
         test.questions.get(id).answer = answer;
     }
