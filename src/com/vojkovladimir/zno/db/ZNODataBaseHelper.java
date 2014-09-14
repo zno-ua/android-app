@@ -356,15 +356,11 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         JSONObject ball;
-        String ballsArray = "[";
+        String ballsArray = new String();
         for (int i = 0; i < balls.length(); i++) {
             ball = balls.getJSONObject(i);
-            ballsArray += "\"" + ball.getString(ApiService.Keys.ZNO_BALL) + "\"";
-            if (i != balls.length()) {
-                ballsArray += ",";
-            }
+            ballsArray += ball.getString(ApiService.Keys.ZNO_BALL) + "\r";
         }
-        ballsArray += "]";
         values.put(KEY_ID, id);
         values.put(KEY_BALLS, ballsArray);
         long status = db.insertWithOnConflict(TABLE_TEST_BALLS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
@@ -376,7 +372,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public String getTableTestBalls(int id) {
+    public String[] getTestBalls(int id) {
         String balls;
 
         SQLiteDatabase db = getReadableDatabase();
@@ -388,7 +384,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         }
         db.close();
 
-        return balls;
+        return balls.split("\r");
     }
 
     public ArrayList<Lesson> getLessons() {

@@ -25,9 +25,9 @@ public class Question {
     public String correctAnswer;
     public int balls;
     public int type;
-    public String answer;
+    public String userAnswer;
 
-    public Question(int id, String question, String parentQuestion, String answers, String correctAnswer, int balls, int type, String answer) {
+    public Question(int id, String question, String parentQuestion, String answers, String correctAnswer, int balls, int type, String userAnswer) {
         this.id = id;
         this.question = question.replace("<a href=\"", "<a href=\"open.image://?src=");
         this.parentQuestion = parentQuestion;
@@ -35,15 +35,77 @@ public class Question {
         this.correctAnswer = correctAnswer;
         this.balls = balls;
         this.type = type;
-        if (answer != null) {
-            this.answer = answer;
+        if (userAnswer != null) {
+            this.userAnswer = userAnswer;
         } else if (type == TYPE_3) {
-            this.answer = "";
+            this.userAnswer = "";
             for (int i = 0; i < Integer.parseInt(this.answers.split("-")[0]); i++) {
-                this.answer += "0";
+                this.userAnswer += "0";
             }
+        } else if (type == TYPE_2) {
+            this.userAnswer = String.valueOf(balls / 2);
         } else {
-            this.answer = new String();
+            this.userAnswer = new String();
+        }
+    }
+
+    public int getBall() {
+        switch (type) {
+            case TYPE_2: {
+                if (balls != 0) {
+                    return Integer.parseInt(userAnswer);
+                }
+            }
+            case TYPE_4: {
+                int ball = 0;
+                StringBuilder correctAnswer = new StringBuilder(this.correctAnswer);
+                for (int i = 0; i < userAnswer.length(); i++) {
+                    int index = correctAnswer.indexOf(String.valueOf(userAnswer.charAt(i)));
+                    if (index != -1) {
+                        ball++;
+                        correctAnswer.deleteCharAt(index);
+                    }
+                }
+                return ball;
+            }
+            case TYPE_3: {
+                if (answers.charAt(0) == answers.charAt(2)) {
+                    boolean is_full = true;
+                    for (int i = 0; i < correctAnswer.length(); i++) {
+                        if (correctAnswer.charAt(i) != userAnswer.charAt(i)) {
+                            is_full = false;
+                            break;
+                        }
+                    }
+                    if (is_full) {
+                        return 3;
+                    } else {
+                        int lastId = correctAnswer.length() - 1;
+                        if (correctAnswer.charAt(lastId) == userAnswer.charAt(lastId)) {
+                            if (correctAnswer.charAt(0) == userAnswer.charAt(0)) {
+                                return 2;
+                            } else {
+                                return 1;
+                            }
+                        }
+                    }
+                } else {
+                    int ball = 0;
+                    for (int i = 0; i < correctAnswer.length(); i++) {
+                        if (correctAnswer.charAt(i) == userAnswer.charAt(i)) {
+                            ball++;
+                        }
+                    }
+                    return ball;
+                }
+            }
+            case TYPE_1:
+            case TYPE_5:
+                if (userAnswer.equals(correctAnswer)) {
+                    return balls;
+                }
+            default:
+                return 0;
         }
     }
 

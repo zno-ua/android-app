@@ -61,7 +61,7 @@ public class QuestionsGridAdapter extends BaseAdapter {
 
         Question question = test.questions.get(position);
 
-        if (question.answer.isEmpty() || (question.type == Question.TYPE_3 && question.answer.contains("0")) || viewMode) {
+        if (question.userAnswer.isEmpty() || (question.type == Question.TYPE_3 && question.userAnswer.contains("0")) || viewMode) {
             convertView.setBackgroundResource(R.drawable.item_background_unselected);
             holder.questionNum.setTextColor(resources.getColorStateList(R.color.item_text_color));
         } else {

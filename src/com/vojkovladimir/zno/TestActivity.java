@@ -1,5 +1,8 @@
 package com.vojkovladimir.zno;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
@@ -115,7 +118,11 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.test_menu, menu);
+        if (viewMode) {
+            inflater.inflate(R.menu.test_menu_view_mode, menu);
+        } else {
+            inflater.inflate(R.menu.test_menu, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -132,6 +139,39 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                     showQuestionsGrid();
                 }
                 return true;
+            case R.id.action_finish_testing:
+                db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers());
+                //Add saving ball to DB
+                int ball = test.getTestBall();
+                String[] testBalls = db.getTestBalls(test.id);
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+                dialogBuilder.setMessage("Тест Завершено!\nтестовий бал: " + ball + "\n" + "рейтинговий бал: " + testBalls[ball] + "\nподивитися помилки?");
+                dialogBuilder.setPositiveButton("Так", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        switch (which) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                Intent viewResults = new Intent(TestActivity.Action.VIEW_TEST);
+                                viewResults.putExtra(TestActivity.Extra.TEST_ID, test.id);
+                                viewResults.putExtra(TestActivity.Extra.USER_ANSWERS_ID, userAnswersId);
+                                startActivity(viewResults);
+                                finish();
+                                break;
+                        }
+                    }
+                });
+                dialogBuilder.setNegativeButton("Ні", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        switch (which) {
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                finish();
+                                break;
+                        }
+                    }
+                });
+                dialogBuilder.setCancelable(false);
+                dialogBuilder.create().show();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -164,6 +204,6 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 mPager.setCurrentItem(mPager.getCurrentItem() + 1);
             }
         }
-        test.questions.get(id).answer = answer;
+        test.questions.get(id).userAnswer = answer;
     }
 }
