@@ -12,7 +12,6 @@ import android.text.Html.ImageGetter;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -53,7 +51,7 @@ public class QuestionFragment extends Fragment {
     String parentQuestion;
     String answers;
     String correctAnswer;
-    String answer;
+    String userAnswer;
     int type;
     int balls;
     char firstLetter;
@@ -78,7 +76,7 @@ public class QuestionFragment extends Fragment {
         f.parentQuestion = question.parentQuestion;
         f.answers = question.answers;
         f.correctAnswer = question.correctAnswer;
-        f.answer = question.answer;
+        f.userAnswer = question.answer;
         f.type = question.type;
         f.balls = question.balls;
         return f;
@@ -101,8 +99,8 @@ public class QuestionFragment extends Fragment {
             question = savedInstanceState.getString(Question.QUESTION);
             parentQuestion = savedInstanceState.getString(Question.PARENT_QUESTION);
             answers = savedInstanceState.getString(Question.ANSWERS);
-            answer = savedInstanceState.getString(Question.ANSWER);
-            correctAnswer =savedInstanceState.getString(Question.CORRECT_ANSWER);
+            userAnswer = savedInstanceState.getString(Question.ANSWER);
+            correctAnswer = savedInstanceState.getString(Question.CORRECT_ANSWER);
             type = savedInstanceState.getInt(Question.TYPE);
             balls = savedInstanceState.getInt(Question.BALLS);
             firstLetter = savedInstanceState.getChar(FIRST_LETTER);
@@ -118,12 +116,12 @@ public class QuestionFragment extends Fragment {
         outState.putString(Question.QUESTION, question);
         outState.putString(Question.PARENT_QUESTION, parentQuestion);
         outState.putString(Question.ANSWERS, answers);
-        outState.putString(Question.ANSWER, answer);
+        outState.putString(Question.ANSWER, userAnswer);
         outState.putString(Question.CORRECT_ANSWER, correctAnswer);
         outState.putInt(Question.TYPE, type);
         outState.putInt(Question.BALLS, balls);
         outState.putChar(FIRST_LETTER, firstLetter);
-        outState.putBoolean(TestActivity.Extra.VIEW_MODE,viewMode);
+        outState.putBoolean(TestActivity.Extra.VIEW_MODE, viewMode);
         super.onSaveInstanceState(outState);
     }
 
@@ -157,8 +155,8 @@ public class QuestionFragment extends Fragment {
         questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
         questionContainer.addView(createQuestionText(inflater, questionContainer));
 
-        if (viewMode && answer.isEmpty()) {
-            inflater.inflate(R.layout.unanswered_question_warning,questionContainer,true);
+        if (viewMode && userAnswer.isEmpty()) {
+            inflater.inflate(R.layout.unanswered_question_warning, questionContainer, true);
         }
 
         LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
@@ -187,32 +185,14 @@ public class QuestionFragment extends Fragment {
                 answerItemText.setText(Html.fromHtml(matcher.group(3), imgGetter, null));
 
                 final int num = i;
-                if (!viewMode) {
-                    answerItems[i].setOnClickListener(new OnClickListener() {
-
-                        @Override
-                        public void onClick(View v) {
-                            if (!answer.isEmpty()) {
-                                int oldNum = Integer.valueOf(answer) - 1;
-                                answerItems[oldNum].setSelected(false);
-                            }
-                            answerItems[num].setSelected(true);
-                            answer = String.valueOf((num + 1));
-                            callBack.onAnswerSelected(idOnTest, answer);
-                        }
-                    });
-
-                    if (!answer.isEmpty()) {
-                        answerItems[Integer.valueOf(answer) - 1].setSelected(true);
-                    }
-                } else {
+                if (viewMode) {
                     if (correctAnswer.equals(String.valueOf(i + 1))) {
                         answerItems[i].setBackgroundResource(R.drawable.item_bg_green);
                         answerItemLetter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
                         answerItemText.setTextColor(getResources().getColor(R.color.item_text_color_selected));
                         ImageView circle = (ImageView) answerItems[i].findViewById(R.id.answer_letter_circle);
                         circle.setImageResource(R.drawable.letter_circle_pressed);
-                    } else if (answer.equals(String.valueOf(i + 1))) {
+                    } else if (userAnswer.equals(String.valueOf(i + 1))) {
                         answerItems[i].setBackgroundResource(R.drawable.item_bg_orange);
                         answerItemLetter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
                         answerItemText.setTextColor(getResources().getColor(R.color.item_text_color_selected));
@@ -220,9 +200,29 @@ public class QuestionFragment extends Fragment {
                         circle.setImageResource(R.drawable.letter_circle_pressed);
                     }
                     answerItems[i].setClickable(false);
+
+                } else {
+                    answerItems[i].setOnClickListener(new OnClickListener() {
+
+                        @Override
+                        public void onClick(View v) {
+                            if (!userAnswer.isEmpty()) {
+                                int oldNum = Integer.valueOf(userAnswer) - 1;
+                                answerItems[oldNum].setSelected(false);
+                            }
+                            answerItems[num].setSelected(true);
+                            userAnswer = String.valueOf((num + 1));
+                            callBack.onAnswerSelected(idOnTest, userAnswer);
+                        }
+                    });
                 }
+
                 answersContainer.addView(answerItems[i]);
             }
+        }
+
+        if (!viewMode && !userAnswer.isEmpty()) {
+            answerItems[Integer.valueOf(userAnswer) - 1].setSelected(true);
         }
 
         return v;
@@ -283,7 +283,7 @@ public class QuestionFragment extends Fragment {
 
                             @Override
                             public void onClick(View v) {
-                                StringBuilder sb = new StringBuilder(answer);
+                                StringBuilder sb = new StringBuilder(userAnswer);
                                 char oldNumLetter = sb.charAt(num);
                                 char newNumLetter = (char) ('0' + letterNum + 1);
                                 if (oldNumLetter != '0') {
@@ -297,16 +297,16 @@ public class QuestionFragment extends Fragment {
 
                                 sb.setCharAt(num, newNumLetter);
                                 answerItemLetters[num][letterNum].setSelected(true);
-                                answer = sb.toString();
-                                if (!answer.contains("0")) {
-                                    callBack.onAnswerSelected(idOnTest, answer);
+                                userAnswer = sb.toString();
+                                if (!userAnswer.contains("0")) {
+                                    callBack.onAnswerSelected(idOnTest, userAnswer);
                                 }
                             }
                         });
 
                 answerLettersContainer.addView(answerItemLetters[i][j]);
             }
-            char oldNumLetter = answer.charAt(i);
+            char oldNumLetter = userAnswer.charAt(i);
             if (oldNumLetter != '0') {
                 answerItemLetters[i][oldNumLetter - '0' - 1].setSelected(true);
             }
@@ -332,8 +332,8 @@ public class QuestionFragment extends Fragment {
         View answerItem = inflater.inflate(R.layout.answer_only_correct, answersContainer, false);
         EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_only_correct_input);
 
-        if (!answer.isEmpty()) {
-            answerItemInput.setText(answer);
+        if (!userAnswer.isEmpty()) {
+            answerItemInput.setText(userAnswer);
         }
 
         answerItemInput.addTextChangedListener(new TextWatcher() {
@@ -350,7 +350,7 @@ public class QuestionFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                answer = s.toString();
+                userAnswer = s.toString();
             }
         });
 
@@ -362,8 +362,8 @@ public class QuestionFragment extends Fragment {
                         || event.getAction() == KeyEvent.ACTION_DOWN
                         && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     hideKeyboard();
-                    if (answer.length() == 3) {
-                        callBack.onAnswerSelected(idOnTest, answer);
+                    if (userAnswer.length() == 3) {
+                        callBack.onAnswerSelected(idOnTest, userAnswer);
                     }
                     return true;
                 }
@@ -390,56 +390,77 @@ public class QuestionFragment extends Fragment {
         LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
         questionContainer.addView(answersContainer);
 
-        View answerItem = inflater.inflate(R.layout.answer_short, answersContainer, false);
-        EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_input);
+        if (viewMode) {
+            View answerItem = inflater.inflate(R.layout.answer_short_view_mode, answersContainer, false);
+            TextView userAnswer = (TextView) answerItem.findViewById(R.id.vm_answer_short_user);
+            TextView correctAnswer = (TextView) answerItem.findViewById(R.id.vm_answer_short_correct);
 
-        if (!answer.isEmpty()) {
-            answerItemInput.setText(answer);
-        }
-
-        answerItemInput.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before,
-                                      int count) {
+            correctAnswer.setText(this.correctAnswer);
+            if (this.userAnswer.isEmpty()) {
+                userAnswer.setText(R.string.unanswered_question_warning);
+            } else {
+                userAnswer.setText(this.userAnswer);
             }
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
+            if (this.correctAnswer.equals(this.userAnswer)) {
+                userAnswer.setTextColor(getResources().getColor(R.color.question_bg_color_green));
+            } else {
+                userAnswer.setTextColor(getResources().getColor(R.color.question_bg_color_orange));
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                answer = s.toString();
+            answersContainer.addView(answerItem);
+        } else {
+            View answerItem = inflater.inflate(R.layout.answer_short, answersContainer, false);
+            EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_input);
+
+            if (!userAnswer.isEmpty()) {
+                answerItemInput.setText(userAnswer);
             }
-        });
 
-        answerItemInput.setOnEditorActionListener(new OnEditorActionListener() {
+            answerItemInput.addTextChangedListener(new TextWatcher() {
 
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE
-                        || event.getAction() == KeyEvent.ACTION_DOWN
-                        && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    hideKeyboard();
-                    if (!answer.isEmpty()) {
-                        new Handler().postDelayed(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                callBack.onAnswerSelected(idOnTest, answer);
-                            }
-
-                        }, 200);
-                    }
-                    return true;
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before,
+                                          int count) {
                 }
-                return false;
-            }
-        });
 
-        answersContainer.addView(answerItem);
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count,
+                                              int after) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    userAnswer = s.toString();
+                }
+            });
+
+            answerItemInput.setOnEditorActionListener(new OnEditorActionListener() {
+
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE
+                            || event.getAction() == KeyEvent.ACTION_DOWN
+                            && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                        hideKeyboard();
+                        if (!userAnswer.isEmpty()) {
+                            new Handler().postDelayed(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    callBack.onAnswerSelected(idOnTest, userAnswer);
+                                }
+
+                            }, 200);
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            answersContainer.addView(answerItem);
+        }
         return v;
     }
 
@@ -481,7 +502,7 @@ public class QuestionFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                answer = String.valueOf(seekBar.getProgress());
+                userAnswer = String.valueOf(seekBar.getProgress());
             }
 
             @Override
