@@ -22,8 +22,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class ZNODataBaseHelper extends SQLiteOpenHelper {
@@ -40,6 +38,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_ANDROID_META_DATA = "android_metadata";
     private static final String TABLE_SQLITE_SEQUENCE = "sqlite_sequence";
     private static final String TABLE_USER_ANSWERS = "user_answers";
+    private static final String TABLE_TEST_BALLS = "test_balls";
 
     private static final String KEY_ID = "id";
     private static final String KEY_LESSON_ID = "lesson_id";
@@ -104,11 +103,16 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_USER_ANSWERS =
             "CREATE TABLE " + TABLE_USER_ANSWERS + " ("
                     + KEY_ID + " INTEGER PRIMARY KEY, "
-                    + KEY_LESSON_ID + " INTEGER,"
-                    + KEY_TEST_ID + " INTEGER,"
-                    + KEY_DATE + " TEXT,"
-                    + KEY_ANSWERS + " INTEGER"
+                    + KEY_LESSON_ID + " INTEGER, "
+                    + KEY_TEST_ID + " INTEGER, "
+                    + KEY_DATE + " TEXT, "
+                    + KEY_ANSWERS + " INTEGER, "
                     + KEY_BALL + " REAL);";
+
+    private static final String CREATE_TABLE_TEST_BALLS =
+            "CREATE TABLE " + TABLE_TEST_BALLS + " ("
+                    + KEY_ID + " INTEGER, "
+                    + KEY_BALLS + " TEXT);";
 
     public ZNODataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -120,6 +124,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_TESTS);
         db.execSQL(CREATE_TABLE_QUESTIONS);
         db.execSQL(CREATE_TABLE_USER_ANSWERS);
+        db.execSQL(CREATE_TABLE_TEST_BALLS);
 
         try {
             JSONArray lessons = loadFromResources(R.raw.lessons);
@@ -142,7 +147,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.e(LOG_TAG, "onUpgrade");
         List<String> tables = new ArrayList<String>();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_SQLITE_MASTER + " WHERE " + KEY_TYPE + "='table';", null);
         if (cursor.moveToFirst()) {
@@ -261,37 +265,34 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         fillInTableTests(db, tests);
     }
 
-    public long saveUserAnswers(int lessonId,int testId,String answers) {
+    public long saveUserAnswers(int lessonId, int testId, String answers) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_LESSON_ID,lessonId);
-        values.put(KEY_TEST_ID,testId);
-        values.put(KEY_ANSWERS,answers);
+        values.put(KEY_LESSON_ID, lessonId);
+        values.put(KEY_TEST_ID, testId);
+        values.put(KEY_ANSWERS, answers);
         values.put(KEY_DATE, System.currentTimeMillis());
         long row = db.insert(TABLE_USER_ANSWERS, null, values);
-        Log.i(LOG_TAG,"saveUserAnswers lesson "+lessonId+", test "+testId+", row "+row);
         db.close();
         return row;
     }
 
-    public long updateUserAnswers(long id, int lessonId,int testId,String answers) {
+    public long updateUserAnswers(long id, int lessonId, int testId, String answers) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_ID,id);
-        values.put(KEY_LESSON_ID,lessonId);
-        values.put(KEY_TEST_ID,testId);
-        values.put(KEY_ANSWERS,answers);
+        values.put(KEY_ID, id);
+        values.put(KEY_LESSON_ID, lessonId);
+        values.put(KEY_TEST_ID, testId);
+        values.put(KEY_ANSWERS, answers);
         values.put(KEY_DATE, System.currentTimeMillis());
-        long row = db.insertWithOnConflict(TABLE_USER_ANSWERS, null, values,SQLiteDatabase.CONFLICT_REPLACE);
-        Log.i(LOG_TAG,"updateUserAnswers lesson "+lessonId+", test "+testId+", userTest_id "+id+", row "+row);
+        long row = db.insertWithOnConflict(TABLE_USER_ANSWERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
         return row;
     }
 
     public String getSavedAnswers(long id) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.query(TABLE_USER_ANSWERS, new String[]{KEY_ANSWERS}, KEY_ID + "=" + id, null, null, null, null);
-        Log.d("MyLogs","getSavedAnswers id "+id+", rows count "+c.getCount());
         if (c.moveToFirst()) {
             return c.getString(c.getColumnIndex(KEY_ANSWERS));
         } else {
@@ -349,6 +350,45 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
         db.close();
         return true;
+    }
+
+    public boolean updateTestBalls(int id, JSONArray balls) throws JSONException {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        JSONObject ball;
+        String ballsArray = "[";
+        for (int i = 0; i < balls.length(); i++) {
+            ball = balls.getJSONObject(i);
+            ballsArray += "\"" + ball.getString(ApiService.Keys.ZNO_BALL) + "\"";
+            if (i != balls.length()) {
+                ballsArray += ",";
+            }
+        }
+        ballsArray += "]";
+        values.put(KEY_ID, id);
+        values.put(KEY_BALLS, ballsArray);
+        long status = db.insertWithOnConflict(TABLE_TEST_BALLS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
+
+        if (status == -1) {
+            return false;
+        }
+        return true;
+    }
+
+    public String getTableTestBalls(int id) {
+        String balls;
+
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.query(TABLE_TEST_BALLS, new String[]{KEY_BALLS}, KEY_ID + "=" + id, null, null, null, null);
+        if (c.moveToFirst()) {
+            balls =  c.getString(c.getColumnIndex(KEY_BALLS));
+        } else {
+            balls = null;
+        }
+        db.close();
+
+        return balls;
     }
 
     public ArrayList<Lesson> getLessons() {
