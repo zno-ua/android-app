@@ -13,6 +13,7 @@
         android:layout_weight="0" >
 
         <ImageView
+            android:id="@+id/answer_letter_circle"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center"

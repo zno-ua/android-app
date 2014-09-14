@@ -19,15 +19,20 @@ public class SplashActivity extends Activity {
 		logo = (TextView) findViewById(R.id.app_logo);
 		ZNOApplication.buildLogo(logo, getResources(), getAssets());
 
-		new Handler().postDelayed(new Runnable() {
-
-			@Override
-			public void run() {
-				Intent i = new Intent(SplashActivity.this, MainActivity.class);
-				startActivity(i);
-				finish();
-			}
-		}, SPLASH_TIME_OUT);
-	}
+//		new Handler().postDelayed(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				Intent i = new Intent(SplashActivity.this, MainActivity.class);
+//				startActivity(i);
+//				finish();
+//			}
+//		}, SPLASH_TIME_OUT);
+        Intent i = new Intent(TestActivity.Action.VIEW_TEST);
+        i.putExtra(TestActivity.Extra.TEST_ID,32);
+        i.putExtra(TestActivity.Extra.USER_ANSWERS_ID,4);
+        startActivity(i);
+        finish();
+    }
 
 }

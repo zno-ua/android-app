@@ -39,14 +39,15 @@
     <!-- Downloading Progress -->
     <string name="progress_test_load">Завантаження тесту</string>
     <string name="progress_test_load_images">Завантаження зображень</string>
-    
+    <string name="unanswered_question_warning">Ви не відповіли на це запитання</string>
+
     <!-- Downloading Errors -->
     <string name="error_no_connection">Відсутнє з\'єднання з інтернетом</string>
     <string name="error_timeout">Неможливо завантажити тест \nСпробуйте пізніше </string>
 
-    
+
     <string name="quotes_2011_title">Цитата з твору ЗНО-2011:</string>
-    
+
     <string-array name="quotes_2011">
         <item>Навіть у бактерій та грибків є свої проблеми та бажання їх вирішити. Саме тому ми й існуємо.</item>
         <item>Проблеми нам Господь створив, щоб нам не казалася земля пухом покушали не тільки пряник, ну і кнут.</item>

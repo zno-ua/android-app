@@ -81,11 +81,11 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         }
 
         mPager = (ViewPager) findViewById(R.id.test_question_pager);
-        mPagerAdapter = new QuestionsAdapter(getApplicationContext(), getSupportFragmentManager(), test);
+        mPagerAdapter = new QuestionsAdapter(getApplicationContext(), getSupportFragmentManager(), test, viewMode);
         mPager.setAdapter(mPagerAdapter);
 
         questionsGrid = (GridView) findViewById(R.id.test_questions);
-        questionsGrid.setAdapter(new QuestionsGridAdapter(getApplicationContext(), test));
+        questionsGrid.setAdapter(new QuestionsGridAdapter(getApplicationContext(), test, viewMode));
         questionsGrid.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
@@ -100,10 +100,12 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(Extra.TEST_ID, test.id);
         outState.putBoolean(Extra.QUESTIONS_GRID_VISIBILITY, questionsGridVisible);
-        if (userAnswersId == -1) {
-            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
-        } else {
-            db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers());
+        if (!viewMode) {
+            if (userAnswersId == -1) {
+                userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
+            } else {
+                db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers());
+            }
         }
         outState.putLong(Extra.USER_ANSWERS_ID, userAnswersId);
         outState.putBoolean(Extra.VIEW_MODE, viewMode);

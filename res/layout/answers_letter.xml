@@ -3,7 +3,7 @@
     android:layout_width="36dp"
     android:layout_height="36dp"
     android:layout_weight="1"
-    android:background="@drawable/item_bg_normal"
+    android:background="@drawable/item_bg_white"
     android:clickable="true" >
 
     <ImageView

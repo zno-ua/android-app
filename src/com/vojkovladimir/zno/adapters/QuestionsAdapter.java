@@ -12,16 +12,18 @@ public class QuestionsAdapter extends FragmentStatePagerAdapter {
 
     Context context;
     Test test;
+    boolean viewMode;
 
-    public QuestionsAdapter(Context context, FragmentManager fm, Test test) {
+    public QuestionsAdapter(Context context, FragmentManager fm, Test test, boolean viewMode) {
         super(fm);
         this.context = context;
         this.test = test;
+        this.viewMode = viewMode;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return QuestionFragment.newInstance(position, test.questions.get(position), test.taskAll, test.lessonId);
+        return QuestionFragment.newInstance(viewMode, position, test.questions.get(position), test.taskAll, test.lessonId);
     }
 
     @Override

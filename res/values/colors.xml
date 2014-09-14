@@ -15,9 +15,10 @@
     <color name="question_underline_color">#b2b2b2</color>
     <color name="question_text_color">@color/quote_color</color>
     <color name="question_bg_color">#fff</color>
-    <color name="question_bg_color_selected">#27b255</color>
+    <color name="question_bg_color_green">#69b70c</color>
+    <color name="question_bg_color_orange">#f88241</color>
     <color name="answer_bg_color">@color/question_bg_color</color>
-    <color name="answer_selected_bg_color">@color/blue</color>
+    <color name="answer_selected_bg_color">@color/blue_light</color>
     <color name="answer_text_color">@color/question_text_color</color>
     <color name="answer_text_pressed_color">#fff</color>
     <color name="action_bar_text_color">#99ffffff</color>

@@ -12,6 +12,7 @@ import android.text.Html.ImageGetter;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -28,6 +31,7 @@ import android.widget.TextView.OnEditorActionListener;
 
 import com.vojkovladimir.zno.FileManager;
 import com.vojkovladimir.zno.R;
+import com.vojkovladimir.zno.TestActivity;
 import com.vojkovladimir.zno.models.Question;
 import com.vojkovladimir.zno.models.Test;
 
@@ -48,10 +52,12 @@ public class QuestionFragment extends Fragment {
     String question;
     String parentQuestion;
     String answers;
+    String correctAnswer;
     String answer;
     int type;
     int balls;
     char firstLetter;
+    boolean viewMode;
 
     FileManager fm;
 
@@ -61,8 +67,9 @@ public class QuestionFragment extends Fragment {
         void onAnswerSelected(int id, String answer);
     }
 
-    public static QuestionFragment newInstance(int idOnTest, Question question, int taskAll, int lessonId) {
+    public static QuestionFragment newInstance(boolean viewMode, int idOnTest, Question question, int taskAll, int lessonId) {
         QuestionFragment f = new QuestionFragment();
+        f.viewMode = viewMode;
         f.idOnTest = idOnTest;
         f.id = question.id;
         f.taskAll = taskAll;
@@ -70,6 +77,7 @@ public class QuestionFragment extends Fragment {
         f.question = question.question;
         f.parentQuestion = question.parentQuestion;
         f.answers = question.answers;
+        f.correctAnswer = question.correctAnswer;
         f.answer = question.answer;
         f.type = question.type;
         f.balls = question.balls;
@@ -94,9 +102,11 @@ public class QuestionFragment extends Fragment {
             parentQuestion = savedInstanceState.getString(Question.PARENT_QUESTION);
             answers = savedInstanceState.getString(Question.ANSWERS);
             answer = savedInstanceState.getString(Question.ANSWER);
+            correctAnswer =savedInstanceState.getString(Question.CORRECT_ANSWER);
             type = savedInstanceState.getInt(Question.TYPE);
             balls = savedInstanceState.getInt(Question.BALLS);
             firstLetter = savedInstanceState.getChar(FIRST_LETTER);
+            viewMode = savedInstanceState.getBoolean(TestActivity.Extra.VIEW_MODE);
         }
     }
 
@@ -109,9 +119,11 @@ public class QuestionFragment extends Fragment {
         outState.putString(Question.PARENT_QUESTION, parentQuestion);
         outState.putString(Question.ANSWERS, answers);
         outState.putString(Question.ANSWER, answer);
+        outState.putString(Question.CORRECT_ANSWER, correctAnswer);
         outState.putInt(Question.TYPE, type);
         outState.putInt(Question.BALLS, balls);
         outState.putChar(FIRST_LETTER, firstLetter);
+        outState.putBoolean(TestActivity.Extra.VIEW_MODE,viewMode);
         super.onSaveInstanceState(outState);
     }
 
@@ -145,8 +157,14 @@ public class QuestionFragment extends Fragment {
         questionContainer.addView(createQuestionHeaderView(inflater, questionContainer));
         questionContainer.addView(createQuestionText(inflater, questionContainer));
 
+        if (viewMode && answer.isEmpty()) {
+            inflater.inflate(R.layout.unanswered_question_warning,questionContainer,true);
+        }
+
         LinearLayout answersContainer = createAnswersContainer(inflater, questionContainer);
+
         questionContainer.addView(answersContainer);
+
 
         String[] answers = this.answers.split("\n");
         final View[] answerItems = new View[answers.length];
@@ -169,27 +187,42 @@ public class QuestionFragment extends Fragment {
                 answerItemText.setText(Html.fromHtml(matcher.group(3), imgGetter, null));
 
                 final int num = i;
-                answerItems[i].setOnClickListener(new OnClickListener() {
+                if (!viewMode) {
+                    answerItems[i].setOnClickListener(new OnClickListener() {
 
-                    @Override
-                    public void onClick(View v) {
-                        if (!answer.isEmpty()) {
-                            int oldNum = Integer.valueOf(answer) - 1;
-                            answerItems[oldNum].setSelected(false);
+                        @Override
+                        public void onClick(View v) {
+                            if (!answer.isEmpty()) {
+                                int oldNum = Integer.valueOf(answer) - 1;
+                                answerItems[oldNum].setSelected(false);
+                            }
+                            answerItems[num].setSelected(true);
+                            answer = String.valueOf((num + 1));
+                            callBack.onAnswerSelected(idOnTest, answer);
                         }
-                        answerItems[num].setSelected(true);
-                        answer = String.valueOf((num + 1));
-                        callBack.onAnswerSelected(idOnTest, answer);
-                    }
-                });
+                    });
 
+                    if (!answer.isEmpty()) {
+                        answerItems[Integer.valueOf(answer) - 1].setSelected(true);
+                    }
+                } else {
+                    if (correctAnswer.equals(String.valueOf(i + 1))) {
+                        answerItems[i].setBackgroundResource(R.drawable.item_bg_green);
+                        answerItemLetter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                        answerItemText.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                        ImageView circle = (ImageView) answerItems[i].findViewById(R.id.answer_letter_circle);
+                        circle.setImageResource(R.drawable.letter_circle_pressed);
+                    } else if (answer.equals(String.valueOf(i + 1))) {
+                        answerItems[i].setBackgroundResource(R.drawable.item_bg_orange);
+                        answerItemLetter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                        answerItemText.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                        ImageView circle = (ImageView) answerItems[i].findViewById(R.id.answer_letter_circle);
+                        circle.setImageResource(R.drawable.letter_circle_pressed);
+                    }
+                    answerItems[i].setClickable(false);
+                }
                 answersContainer.addView(answerItems[i]);
             }
-        }
-
-        if (!answer.isEmpty()) {
-            int num = Integer.valueOf(answer) - 1;
-            answerItems[num].setSelected(true);
         }
 
         return v;
