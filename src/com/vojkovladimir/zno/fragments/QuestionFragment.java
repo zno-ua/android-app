@@ -273,42 +273,82 @@ public class QuestionFragment extends Fragment {
 
             final int num = i;
             for (int j = 0; j < answerItemLetters[0].length; j++) {
-                answerItemLetters[i][j] = inflater.inflate(R.layout.answers_letter,
-                        answerLettersContainer, false);
+                answerItemLetters[i][j] = inflater.inflate(R.layout.answers_letter, answerLettersContainer, false);
                 answerItemLetter = (TextView) answerItemLetters[i][j].findViewById(R.id.answer_letter);
                 answerItemLetter.setText(String.valueOf((char) (firstLetter + j)));
+
                 final int letterNum = j;
-                answerItemLetters[i][j]
-                        .setOnClickListener(new OnClickListener() {
 
-                            @Override
-                            public void onClick(View v) {
-                                StringBuilder sb = new StringBuilder(userAnswer);
-                                char oldNumLetter = sb.charAt(num);
-                                char newNumLetter = (char) ('0' + letterNum + 1);
-                                if (oldNumLetter != '0') {
-                                    answerItemLetters[num][oldNumLetter - '0' - 1].setSelected(false);
-                                }
-                                int usedNumLetter = sb.indexOf(String.valueOf(newNumLetter));
-                                if (usedNumLetter != -1) {
-                                    answerItemLetters[usedNumLetter][letterNum].setSelected(false);
-                                    sb.setCharAt(usedNumLetter, '0');
-                                }
+                if (viewMode) {
+                    answerItemLetters[i][j].setClickable(false);
+                } else {
+                    answerItemLetters[i][j].setOnClickListener(new OnClickListener() {
 
-                                sb.setCharAt(num, newNumLetter);
-                                answerItemLetters[num][letterNum].setSelected(true);
-                                userAnswer = sb.toString();
-                                if (!userAnswer.contains("0")) {
-                                    callBack.onAnswerSelected(idOnTest, userAnswer);
-                                }
+                        @Override
+                        public void onClick(View v) {
+                            StringBuilder sb = new StringBuilder(userAnswer);
+                            char oldNumLetter = sb.charAt(num);
+                            char newNumLetter = (char) ('0' + letterNum + 1);
+                            if (oldNumLetter != '0') {
+                                answerItemLetters[num][oldNumLetter - '0' - 1].setSelected(false);
                             }
-                        });
+                            int usedNumLetter = sb.indexOf(String.valueOf(newNumLetter));
+                            if (usedNumLetter != -1) {
+                                answerItemLetters[usedNumLetter][letterNum].setSelected(false);
+                                sb.setCharAt(usedNumLetter, '0');
+                            }
+
+                            sb.setCharAt(num, newNumLetter);
+                            answerItemLetters[num][letterNum].setSelected(true);
+                            userAnswer = sb.toString();
+                            if (!userAnswer.contains("0")) {
+                                callBack.onAnswerSelected(idOnTest, userAnswer);
+                            }
+                        }
+                    });
+                }
 
                 answerLettersContainer.addView(answerItemLetters[i][j]);
             }
-            char oldNumLetter = userAnswer.charAt(i);
-            if (oldNumLetter != '0') {
-                answerItemLetters[i][oldNumLetter - '0' - 1].setSelected(true);
+
+            if (viewMode) {
+                char userAnswerChar = userAnswer.charAt(i);
+                char correctAnswerChar = correctAnswer.charAt(i);
+                if (userAnswerChar == '0') {
+                    answerItems[i].setBackgroundResource(R.drawable.item_bg_orange);
+                    answerCoupleNum.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                    for (int j = 0; j < answerItemLetters[i].length; j++) {
+                        ImageView circle = (ImageView) answerItemLetters[i][j].findViewById(R.id.answer_letter_circle);
+                        TextView letter = (TextView) answerItemLetters[i][j].findViewById(R.id.answer_letter);
+                        if (j == correctAnswerChar - '0' - 1) {
+                            circle.setImageResource(R.drawable.letter_circle_green);
+                            letter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                        } else {
+                            circle.setImageResource(R.drawable.letter_circle_inverted);
+                            letter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                        }
+                    }
+                } else {
+                    ImageView circle = (ImageView) answerItemLetters[i][correctAnswerChar - '0' - 1].findViewById(R.id.answer_letter_circle);
+                    TextView letter = (TextView) answerItemLetters[i][correctAnswerChar - '0' - 1].findViewById(R.id.answer_letter);
+
+                    circle.setImageResource(R.drawable.letter_circle_green);
+                    letter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+
+                    if (userAnswerChar != correctAnswerChar) {
+                        circle = (ImageView) answerItemLetters[i][userAnswerChar - '0' - 1].findViewById(R.id.answer_letter_circle);
+                        letter = (TextView) answerItemLetters[i][userAnswerChar - '0' - 1].findViewById(R.id.answer_letter);
+
+                        circle.setImageResource(R.drawable.letter_circle_orange);
+                        letter.setTextColor(getResources().getColor(R.color.item_text_color_selected));
+                    }
+
+                }
+            } else {
+                char oldNumLetter = userAnswer.charAt(i);
+                if (oldNumLetter != '0') {
+                    answerItemLetters[i][oldNumLetter - '0' - 1].setSelected(true);
+                }
             }
             answersContainer.addView(answerItems[i]);
         }
