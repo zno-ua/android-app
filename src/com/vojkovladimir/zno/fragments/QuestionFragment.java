@@ -308,6 +308,8 @@ public class QuestionFragment extends Fragment {
                             userAnswer = sb.toString();
                             if (!userAnswer.contains("0")) {
                                 callBack.onAnswerSelected(idOnTest, userAnswer, true);
+                            } else {
+                                callBack.onAnswerSelected(idOnTest, userAnswer, false);
                             }
                         }
                     });
@@ -383,7 +385,7 @@ public class QuestionFragment extends Fragment {
 
             String correctAnswerCombination = new String();
             for (int i = 0; i < correctAnswer.length(); i++) {
-                correctAnswerCombination += correctAnswer.charAt(i)+" ";
+                correctAnswerCombination += correctAnswer.charAt(i) + " ";
             }
             correctAnswerText.setText(correctAnswerCombination);
 
@@ -397,9 +399,9 @@ public class QuestionFragment extends Fragment {
                     userAnswerCombination.insert(i * 2, userAnswerChar + " ");
 
                     if (correctAnswer.indexOf(userAnswerChar) == -1) {
-                        userAnswerCombination.setSpan(new ForegroundColorSpan(res.getColor(R.color.question_bg_color_orange)),i*2,i*2+2,0);
+                        userAnswerCombination.setSpan(new ForegroundColorSpan(res.getColor(R.color.question_bg_color_orange)), i * 2, i * 2 + 2, 0);
                     } else {
-                        userAnswerCombination.setSpan(new ForegroundColorSpan(res.getColor(R.color.question_bg_color_green)),i*2,i*2+2,0);
+                        userAnswerCombination.setSpan(new ForegroundColorSpan(res.getColor(R.color.question_bg_color_green)), i * 2, i * 2 + 2, 0);
                     }
                 }
                 userAnswerText.setText(userAnswerCombination);
