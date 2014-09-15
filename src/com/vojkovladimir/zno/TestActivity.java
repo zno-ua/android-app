@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,7 +44,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     private boolean viewMode;
     private Test test;
-    private long userAnswersId = -1;
+    private int userAnswersId = -1;
     private boolean questionsGridVisible;
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
@@ -68,6 +69,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             } else if (action.equals(Action.VIEW_TEST)) {
                 int testId = getIntent().getIntExtra(Extra.TEST_ID, -1);
                 userAnswersId = getIntent().getIntExtra(Extra.USER_ANSWERS_ID, -1);
+                Log.d("MyLogs", "ViewTest id: " + testId + ", answersId: " + userAnswersId);
                 test = db.getTest(testId);
                 test.putAnswers(db.getSavedAnswers(userAnswersId));
                 viewMode = true;
@@ -76,7 +78,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             }
         } else {
             int testId = savedInstanceState.getInt(Extra.TEST_ID);
-            userAnswersId = savedInstanceState.getLong(Extra.USER_ANSWERS_ID);
+            userAnswersId = savedInstanceState.getInt(Extra.USER_ANSWERS_ID);
             test = db.getTest(testId);
             test.putAnswers(db.getSavedAnswers(userAnswersId));
             questionsGridVisible = savedInstanceState.getBoolean(Extra.QUESTIONS_GRID_VISIBILITY);
@@ -110,7 +112,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers());
             }
         }
-        outState.putLong(Extra.USER_ANSWERS_ID, userAnswersId);
+        outState.putInt(Extra.USER_ANSWERS_ID, userAnswersId);
         outState.putBoolean(Extra.VIEW_MODE, viewMode);
         super.onSaveInstanceState(outState);
     }
@@ -140,8 +142,12 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 }
                 return true;
             case R.id.action_finish_testing:
-                db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers());
-                //Add saving ball to DB
+                if (userAnswersId == -1) {
+                    userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
+                } else {
+                    userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers());
+                    //Add saving ball to DB
+                }
                 int ball = test.getTestBall();
                 String[] testBalls = db.getTestBalls(test.id);
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);

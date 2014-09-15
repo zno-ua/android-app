@@ -265,19 +265,19 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         fillInTableTests(db, tests);
     }
 
-    public long saveUserAnswers(int lessonId, int testId, String answers) {
+    public int saveUserAnswers(int lessonId, int testId, String answers) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_LESSON_ID, lessonId);
         values.put(KEY_TEST_ID, testId);
         values.put(KEY_ANSWERS, answers);
         values.put(KEY_DATE, System.currentTimeMillis());
-        long row = db.insert(TABLE_USER_ANSWERS, null, values);
+        int row = (int) db.insert(TABLE_USER_ANSWERS, null, values);
         db.close();
         return row;
     }
 
-    public long updateUserAnswers(long id, int lessonId, int testId, String answers) {
+    public int updateUserAnswers(int id, int lessonId, int testId, String answers) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_ID, id);
@@ -285,12 +285,12 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         values.put(KEY_TEST_ID, testId);
         values.put(KEY_ANSWERS, answers);
         values.put(KEY_DATE, System.currentTimeMillis());
-        long row = db.insertWithOnConflict(TABLE_USER_ANSWERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        int row = (int) db.insertWithOnConflict(TABLE_USER_ANSWERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
         return row;
     }
 
-    public String getSavedAnswers(long id) {
+    public String getSavedAnswers(int id) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.query(TABLE_USER_ANSWERS, new String[]{KEY_ANSWERS}, KEY_ID + "=" + id, null, null, null, null);
         if (c.moveToFirst()) {
