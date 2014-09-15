@@ -378,7 +378,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.query(TABLE_TEST_BALLS, new String[]{KEY_BALLS}, KEY_ID + "=" + id, null, null, null, null);
         if (c.moveToFirst()) {
-            balls =  c.getString(c.getColumnIndex(KEY_BALLS));
+            balls = c.getString(c.getColumnIndex(KEY_BALLS));
         } else {
             balls = null;
         }
@@ -475,8 +475,9 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getWritableDatabase();
 
-        Cursor c = db.query(TABLE_QUESTIONS, new String[]{KEY_ID_TEST_QUESTION, KEY_QUESTION, KEY_PARENT_QUESTION, KEY_ANSWERS,
-                KEY_CORRECT_ANSWER, KEY_BALLS, KEY_TYPE_QUESTION, KEY_TEST_ID}, KEY_TEST_ID + "=" + id, null, null, null, null);
+        Cursor c = db.query(TABLE_QUESTIONS, new String[]{KEY_ID_TEST_QUESTION, KEY_QUESTION, KEY_PARENT_QUESTION,
+                KEY_ANSWERS, KEY_CORRECT_ANSWER, KEY_BALLS, KEY_TYPE_QUESTION, KEY_TEST_ID}, KEY_TEST_ID + "=" + id, null,
+                null, null, KEY_ID_ON_TEST);
 
         if (c.moveToFirst()) {
             int idTestQuestionIndex = c.getColumnIndex(KEY_ID_TEST_QUESTION);
