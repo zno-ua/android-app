@@ -142,16 +142,15 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 }
                 return true;
             case R.id.action_finish_testing:
+                int testBall = test.getTestBall();
+                float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
                 if (userAnswersId == -1) {
-                    userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
+                    userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
                 } else {
-                    userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers());
-                    //Add saving ball to DB
+                    userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
                 }
-                int ball = test.getTestBall();
-                String[] testBalls = db.getTestBalls(test.id);
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-                dialogBuilder.setMessage("Тест Завершено!\nтестовий бал: " + ball + "\n" + "рейтинговий бал: " + testBalls[ball] + "\nподивитися помилки?");
+                dialogBuilder.setMessage("Тест Завершено!\nтестовий бал: " + testBall + "\n" + "рейтинговий бал: " + znoBall + "\nподивитися помилки?");
                 dialogBuilder.setPositiveButton("Так", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {

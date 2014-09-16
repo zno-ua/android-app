@@ -58,6 +58,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ANSWERS = "answers";
     private static final String KEY_BALLS = "balls";
     private static final String KEY_BALL = "ball";
+    private static final String KEY_TEST_BALL = "test_ball";
+    private static final String KEY_ZNO_BALL = "zno_ball";
     private static final String KEY_CORRECT_ANSWER = "correct_answer";
     private static final String KEY_QUESTION = "question";
     private static final String KEY_TYPE_QUESTION = "type_question";
@@ -105,9 +107,10 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                     + KEY_ID + " INTEGER PRIMARY KEY, "
                     + KEY_LESSON_ID + " INTEGER, "
                     + KEY_TEST_ID + " INTEGER, "
-                    + KEY_DATE + " TEXT, "
-                    + KEY_ANSWERS + " INTEGER, "
-                    + KEY_BALL + " REAL);";
+                    + KEY_DATE + " INTEGER, "
+                    + KEY_ANSWERS + " TEXT, "
+                    + KEY_TEST_BALL + " INTEGER, "
+                    + KEY_ZNO_BALL + " REAL);";
 
     private static final String CREATE_TABLE_TEST_BALLS =
             "CREATE TABLE " + TABLE_TEST_BALLS + " ("
@@ -267,27 +270,44 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
     public int saveUserAnswers(int lessonId, int testId, String answers) {
         SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_LESSON_ID, lessonId);
-        values.put(KEY_TEST_ID, testId);
-        values.put(KEY_ANSWERS, answers);
-        values.put(KEY_DATE, System.currentTimeMillis());
-        int row = (int) db.insert(TABLE_USER_ANSWERS, null, values);
+        int row = (int) insertUserAnswers(db, -1, lessonId, testId, answers, 0, 0.0f);
+        db.close();
+        return row;
+    }
+
+    public int saveUserAnswers(int lessonId, int testId, String answers, int testBall, float znoBall) {
+        SQLiteDatabase db = getWritableDatabase();
+        int row = (int) insertUserAnswers(db, -1, lessonId, testId, answers, testBall, znoBall);
         db.close();
         return row;
     }
 
     public int updateUserAnswers(int id, int lessonId, int testId, String answers) {
         SQLiteDatabase db = getWritableDatabase();
+        int row = (int) insertUserAnswers(db, id, lessonId, testId, answers, 0, 0.0f);
+        db.close();
+        return row;
+    }
+
+    public int updateUserAnswers(int id, int lessonId, int testId, String answers, int testBall, float znoBall) {
+        SQLiteDatabase db = getWritableDatabase();
+        int row = (int) insertUserAnswers(db, id, lessonId, testId, answers, testBall, znoBall);
+        db.close();
+        return row;
+    }
+
+    private int insertUserAnswers(SQLiteDatabase db, int id, int lessonId, int testId, String answers, int testBall, float znoBall) {
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, id);
+        if (id != -1) {
+            values.put(KEY_ID, id);
+        }
         values.put(KEY_LESSON_ID, lessonId);
         values.put(KEY_TEST_ID, testId);
         values.put(KEY_ANSWERS, answers);
+        values.put(KEY_TEST_BALL, testBall);
+        values.put(KEY_ZNO_BALL, znoBall);
         values.put(KEY_DATE, System.currentTimeMillis());
-        int row = (int) db.insertWithOnConflict(TABLE_USER_ANSWERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-        db.close();
-        return row;
+        return (int) db.insertWithOnConflict(TABLE_USER_ANSWERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     public String getSavedAnswers(int id) {
@@ -476,7 +496,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         Cursor c = db.query(TABLE_QUESTIONS, new String[]{KEY_ID_TEST_QUESTION, KEY_QUESTION, KEY_PARENT_QUESTION,
-                KEY_ANSWERS, KEY_CORRECT_ANSWER, KEY_BALLS, KEY_TYPE_QUESTION, KEY_TEST_ID}, KEY_TEST_ID + "=" + id, null,
+                        KEY_ANSWERS, KEY_CORRECT_ANSWER, KEY_BALLS, KEY_TYPE_QUESTION, KEY_TEST_ID}, KEY_TEST_ID + "=" + id, null,
                 null, null, KEY_ID_ON_TEST);
 
         if (c.moveToFirst()) {
