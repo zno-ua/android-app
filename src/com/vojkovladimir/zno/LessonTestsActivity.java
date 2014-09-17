@@ -42,8 +42,7 @@ public class LessonTestsActivity extends Activity {
 
 	ListView testsListView;
 	TestsListAdapter testsListAdapter;
-	ArrayList<TestInfo> tests;
-	
+
 	ProgressDialog downloadProgress;
 	
 	ApiService apiService;
@@ -69,12 +68,10 @@ public class LessonTestsActivity extends Activity {
 	OnItemClickListener itemListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-			final TestInfo test = tests.get(position);
+            final TestInfo test = (TestInfo) testsListAdapter.getItem(position);
 
 			if (test.loaded) {
-                Intent passTest = new Intent(TestActivity.Action.PASS_TEST);
-                passTest.putExtra(TestActivity.Extra.TEST_ID,test.id);
-				startActivity(passTest);
+                startTest(test.id);
 			} else {
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
 
@@ -99,6 +96,7 @@ public class LessonTestsActivity extends Activity {
 										}
 									});
 									downloadProgress.dismiss();
+                                    startTest(test.id);
 								}
 								
 								@Override
@@ -154,9 +152,7 @@ public class LessonTestsActivity extends Activity {
 
 		setTitle(intent.getStringExtra(ZNOApplication.ExtrasKeys.LESSON_NAME));
 		idLesson = intent.getIntExtra(ZNOApplication.ExtrasKeys.ID_LESSON, -1);
-		tests = new ArrayList<TestInfo>();
-		tests = db.getLessonTests(idLesson);
-		testsListAdapter = new TestsListAdapter(this, tests);
+		testsListAdapter = new TestsListAdapter(this, db.getLessonTests(idLesson));
 		testsListView = (ListView) findViewById(R.id.tests_list_view);
 		testsListView.setAdapter(testsListAdapter);
 		testsListView.setOnItemClickListener(itemListener);
@@ -189,8 +185,14 @@ public class LessonTestsActivity extends Activity {
 	}
 
 	public void invalidate() {
-		tests = db.getLessonTests(idLesson);
-		testsListAdapter.setTestsList(tests);
+		testsListAdapter.setTestsList(db.getLessonTests(idLesson));
 		testsListView.invalidateViews();
 	}
+
+    public void startTest(int testId) {
+        Intent passTest = new Intent(TestActivity.Action.PASS_TEST);
+        passTest.putExtra(TestActivity.Extra.TEST_ID, testId);
+        startActivity(passTest);
+    }
+
 }
