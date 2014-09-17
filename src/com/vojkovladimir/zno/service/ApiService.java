@@ -129,10 +129,8 @@ public class ApiService extends Service {
                                 @Override
                                 public void run() {
                                     try {
-                                        if (db.updateTestBalls(id, balls)) {
-                                            if (db.updateQuestions(id, questions)) {
-                                                feedBack.onTestLoaded();
-                                            }
+                                        if (db.updateQuestions(id, questions,balls)) {
+                                            feedBack.onTestLoaded();
                                         } else {
                                             app.getRequestQueue().cancelAll(REQUEST_TAG);
                                             feedBack.onError(new Exception("update test error"));
@@ -154,7 +152,7 @@ public class ApiService extends Service {
                                         public void onResponse(Bitmap image) {
                                             String path = url.substring(0, url.lastIndexOf('/'));
                                             String name = url.substring(url.lastIndexOf('/') + 1);
-                                            boolean bitmapSaveStatus = fm.saveBitmap(path, name, image);
+                                            fm.saveBitmap(path, name, image);
                                             counter.requestFinished();
                                         }
                                     };

@@ -38,7 +38,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_ANDROID_META_DATA = "android_metadata";
     private static final String TABLE_SQLITE_SEQUENCE = "sqlite_sequence";
     private static final String TABLE_USER_ANSWERS = "user_answers";
-    private static final String TABLE_TEST_BALLS = "test_balls";
 
     private static final String KEY_ID = "id";
     private static final String KEY_LESSON_ID = "lesson_id";
@@ -57,7 +56,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String KEY_LOADED = "loaded";
     private static final String KEY_ANSWERS = "answers";
     private static final String KEY_BALLS = "balls";
-    private static final String KEY_BALL = "ball";
     private static final String KEY_TEST_BALL = "test_ball";
     private static final String KEY_ZNO_BALL = "zno_ball";
     private static final String KEY_CORRECT_ANSWER = "correct_answer";
@@ -87,6 +85,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                     + KEY_TIME + " INTEGER, "
                     + KEY_YEAR + " INTEGER, "
                     + KEY_LAST_UPDATE + " INTEGER, "
+                    + KEY_BALLS + " TEXT, "
                     + KEY_LOADED + " INTEGER);";
 
     private static final String CREATE_TABLE_QUESTIONS =
@@ -112,11 +111,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                     + KEY_TEST_BALL + " INTEGER, "
                     + KEY_ZNO_BALL + " REAL);";
 
-    private static final String CREATE_TABLE_TEST_BALLS =
-            "CREATE TABLE " + TABLE_TEST_BALLS + " ("
-                    + KEY_ID + " INTEGER, "
-                    + KEY_BALLS + " TEXT);";
-
     public ZNODataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -127,7 +121,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_TESTS);
         db.execSQL(CREATE_TABLE_QUESTIONS);
         db.execSQL(CREATE_TABLE_USER_ANSWERS);
-        db.execSQL(CREATE_TABLE_TEST_BALLS);
 
         try {
             JSONArray lessons = loadFromResources(R.raw.lessons);
@@ -263,35 +256,34 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void updateTableTests(JSONArray tests) {
-        SQLiteDatabase db = getWritableDatabase();
-        fillInTableTests(db, tests);
-    }
+//    public void updateTableTests(JSONArray tests) {
+//
+//    }
 
     public int saveUserAnswers(int lessonId, int testId, String answers) {
         SQLiteDatabase db = getWritableDatabase();
-        int row = (int) insertUserAnswers(db, -1, lessonId, testId, answers, 0, 0.0f);
+        int row = insertUserAnswers(db, -1, lessonId, testId, answers, 0, 0.0f);
         db.close();
         return row;
     }
 
     public int saveUserAnswers(int lessonId, int testId, String answers, int testBall, float znoBall) {
         SQLiteDatabase db = getWritableDatabase();
-        int row = (int) insertUserAnswers(db, -1, lessonId, testId, answers, testBall, znoBall);
+        int row = insertUserAnswers(db, -1, lessonId, testId, answers, testBall, znoBall);
         db.close();
         return row;
     }
 
     public int updateUserAnswers(int id, int lessonId, int testId, String answers) {
         SQLiteDatabase db = getWritableDatabase();
-        int row = (int) insertUserAnswers(db, id, lessonId, testId, answers, 0, 0.0f);
+        int row = insertUserAnswers(db, id, lessonId, testId, answers, 0, 0.0f);
         db.close();
         return row;
     }
 
     public int updateUserAnswers(int id, int lessonId, int testId, String answers, int testBall, float znoBall) {
         SQLiteDatabase db = getWritableDatabase();
-        int row = (int) insertUserAnswers(db, id, lessonId, testId, answers, testBall, znoBall);
+        int row = insertUserAnswers(db, id, lessonId, testId, answers, testBall, znoBall);
         db.close();
         return row;
     }
@@ -320,10 +312,12 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean updateQuestions(int testId, JSONArray questions) throws JSONException {
+    public boolean updateQuestions(int testId, JSONArray questions, JSONArray testBalls) throws JSONException {
         long status;
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
+
+        db.delete(TABLE_QUESTIONS, KEY_TEST_ID + "=" + testId, null);
 
         JSONObject question;
         int typeQuestion;
@@ -336,7 +330,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
             if (!(balls == 0 && typeQuestion == 2)) {
                 values.clear();
-                values.put(KEY_ID, question.getInt(ApiService.Keys.ID));
                 values.put(KEY_ID_ON_TEST, question.getInt(ApiService.Keys.ID_ON_TEST));
                 values.put(KEY_ID_TEST_QUESTION, question.getInt(ApiService.Keys.ID_TEST_QUESTION));
                 values.put(KEY_TEST_ID, testId);
@@ -347,7 +340,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                 values.put(KEY_BALLS, balls);
                 values.put(KEY_TYPE_QUESTION, typeQuestion);
 
-                status = db.insertWithOnConflict(TABLE_QUESTIONS, "", values, SQLiteDatabase.CONFLICT_REPLACE);
+                status = db.insert(TABLE_QUESTIONS, null, values);
                 if (status == -1) {
                     Log.e(LOG_TAG, "Error while inserting question, test # " + testId);
                     db.close();
@@ -356,47 +349,32 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             }
         }
 
-        Cursor c = db.query(TABLE_TESTS, new String[]{KEY_ID, KEY_LOADED}, KEY_ID + "=" + testId, null, null, null, null);
-
-        if (c.moveToNext()) {
-            int loadedIndex = c.getColumnIndex(KEY_LOADED);
-
-            if (c.getInt(loadedIndex) == 0) {
-                values.clear();
-                values.put(KEY_LOADED, 1);
-                db.update(TABLE_TESTS, values, KEY_ID + "=" + testId, null);
-            }
-        }
-
-        db.close();
-        return true;
-    }
-
-    public boolean updateTestBalls(int id, JSONArray balls) throws JSONException {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
         JSONObject ball;
         String ballsArray = new String();
-        for (int i = 0; i < balls.length(); i++) {
-            ball = balls.getJSONObject(i);
+        values.clear();
+
+        for (int i = 0; i < testBalls.length(); i++) {
+            ball = testBalls.getJSONObject(i);
             ballsArray += ball.getString(ApiService.Keys.ZNO_BALL) + "\r";
         }
-        values.put(KEY_ID, id);
+
         values.put(KEY_BALLS, ballsArray);
-        long status = db.insertWithOnConflict(TABLE_TEST_BALLS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        values.put(KEY_LOADED, 1);
+        status = db.update(TABLE_TESTS, values, KEY_ID + "=" + testId, null);
         db.close();
 
         if (status == -1) {
             return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
     public String[] getTestBalls(int id) {
         String balls;
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.query(TABLE_TEST_BALLS, new String[]{KEY_BALLS}, KEY_ID + "=" + id, null, null, null, null);
+        Cursor c = db.query(TABLE_TESTS, new String[]{KEY_BALLS}, KEY_ID + "=" + id, null, null, null, null);
         if (c.moveToFirst()) {
             balls = c.getString(c.getColumnIndex(KEY_BALLS));
         } else {
