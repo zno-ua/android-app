@@ -220,7 +220,9 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             public void onClick(DialogInterface dialogInterface, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        // delete userAnswers if saved
+                        if (userAnswersId != -1) {
+                            db.deleteUserAnswers(userAnswersId);
+                        }
                         finish();
                         break;
                 }

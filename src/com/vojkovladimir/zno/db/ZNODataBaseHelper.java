@@ -281,6 +281,12 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         return row;
     }
 
+    public void deleteUserAnswers(int id) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_USER_ANSWERS, KEY_ID + "=" + id, null);
+        db.close();
+    }
+
     public int updateUserAnswers(int id, int lessonId, int testId, String answers, int testBall, float znoBall) {
         SQLiteDatabase db = getWritableDatabase();
         int row = insertUserAnswers(db, id, lessonId, testId, answers, testBall, znoBall);
