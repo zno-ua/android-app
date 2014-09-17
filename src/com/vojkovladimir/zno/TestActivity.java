@@ -132,7 +132,11 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                showCancelTestAlert();
+                if (viewMode) {
+                    finish();
+                } else {
+                    showCancelTestAlert();
+                }
                 return true;
             case R.id.action_questions_list:
                 if (questionsGridVisible) {
@@ -199,7 +203,11 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     @Override
     public void onBackPressed() {
-        showCancelTestAlert();
+        if (viewMode) {
+            finish();
+        } else {
+            showCancelTestAlert();
+        }
     }
 
     @Override
