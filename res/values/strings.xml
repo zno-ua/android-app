@@ -37,7 +37,7 @@
     <string name="loren_ipsum_text">Lorem Ipsum - це текст-"риба", що використовується</string>
 
     <!--TestActivity-->
-    <string name="cancle_test_confirm">Заверщити тестування без збереження відповідей?</string>
+    <string name="cancle_test_confirm">Завершити тестування без збереження відповідей?</string>
     
     <!-- Downloading Progress -->
     <string name="progress_test_load">Завантаження тесту</string>
