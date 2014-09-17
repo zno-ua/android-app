@@ -566,33 +566,40 @@ public class QuestionFragment extends Fragment {
         View v = inflater.inflate(R.layout.test_question_statement, container, false);
 
         TextView questionText = (TextView) v.findViewById(R.id.test_question_statement_text);
-        questionText.setText(Html.fromHtml(question + res.getString(R.string.choose_ball), imgGetter, null));
         questionText.setMovementMethod(LinkMovementMethod.getInstance());
 
         final TextView ballsText = (TextView) v.findViewById(R.id.test_question_statement_balls);
         ballsText.setText(res.getString(R.string.choosed_ball) + " " + String.valueOf(balls / 2));
 
         SeekBar ballsSeekBar = (SeekBar) v.findViewById(R.id.question_statement_balls_seekbar);
-        ballsSeekBar.setMax(balls);
-        ballsSeekBar.setProgress(balls / 2);
-        ballsSeekBar.setSecondaryProgress(0);
-        ballsSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                userAnswer = String.valueOf(seekBar.getProgress());
-            }
+        if (viewMode) {
+            questionText.setText(Html.fromHtml(question, imgGetter, null));
+            ballsSeekBar.setVisibility(View.GONE);
+        } else {
+            questionText.setText(Html.fromHtml(question + res.getString(R.string.choose_ball), imgGetter, null));
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            ballsSeekBar.setMax(balls);
+            ballsSeekBar.setProgress(balls / 2);
+            ballsSeekBar.setSecondaryProgress(0);
+            ballsSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
-            }
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    userAnswer = String.valueOf(seekBar.getProgress());
+                }
 
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                ballsText.setText(res.getString(R.string.choosed_ball) + " " + String.valueOf(progress));
-            }
-        });
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    ballsText.setText(res.getString(R.string.choosed_ball) + " " + String.valueOf(progress));
+                }
+            });
+        }
 
         return v;
     }
