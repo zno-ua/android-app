@@ -35,6 +35,9 @@
     <string name="choosed_ball">Обраний бал — </string>
     <string name="image_desription">Image</string>
     <string name="loren_ipsum_text">Lorem Ipsum - це текст-"риба", що використовується</string>
+
+    <!--TestActivity-->
+    <string name="cancle_test_confirm">Заверщити тестування без збереження відповідей?</string>
     
     <!-- Downloading Progress -->
     <string name="progress_test_load">Завантаження тесту</string>
