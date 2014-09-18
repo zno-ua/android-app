@@ -65,12 +65,14 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String KEY_PARENT_QUESTION = "parent_question";
     private static final String KEY_TYPE = "type";
     private static final String KEY_DATE = "date";
+    private static final String KEY_RECORD_BALL = "record_ball";
 
     private static final String CREATE_TABLE_LESSONS =
             "CREATE TABLE " + TABLE_LESSONS + " ("
                     + KEY_ID + " INTEGER PRIMARY KEY, "
                     + KEY_LINK + " TEXT, "
-                    + KEY_NAME + " TEXT);";
+                    + KEY_NAME + " TEXT, "
+                    + KEY_RECORD_BALL + " REAL DEFAULT -1);";
 
     private static final String CREATE_TABLE_TESTS =
             "CREATE TABLE " + TABLE_TESTS + " ("
@@ -256,6 +258,19 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    private void updateRecordBall(SQLiteDatabase db,int lessonId, float newBall) {
+        Cursor c = db.query(TABLE_LESSONS, new String[]{KEY_RECORD_BALL}, KEY_ID + "=" + lessonId, null, null, null, null);
+        if (c.moveToFirst()) {
+            int recordBallIndex = c.getColumnIndex(KEY_RECORD_BALL);
+            float recordBall = c.getFloat(recordBallIndex);
+            if (newBall > recordBall) {
+                ContentValues values = new ContentValues();
+                values.put(KEY_RECORD_BALL, newBall);
+                db.update(TABLE_LESSONS, values, KEY_ID + "=" + lessonId, null);
+            }
+        }
+    }
+
 //    public void updateTableTests(JSONArray tests) {
 //
 //    }
@@ -276,7 +291,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
     public int updateUserAnswers(int id, int lessonId, int testId, String answers) {
         SQLiteDatabase db = getWritableDatabase();
-        int row = insertUserAnswers(db, id, lessonId, testId, answers, 0, 0.0f);
+        int row = insertUserAnswers(db, id, lessonId, testId, answers, -1, -1);
         db.close();
         return row;
     }
@@ -302,8 +317,11 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         values.put(KEY_LESSON_ID, lessonId);
         values.put(KEY_TEST_ID, testId);
         values.put(KEY_ANSWERS, answers);
-        values.put(KEY_TEST_BALL, testBall);
-        values.put(KEY_ZNO_BALL, znoBall);
+        if (testBall != -1 && znoBall != -1) {
+            values.put(KEY_TEST_BALL, testBall);
+            values.put(KEY_ZNO_BALL, znoBall);
+            updateRecordBall(db, lessonId, znoBall);
+        }
         values.put(KEY_DATE, System.currentTimeMillis());
         return (int) db.insertWithOnConflict(TABLE_USER_ANSWERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
