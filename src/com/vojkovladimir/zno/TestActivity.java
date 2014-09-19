@@ -19,6 +19,7 @@ import com.vojkovladimir.zno.adapters.QuestionsAdapter;
 import com.vojkovladimir.zno.adapters.QuestionsGridAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.fragments.QuestionFragment;
+import com.vojkovladimir.zno.models.Question;
 import com.vojkovladimir.zno.models.Test;
 
 public class TestActivity extends FragmentActivity implements QuestionFragment.OnAnswerSelectedListener {
@@ -176,14 +177,18 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     @Override
     public void onAnswerSelected(int id, String answer, boolean switchToNext) {
-        if (switchToNext) {
-            if (mPager.getCurrentItem() + 1 < test.questions.size()) {
-                mPager.setCurrentItem(mPager.getCurrentItem() + 1);
-            }
-        }
         test.questions.get(id).userAnswer = answer;
-        if (!test.hasUnAnswerdQuestions()) {
-            showConfirmFinishTestAlert();
+        if (switchToNext) {
+            if (test.hasUnAnsweredQuestions()) {
+                if (mPager.getCurrentItem() + 1 < test.questions.size()) {
+                    mPager.setCurrentItem(mPager.getCurrentItem() + 1);
+                }
+            } else {
+                Question question = test.questions.get(test.questions.size() - 1);
+                if (question.type == Question.TYPE_2 && question.balls != 0 && !question.userAnswer.isEmpty()) {
+                    showConfirmFinishTestAlert();
+                }
+            }
         }
     }
 
@@ -211,7 +216,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     public void showFinishTestAlert() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
-        if (test.hasUnAnswerdQuestions()) {
+        if (test.hasUnAnsweredQuestions()) {
             dialogBuilder.setMessage(getString(R.string.has_unanswered_questions) + "\n" + getString(R.string.want_to_finish));
             dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new DialogInterface.OnClickListener() {
                 @Override

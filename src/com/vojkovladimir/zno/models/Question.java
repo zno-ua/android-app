@@ -51,6 +51,9 @@ public class Question {
         switch (type) {
             case TYPE_2: {
                 if (balls != 0) {
+                    if (userAnswer.isEmpty()) {
+                        return balls / 2;
+                    }
                     return Integer.parseInt(userAnswer);
                 }
             }
@@ -110,15 +113,19 @@ public class Question {
     public boolean isAnswered() {
         switch (type) {
             case TYPE_3:
-                if (userAnswer.contains("0")) {
-                    return false;
-                }
-                return true;
+                return !userAnswer.contains("0");
+            case TYPE_2:
+                return balls != 0;
             default:
-                if (userAnswer.isEmpty()) {
-                    return false;
-                }
-                return true;
+                return !userAnswer.isEmpty();
         }
     }
+
+    public boolean isCorrect() {
+        if (type == TYPE_2 && balls != 0) {
+            return true;
+        }
+        return userAnswer.equals(correctAnswer);
+    }
+
 }

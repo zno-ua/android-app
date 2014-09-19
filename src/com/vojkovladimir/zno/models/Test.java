@@ -20,6 +20,12 @@ public class Test extends TestInfo {
         String answers = "[";
 
         for (int i = 0; i < questions.size(); i++) {
+            Question question = questions.get(i);
+            if (question .type==Question.TYPE_2&&question .balls!=0){
+                if(question.userAnswer.isEmpty()){
+                    question.userAnswer = String.valueOf(question.balls / 2);
+                }
+            }
             answers += String.format("\"%s\"", questions.get(i).userAnswer);
             if (i != questions.size() - 1) {
                 answers += ",";
@@ -32,17 +38,16 @@ public class Test extends TestInfo {
     }
 
     public void putAnswers(String savedAswers) {
-        Log.i("MyLogs", "Test.putAnswers");
-        try {
-            JSONArray answers = new JSONArray(savedAswers);
-            for (int i = 0; i < answers.length(); i++) {
-                questions.get(i).userAnswer = answers.getString(i);
+        if (savedAswers != null) {
+            try {
+                JSONArray answers = new JSONArray(savedAswers);
+                for (int i = 0; i < answers.length(); i++) {
+                    questions.get(i).userAnswer = answers.getString(i);
+                }
+            } catch (JSONException e) {
+                Log.e("MyLogs", e.toString());
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            Log.e("MyLogs", e.toString());
-            e.printStackTrace();
-        } catch (NullPointerException e) {
-            Log.e("MyLogs", "savedAswers = null");
         }
     }
 
@@ -54,9 +59,9 @@ public class Test extends TestInfo {
         return ball;
     }
 
-    public boolean hasUnAnswerdQuestions() {
-        for (Question q : questions) {
-            if (!q.isAnswered()) {
+    public boolean hasUnAnsweredQuestions() {
+        for (Question question : questions) {
+            if (!question.isAnswered()) {
                 return true;
             }
         }

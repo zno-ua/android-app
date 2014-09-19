@@ -569,16 +569,15 @@ public class QuestionFragment extends Fragment {
         questionText.setMovementMethod(LinkMovementMethod.getInstance());
 
         final TextView ballsText = (TextView) v.findViewById(R.id.test_question_statement_balls);
-        ballsText.setText(res.getString(R.string.choosed_ball) + " " + String.valueOf(balls / 2));
-
         SeekBar ballsSeekBar = (SeekBar) v.findViewById(R.id.question_statement_balls_seekbar);
 
         if (viewMode) {
             questionText.setText(Html.fromHtml(question, imgGetter, null));
+            ballsText.setText(res.getString(R.string.choosed_ball) + " " + userAnswer);
             ballsSeekBar.setVisibility(View.GONE);
         } else {
             questionText.setText(Html.fromHtml(question + res.getString(R.string.choose_ball), imgGetter, null));
-
+            ballsText.setText(res.getString(R.string.choosed_ball) + " " + String.valueOf(balls / 2));
             ballsSeekBar.setMax(balls);
             ballsSeekBar.setProgress(balls / 2);
             ballsSeekBar.setSecondaryProgress(0);

@@ -61,18 +61,18 @@ public class QuestionsGridAdapter extends BaseAdapter {
 
         Question question = test.questions.get(position);
 
-        if (question.userAnswer.isEmpty() || (question.type == Question.TYPE_3 && question.userAnswer.contains("0")) || viewMode) {
-            convertView.setBackgroundResource(R.drawable.item_background_unselected);
-            holder.questionNum.setTextColor(resources.getColorStateList(R.color.item_text_color));
-        } else {
-            convertView.setBackgroundResource(R.drawable.item_background_selected);
-            holder.questionNum.setTextColor(resources.getColorStateList(R.color.item_text_color_selected));
-        }
-
         if (position == test.questions.size() - 1 && question.type == Question.TYPE_2) {
             holder.questionNum.setText(resources.getString(R.string.statement_text_grid_item));
         } else {
             holder.questionNum.setText(String.valueOf(position + 1));
+        }
+
+        if (!viewMode && question.isAnswered() || viewMode && question.isCorrect()) {
+            convertView.setBackgroundResource(R.drawable.item_background_selected);
+            holder.questionNum.setTextColor(resources.getColorStateList(R.color.item_text_color_selected));
+        } else {
+            convertView.setBackgroundResource(R.drawable.item_background_unselected);
+            holder.questionNum.setTextColor(resources.getColorStateList(R.color.item_text_color));
         }
 
         return convertView;
