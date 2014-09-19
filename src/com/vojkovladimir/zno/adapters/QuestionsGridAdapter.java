@@ -69,7 +69,11 @@ public class QuestionsGridAdapter extends BaseAdapter {
             holder.questionNum.setTextColor(resources.getColorStateList(R.color.item_text_color_selected));
         }
 
-        holder.questionNum.setText(String.valueOf(position + 1));
+        if (position == test.questions.size() - 1 && question.type == Question.TYPE_2) {
+            holder.questionNum.setText(resources.getString(R.string.statement_text_grid_item));
+        } else {
+            holder.questionNum.setText(String.valueOf(position + 1));
+        }
 
         return convertView;
     }
