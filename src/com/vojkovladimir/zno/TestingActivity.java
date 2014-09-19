@@ -1,7 +1,5 @@
 package com.vojkovladimir.zno;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,23 +13,21 @@ import android.widget.ListView;
 import com.vojkovladimir.zno.adapters.LessonsListAdapter;
 import com.vojkovladimir.zno.models.Lesson;
 
-public class TestingActivity extends Activity {
+import java.util.ArrayList;
 
-	public static String LOG_TAG = "MyLogs";
+public class TestingActivity extends Activity {
 
 	ListView lessonsListView;
 
 	LessonsListAdapter lessonsListAdapter;
 	ArrayList<Lesson> lessons;
 
-	int[] lessonsIds;
-
 	OnItemClickListener itemListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 			Intent testsList = new Intent(getApplicationContext(), LessonTestsActivity.class);
-			testsList.putExtra(ZNOApplication.ExtrasKeys.ID_LESSON, lessons.get(position).id);
-			testsList.putExtra(ZNOApplication.ExtrasKeys.LESSON_NAME, lessons.get(position).name);
+			testsList.putExtra(Lesson.LESSON_ID, lessons.get(position).id);
+			testsList.putExtra(Lesson.LESSON_NAME, lessons.get(position).name);
 			startActivity(testsList);
 		}
 	};

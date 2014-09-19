@@ -1,9 +1,5 @@
 package com.vojkovladimir.zno;
 
-import java.util.ArrayList;
-
-import org.json.JSONException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -28,10 +24,14 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.vojkovladimir.zno.adapters.TestsListAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
+import com.vojkovladimir.zno.models.Lesson;
+import com.vojkovladimir.zno.models.Test;
 import com.vojkovladimir.zno.models.TestInfo;
 import com.vojkovladimir.zno.service.ApiService;
 import com.vojkovladimir.zno.service.ApiService.ApiBinder;
 import com.vojkovladimir.zno.service.ApiService.TestDownloadingFeedBack;
+
+import org.json.JSONException;
 
 public class LessonTestsActivity extends Activity {
 
@@ -150,8 +150,8 @@ public class LessonTestsActivity extends Activity {
 
 		Intent intent = getIntent();
 
-		setTitle(intent.getStringExtra(ZNOApplication.ExtrasKeys.LESSON_NAME));
-		idLesson = intent.getIntExtra(ZNOApplication.ExtrasKeys.ID_LESSON, -1);
+		setTitle(intent.getStringExtra(Lesson.LESSON_NAME));
+		idLesson = intent.getIntExtra(Lesson.LESSON_ID, -1);
 		testsListAdapter = new TestsListAdapter(this, db.getLessonTests(idLesson));
 		testsListView = (ListView) findViewById(R.id.tests_list_view);
 		testsListView.setAdapter(testsListAdapter);
@@ -191,7 +191,7 @@ public class LessonTestsActivity extends Activity {
 
     public void startTest(int testId) {
         Intent passTest = new Intent(TestActivity.Action.PASS_TEST);
-        passTest.putExtra(TestActivity.Extra.TEST_ID, testId);
+        passTest.putExtra(Test.TEST_ID, testId);
         startActivity(passTest);
     }
 

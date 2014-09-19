@@ -3,6 +3,7 @@ package com.vojkovladimir.zno.models;
 public class TestInfo {
 
     public static final String TASK_ALL = "task_all";
+    public static final String TEST_ID = "test_id";
 
 	public int id;
 	public int lessonId;

@@ -21,16 +21,11 @@ public class ZNOApplication extends Application {
 
     public static String LOG_TAG = "MyLogs";
     public static final String TAG = ZNOApplication.class.getSimpleName();
+    public static final String APP_SETTINGS = "settings";
 
     private static ZNOApplication mInstance;
     private RequestQueue mRequestQueue;
     private ZNODataBaseHelper znoDBHelper;
-
-    public interface ExtrasKeys {
-        String LESSON_NAME = "lesson_name";
-        String ID_LESSON = "id_lesson";
-        String ID_TEST = "id_test";
-    }
 
     @Override
     public void onCreate() {

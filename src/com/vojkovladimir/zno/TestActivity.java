@@ -1,8 +1,10 @@
 package com.vojkovladimir.zno;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
@@ -33,16 +35,18 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     }
 
     public interface Extra {
-        String TEST_ID = "test_id";
         String USER_ANSWERS_ID = "user_answers_id";
         String QUESTIONS_GRID_VISIBILITY = "q_grid_visibility";
         String VIEW_MODE = "view_mode";
+        String RESUMED = "resumed";
+        String QUESTION_NUMBER = "q_num";
     }
 
     private ZNOApplication app;
     private ZNODataBaseHelper db;
 
     private boolean viewMode;
+    private boolean resumed;
     private Test test;
     private int userAnswersId = -1;
     private boolean questionsGridVisible;
@@ -59,34 +63,52 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         app = ZNOApplication.getInstance();
         db = app.getZnoDataBaseHelper();
 
+        int startItemNum = 0;
+
         if (savedInstanceState == null) {
-            String action = getIntent().getAction();
+            Intent intent = getIntent();
+            String action = intent.getAction();
             if (action.equals(Action.PASS_TEST)) {
-                int testId = getIntent().getIntExtra(Extra.TEST_ID, -1);
+                int testId = intent.getIntExtra(Test.TEST_ID, -1);
                 test = db.getTest(testId);
+                resumed = false;
+                viewMode = false;
             } else if (action.equals(Action.CONTINUE_PASSAGE_TEST)) {
-                userAnswersId = getIntent().getIntExtra(Extra.USER_ANSWERS_ID, -1);
+                userAnswersId = intent.getIntExtra(Extra.USER_ANSWERS_ID, -1);
+                int testId = intent.getIntExtra(Test.TEST_ID, -1);
+                test = db.getTest(testId);
+                test.putAnswers(db.getSavedAnswers(userAnswersId));
+                resumed = true;
+                viewMode = false;
+                startItemNum = intent.getIntExtra(Extra.QUESTION_NUMBER, 0);
             } else if (action.equals(Action.VIEW_TEST)) {
-                int testId = getIntent().getIntExtra(Extra.TEST_ID, -1);
-                userAnswersId = getIntent().getIntExtra(Extra.USER_ANSWERS_ID, -1);
+                int testId = intent.getIntExtra(Test.TEST_ID, -1);
+                userAnswersId = intent.getIntExtra(Extra.USER_ANSWERS_ID, -1);
                 test = db.getTest(testId);
                 test.putAnswers(db.getSavedAnswers(userAnswersId));
                 viewMode = true;
+                resumed = intent.getBooleanExtra(Extra.RESUMED, false);
             } else {
+                if (resumed) {
+                    Intent main = new Intent(this, MainActivity.class);
+                    startActivity(main);
+                }
                 finish();
             }
         } else {
-            int testId = savedInstanceState.getInt(Extra.TEST_ID);
+            int testId = savedInstanceState.getInt(Test.TEST_ID);
             userAnswersId = savedInstanceState.getInt(Extra.USER_ANSWERS_ID);
             test = db.getTest(testId);
             test.putAnswers(db.getSavedAnswers(userAnswersId));
             questionsGridVisible = savedInstanceState.getBoolean(Extra.QUESTIONS_GRID_VISIBILITY);
             viewMode = savedInstanceState.getBoolean(Extra.VIEW_MODE);
+            resumed = savedInstanceState.getBoolean(Extra.RESUMED);
         }
 
         mPager = (ViewPager) findViewById(R.id.test_question_pager);
         mPagerAdapter = new QuestionsAdapter(getApplicationContext(), getSupportFragmentManager(), test, viewMode);
         mPager.setAdapter(mPagerAdapter);
+        mPager.setCurrentItem(startItemNum);
 
         questionsGrid = (GridView) findViewById(R.id.test_questions);
         questionsGrid.setAdapter(new QuestionsGridAdapter(getApplicationContext(), test, viewMode));
@@ -102,17 +124,24 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(Extra.TEST_ID, test.id);
-        outState.putBoolean(Extra.QUESTIONS_GRID_VISIBILITY, questionsGridVisible);
         if (!viewMode) {
             if (userAnswersId == -1) {
                 userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
             } else {
                 db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers());
             }
+            SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putInt(Test.TEST_ID, test.id);
+            editor.putInt(Extra.USER_ANSWERS_ID, userAnswersId);
+            editor.putInt(Extra.QUESTION_NUMBER, mPager.getCurrentItem());
+            editor.apply();
         }
+        outState.putInt(Test.TEST_ID, test.id);
+        outState.putBoolean(Extra.QUESTIONS_GRID_VISIBILITY, questionsGridVisible);
         outState.putInt(Extra.USER_ANSWERS_ID, userAnswersId);
         outState.putBoolean(Extra.VIEW_MODE, viewMode);
+        outState.putBoolean(Extra.RESUMED, resumed);
         super.onSaveInstanceState(outState);
     }
 
@@ -132,6 +161,10 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         switch (item.getItemId()) {
             case android.R.id.home:
                 if (viewMode) {
+                    if (resumed) {
+                        Intent main = new Intent(this, MainActivity.class);
+                        startActivity(main);
+                    }
                     finish();
                 } else {
                     showCancelTestAlert();
@@ -169,6 +202,10 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     @Override
     public void onBackPressed() {
         if (viewMode) {
+            if (resumed) {
+                Intent main = new Intent(this, MainActivity.class);
+                startActivity(main);
+            }
             finish();
         } else {
             showCancelTestAlert();
@@ -203,6 +240,16 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                         if (userAnswersId != -1) {
                             db.deleteUserAnswers(userAnswersId);
                         }
+                        if (resumed) {
+                            Intent main = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(main);
+                            SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.remove(Test.TEST_ID);
+                            editor.remove(Extra.USER_ANSWERS_ID);
+                            editor.remove(Extra.QUESTION_NUMBER);
+                            editor.apply();
+                        }
                         finish();
                         break;
                 }
@@ -229,6 +276,14 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                                 userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
                             } else {
                                 userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
+                            }
+                            if (resumed) {
+                                SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
+                                editor.remove(Test.TEST_ID);
+                                editor.remove(Extra.USER_ANSWERS_ID);
+                                editor.remove(Extra.QUESTION_NUMBER);
+                                editor.apply();
                             }
                             showTestResults(testBall, znoBall);
                             break;
@@ -258,6 +313,14 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                         } else {
                             userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
                         }
+                        if (resumed) {
+                            SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.remove(Test.TEST_ID);
+                            editor.remove(Extra.USER_ANSWERS_ID);
+                            editor.remove(Extra.QUESTION_NUMBER);
+                            editor.apply();
+                        }
                         showTestResults(testBall, znoBall);
                         break;
                 }
@@ -277,8 +340,9 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         Intent viewResults = new Intent(TestActivity.Action.VIEW_TEST);
-                        viewResults.putExtra(TestActivity.Extra.TEST_ID, test.id);
-                        viewResults.putExtra(TestActivity.Extra.USER_ANSWERS_ID, userAnswersId);
+                        viewResults.putExtra(Test.TEST_ID, test.id);
+                        viewResults.putExtra(Extra.USER_ANSWERS_ID, userAnswersId);
+                        viewResults.putExtra(Extra.RESUMED, resumed);
                         startActivity(viewResults);
                         finish();
                         break;
@@ -290,6 +354,10 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             public void onClick(DialogInterface dialogInterface, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_NEGATIVE:
+                        if (resumed) {
+                            Intent main = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(main);
+                        }
                         finish();
                         break;
                 }
