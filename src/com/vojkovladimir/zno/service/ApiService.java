@@ -92,7 +92,7 @@ public class ApiService extends Service {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.i(LOG_TAG, error.toString());
-                app.getRequestQueue().cancelAll(REQUEST_TAG);
+                app.cancelPendingRequests(REQUEST_TAG);
                 feedBack.onError(error);
             }
         };
@@ -108,8 +108,8 @@ public class ApiService extends Service {
                         try {
                             final JSONArray questions = testResponse.getJSONArray(Keys.OBJECTS);
                             final JSONArray balls = ballsResponse.getJSONArray(Keys.OBJECTS);
-                            JSONObject question = null;
-                            JSONArray images = null;
+                            JSONObject question;
+                            JSONArray images;
                             ArrayList<String> imageUrls = new ArrayList<String>();
                             for (int i = 0; i < questions.length(); i++) {
                                 question = questions.getJSONObject(i);
@@ -117,19 +117,21 @@ public class ApiService extends Service {
                                 if (images != null) {
                                     final String path = question.getString(Keys.IMAGES_RELATIVE_URL);
                                     for (int j = 0; j < images.length(); j++) {
-                                        final String name = images.getJSONObject(j).getString(ApiService.Keys.NAME);
-                                        imageUrls.add(path + "/" + name);
+                                        String name = images.getJSONObject(j).getString(ApiService.Keys.NAME);
+                                        String imageRelPath = path + "/" + name;
+                                        if (!fm.isFileExists(imageRelPath)) {
+                                            imageUrls.add(imageRelPath);
+                                        }
                                     }
                                 }
                             }
-                            Log.i(LOG_TAG, imageUrls.size() + " images count");
 
                             final Thread onTestLoaded = new Thread(new Runnable() {
 
                                 @Override
                                 public void run() {
                                     try {
-                                        if (db.updateQuestions(id, questions,balls)) {
+                                        if (db.updateQuestions(id, questions, balls)) {
                                             feedBack.onTestLoaded();
                                         } else {
                                             app.getRequestQueue().cancelAll(REQUEST_TAG);
@@ -181,13 +183,11 @@ public class ApiService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.i(LOG_TAG, "ApiService: stoped");
         super.onDestroy();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.i(LOG_TAG, "ApiService: bind");
         return mBinder;
     }
 
