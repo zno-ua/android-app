@@ -30,7 +30,6 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         android:gravity="center"
-        android:onClick="refreshQuote"
         android:padding="10dp"
         android:textColor="@color/quote_color"
         android:textSize="17sp" />
@@ -55,7 +54,6 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:onClick="beginTesting"
             android:text="@string/begin_testing_btn_text" />
 
         <Button
@@ -65,7 +63,6 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:onClick="lastPassedTests"
             android:text="@string/last_passed_tests_btn_text" />
 
         <Button
@@ -75,18 +72,8 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:onClick="records"
             android:text="@string/records_btn_text" />
 
-        <Button
-            android:id="@+id/settings_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:onClick="settings"
-            android:text="@string/settings_btn_text" />
     </LinearLayout>
 
 </LinearLayout>

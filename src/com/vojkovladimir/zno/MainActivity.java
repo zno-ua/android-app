@@ -1,7 +1,5 @@
 package com.vojkovladimir.zno;
 
-import java.util.Random;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,79 +7,50 @@ import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+import java.util.Random;
 
-	public static String LOG_TAG = "MyLogs";
+public class MainActivity extends Activity implements View.OnClickListener {
 
-	String[] quotes;
-	String quoteTitle;
-	TextView quote;
-	TextView logo;
+    String[] quotes;
+    String quoteTitle;
+    TextView quote;
+    TextView logo;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-		quote = (TextView) findViewById(R.id.quote);
-		logo = (TextView) findViewById(R.id.app_logo);
-		ZNOApplication.buildLogo(logo, getResources(), getAssets());
-		quotes = getResources().getStringArray(R.array.quotes_2011);
-		quoteTitle = getResources().getString(R.string.quotes_2011_title);
-	}
+        quote = (TextView) findViewById(R.id.quote);
+        logo = (TextView) findViewById(R.id.app_logo);
+        ZNOApplication.buildLogo(logo, getResources(), getAssets());
+        quotes = getResources().getStringArray(R.array.quotes_2011);
+        quoteTitle = getResources().getString(R.string.quotes_2011_title);
+        findViewById(R.id.begin_testing_btn).setOnClickListener(this);
+    }
 
-	protected void onStart() {
-		super.onStart();
-		refreshQuote(null);
-	}
+    protected void onStart() {
+        super.onStart();
+        refreshQuote();
+    }
 
-	protected void onStop() {
-		super.onStop();
-	}
 
-	protected void onPause() {
-		super.onPause();
-	}
+    public void refreshQuote() {
+        String text = quoteTitle + "<br>";
+        Random rand = new Random();
+        int num = rand.nextInt(quotes.length);
+        text += quotes[num];
+        quote.setText(Html.fromHtml(text));
 
-	protected void onResume() {
-		super.onResume();
-	}
+    }
 
-	protected void onDestroy() {
-		super.onDestroy();
-	}
-
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-	}
-
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-	}
-
-	public void beginTesting(View v) {
-		Intent testingActivity = new Intent(this, TestingActivity.class);
-		startActivity(testingActivity);
-	}
-
-	public void lastPassedTests(View v) {
-
-	}
-
-	public void records(View v) {
-
-	}
-
-	public void settings(View v) {
-
-	}
-
-	public void refreshQuote(View v) {
-		String text = quoteTitle + "<br>";
-		Random rand = new Random();
-		int num = rand.nextInt(quotes.length);
-		text += quotes[num];
-		quote.setText(Html.fromHtml(text));
-
-	}
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.begin_testing_btn:
+                Intent testingActivity = new Intent(this, TestingActivity.class);
+                startActivity(testingActivity);
+                break;
+        }
+    }
 }
