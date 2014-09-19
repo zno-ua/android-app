@@ -53,4 +53,13 @@ public class Test extends TestInfo {
         }
         return ball;
     }
+
+    public boolean hasUnAnswerdQuestions() {
+        for (Question q : questions) {
+            if (!q.isAnswered()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

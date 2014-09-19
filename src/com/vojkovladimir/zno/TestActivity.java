@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -69,7 +68,6 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             } else if (action.equals(Action.VIEW_TEST)) {
                 int testId = getIntent().getIntExtra(Extra.TEST_ID, -1);
                 userAnswersId = getIntent().getIntExtra(Extra.USER_ANSWERS_ID, -1);
-                Log.d("MyLogs", "ViewTest id: " + testId + ", answersId: " + userAnswersId);
                 test = db.getTest(testId);
                 test.putAnswers(db.getSavedAnswers(userAnswersId));
                 viewMode = true;
@@ -146,41 +144,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 }
                 return true;
             case R.id.action_finish_testing:
-                int testBall = test.getTestBall();
-                float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
-                if (userAnswersId == -1) {
-                    userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
-                } else {
-                    userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
-                }
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-                dialogBuilder.setMessage("Тест Завершено!\nтестовий бал: " + testBall + "\n" + "рейтинговий бал: " + znoBall + "\nподивитися помилки?");
-                dialogBuilder.setPositiveButton("Так", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int which) {
-                        switch (which) {
-                            case DialogInterface.BUTTON_POSITIVE:
-                                Intent viewResults = new Intent(TestActivity.Action.VIEW_TEST);
-                                viewResults.putExtra(TestActivity.Extra.TEST_ID, test.id);
-                                viewResults.putExtra(TestActivity.Extra.USER_ANSWERS_ID, userAnswersId);
-                                startActivity(viewResults);
-                                finish();
-                                break;
-                        }
-                    }
-                });
-                dialogBuilder.setNegativeButton("Ні", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int which) {
-                        switch (which) {
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                finish();
-                                break;
-                        }
-                    }
-                });
-                dialogBuilder.setCancelable(false);
-                dialogBuilder.create().show();
+                showFinishTestAlert();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -218,6 +182,9 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             }
         }
         test.questions.get(id).userAnswer = answer;
+        if (!test.hasUnAnswerdQuestions()) {
+            showConfirmFinishTestAlert();
+        }
     }
 
     public void showCancelTestAlert() {
@@ -237,6 +204,92 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             }
         });
         dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
+        dialogBuilder.setCancelable(false);
+        dialogBuilder.create().show();
+    }
+
+    public void showFinishTestAlert() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+        if (test.hasUnAnswerdQuestions()) {
+            dialogBuilder.setMessage(getString(R.string.has_unanswered_questions) + "\n" + getString(R.string.want_to_finish));
+            dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            final int testBall = test.getTestBall();
+                            final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
+                            if (userAnswersId == -1) {
+                                userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
+                            } else {
+                                userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
+                            }
+                            showTestResults(testBall, znoBall);
+                            break;
+                    }
+                }
+            });
+            dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
+            dialogBuilder.setCancelable(false);
+            dialogBuilder.create().show();
+        } else {
+            showConfirmFinishTestAlert();
+        }
+    }
+
+    public void showConfirmFinishTestAlert() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setMessage(getString(R.string.want_to_finish));
+        dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        final int testBall = test.getTestBall();
+                        final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
+                        if (userAnswersId == -1) {
+                            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
+                        } else {
+                            userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
+                        }
+                        showTestResults(testBall, znoBall);
+                        break;
+                }
+            }
+        });
+        dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
+        dialogBuilder.setCancelable(false);
+        dialogBuilder.create().show();
+    }
+
+    public void showTestResults(int testBall, float znoBall) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setMessage("Тест Завершено!\nтестовий бал: " + testBall + "\n" + "рейтинговий бал: " + znoBall + "\nподивитися помилки?");
+        dialogBuilder.setPositiveButton("Так", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        Intent viewResults = new Intent(TestActivity.Action.VIEW_TEST);
+                        viewResults.putExtra(TestActivity.Extra.TEST_ID, test.id);
+                        viewResults.putExtra(TestActivity.Extra.USER_ANSWERS_ID, userAnswersId);
+                        startActivity(viewResults);
+                        finish();
+                        break;
+                }
+            }
+        });
+        dialogBuilder.setNegativeButton("Ні", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        finish();
+                        break;
+                }
+            }
+        });
         dialogBuilder.setCancelable(false);
         dialogBuilder.create().show();
     }

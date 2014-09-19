@@ -42,8 +42,6 @@ public class Question {
             for (int i = 0; i < Integer.parseInt(this.answers.split("-")[0]); i++) {
                 this.userAnswer += "0";
             }
-        } else if (type == TYPE_2) {
-            this.userAnswer = String.valueOf(balls / 2);
         } else {
             this.userAnswer = new String();
         }
@@ -109,4 +107,18 @@ public class Question {
         }
     }
 
+    public boolean isAnswered() {
+        switch (type) {
+            case TYPE_3:
+                if (userAnswer.contains("0")) {
+                    return false;
+                }
+                return true;
+            default:
+                if (userAnswer.isEmpty()) {
+                    return false;
+                }
+                return true;
+        }
+    }
 }
