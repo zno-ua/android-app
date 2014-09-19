@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class ApiService extends Service {
 
-    private static final String SITE_URL = "http://new.zno-ua.net";
+    private static final String SITE_URL = "http://zno-ua.net";
     private static final String API_URL = SITE_URL + "/api/v1/";
     //	private static final String GET_TESTS = "test/?format=json";
     private static final String GET_TEST = "question/?format=json&test=";
