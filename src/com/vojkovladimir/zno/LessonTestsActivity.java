@@ -36,7 +36,7 @@ import org.json.JSONException;
 public class LessonTestsActivity extends Activity {
 
 	final Context context = this;
-	
+
 	ZNOApplication app;
 	ZNODataBaseHelper db;
 
@@ -44,27 +44,27 @@ public class LessonTestsActivity extends Activity {
 	TestsListAdapter testsListAdapter;
 
 	ProgressDialog downloadProgress;
-	
+
 	ApiService apiService;
     boolean apiBound = false;
+    int idLesson;
+
 	private ServiceConnection apiConnection = new ServiceConnection() {
-		
+
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			ApiBinder binder = (ApiBinder) service;
 			apiService = binder.getService();
 			apiBound = true;
 		}
-		
+
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			apiBound = false;
 		}
-		
+
 	};
-	
-	int idLesson;
-	
+
 	OnItemClickListener itemListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -87,7 +87,7 @@ public class LessonTestsActivity extends Activity {
 							downloadProgress.setMessage(getResources().getString(R.string.progress_test_load));
 							downloadProgress.show();
 							apiService.downLoadTest(new TestDownloadingFeedBack() {
-								
+
 								@Override
 								public void onTestLoaded() {
 									runOnUiThread(new Runnable() {
@@ -96,9 +96,14 @@ public class LessonTestsActivity extends Activity {
 										}
 									});
 									downloadProgress.dismiss();
-                                    startTest(test.id);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            startTest(test.id);
+                                        }
+                                    });
 								}
-								
+
 								@Override
 								public void onError(Exception e) {
 									downloadProgress.dismiss();
@@ -164,7 +169,7 @@ public class LessonTestsActivity extends Activity {
         bindService(intent, apiConnection, Context.BIND_AUTO_CREATE);
 		super.onStart();
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -173,7 +178,7 @@ public class LessonTestsActivity extends Activity {
 			apiBound = false;
 		}
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -189,10 +194,28 @@ public class LessonTestsActivity extends Activity {
 		testsListView.invalidateViews();
 	}
 
-    public void startTest(int testId) {
-        Intent passTest = new Intent(TestActivity.Action.PASS_TEST);
-        passTest.putExtra(Test.TEST_ID, testId);
-        startActivity(passTest);
+    public void startTest(final int testId) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setMessage("Розпочати тест з урахуванням часу?");
+        dialogBuilder.setPositiveButton(R.string.dialog_positive_text,new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                final Intent passTest = new Intent(TestActivity.Action.PASS_TEST);
+                passTest.putExtra(Test.TEST_ID, testId);
+                passTest.putExtra(TestActivity.Extra.TIMER_MODE, true);
+                startActivity(passTest);
+            }
+        });
+        dialogBuilder.setNegativeButton(R.string.dialog_negative_text, new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                final Intent passTest = new Intent(TestActivity.Action.PASS_TEST);
+                passTest.putExtra(Test.TEST_ID, testId);
+                passTest.putExtra(TestActivity.Extra.TIMER_MODE, false);
+                startActivity(passTest);
+            }
+        });
+        dialogBuilder.create().show();
     }
 
 }
