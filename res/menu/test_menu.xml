@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/action_time"
+        android:icon="@drawable/ic_action_time"
+        android:showAsAction="always"
+        android:title="@string/action_time"/>
+
+    <item
         android:id="@+id/action_finish_testing"
         android:icon="@drawable/ic_action_accept"
         android:showAsAction="always"

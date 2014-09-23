@@ -6,9 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,12 +25,11 @@ import com.vojkovladimir.zno.adapters.QuestionsAdapter;
 import com.vojkovladimir.zno.adapters.QuestionsGridAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.fragments.QuestionFragment;
+import com.vojkovladimir.zno.fragments.TestTimerFragment;
 import com.vojkovladimir.zno.models.Question;
 import com.vojkovladimir.zno.models.Test;
 
-public class TestActivity extends FragmentActivity implements QuestionFragment.OnAnswerSelectedListener {
-
-    public static String LOG_TAG = "MyLogs";
+public class TestActivity extends FragmentActivity implements QuestionFragment.OnAnswerSelectedListener, TestTimerFragment.OnTimerStates {
 
     public interface Action {
         String VIEW_TEST = "com.vojkovladimir.zno.VIEW_TEST";
@@ -38,21 +41,32 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         String USER_ANSWERS_ID = "user_answers_id";
         String QUESTIONS_GRID_VISIBILITY = "q_grid_visibility";
         String VIEW_MODE = "view_mode";
+        String TIMER_MODE = "timer_mode";
         String RESUMED = "resumed";
         String QUESTION_NUMBER = "q_num";
     }
 
-    private ZNOApplication app;
-    private ZNODataBaseHelper db;
+    ZNOApplication app;
+    ZNODataBaseHelper db;
 
-    private boolean viewMode;
-    private boolean resumed;
-    private Test test;
-    private int userAnswersId = -1;
-    private boolean questionsGridVisible;
-    private ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
-    private GridView questionsGrid;
+    boolean viewMode;
+    boolean resumed;
+
+    boolean timerMode;
+    long millisLeft;
+    MenuItem timerAction;
+
+    Test test;
+    int userAnswersId = -1;
+
+    boolean questionsGridVisible;
+    ViewPager mPager;
+    PagerAdapter mPagerAdapter;
+    GridView questionsGrid;
+
+    FragmentManager fm;
+    TestTimerFragment timerFragment;
+    Handler timerFragmentHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +85,13 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             if (action.equals(Action.PASS_TEST)) {
                 int testId = intent.getIntExtra(Test.TEST_ID, -1);
                 test = db.getTest(testId);
+                timerMode = intent.getBooleanExtra(Extra.TIMER_MODE, false);
                 resumed = false;
                 viewMode = false;
+                timerMode = intent.getBooleanExtra(Extra.TIMER_MODE, false);
+                if (timerMode) {
+                    millisLeft = test.time * 60000;
+                }
             } else if (action.equals(Action.CONTINUE_PASSAGE_TEST)) {
                 userAnswersId = intent.getIntExtra(Extra.USER_ANSWERS_ID, -1);
                 int testId = intent.getIntExtra(Test.TEST_ID, -1);
@@ -80,6 +99,13 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 test.putAnswers(db.getSavedAnswers(userAnswersId));
                 resumed = true;
                 viewMode = false;
+                timerMode = intent.hasExtra(TestTimerFragment.MILLIS_LEFT);
+                if (timerMode) {
+                    millisLeft = intent.getLongExtra(TestTimerFragment.MILLIS_LEFT, test.time * 60000);
+                    if (millisLeft == -1) {
+                        millisLeft = test.time * 60000;
+                    }
+                }
                 startItemNum = intent.getIntExtra(Extra.QUESTION_NUMBER, 0);
             } else if (action.equals(Action.VIEW_TEST)) {
                 int testId = intent.getIntExtra(Test.TEST_ID, -1);
@@ -88,12 +114,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 test.putAnswers(db.getSavedAnswers(userAnswersId));
                 viewMode = true;
                 resumed = intent.getBooleanExtra(Extra.RESUMED, false);
-            } else {
-                if (resumed) {
-                    Intent main = new Intent(this, MainActivity.class);
-                    startActivity(main);
-                }
-                finish();
+                timerMode = false;
             }
         } else {
             int testId = savedInstanceState.getInt(Test.TEST_ID);
@@ -103,6 +124,12 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             questionsGridVisible = savedInstanceState.getBoolean(Extra.QUESTIONS_GRID_VISIBILITY);
             viewMode = savedInstanceState.getBoolean(Extra.VIEW_MODE);
             resumed = savedInstanceState.getBoolean(Extra.RESUMED);
+            if (!viewMode) {
+                timerMode = savedInstanceState.containsKey(TestTimerFragment.MILLIS_LEFT);
+                if (timerMode) {
+                    millisLeft = savedInstanceState.getLong(TestTimerFragment.MILLIS_LEFT);
+                }
+            }
         }
 
         mPager = (ViewPager) findViewById(R.id.test_question_pager);
@@ -120,6 +147,8 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 hideQuestionsGrid();
             }
         });
+        fm = getSupportFragmentManager();
+        timerFragmentHandler = new Handler();
     }
 
     @Override
@@ -135,6 +164,14 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             editor.putInt(Test.TEST_ID, test.id);
             editor.putInt(Extra.USER_ANSWERS_ID, userAnswersId);
             editor.putInt(Extra.QUESTION_NUMBER, mPager.getCurrentItem());
+            if (timerMode) {
+                editor.putLong(TestTimerFragment.MILLIS_LEFT, timerFragment.getMillisLeft());
+                outState.putLong(TestTimerFragment.MILLIS_LEFT, timerFragment.getMillisLeft());
+                timerFragment.cancel();
+                FragmentTransaction ft = fm.beginTransaction();
+                ft.remove(timerFragment);
+                ft.commit();
+            }
             editor.apply();
         }
         outState.putInt(Test.TEST_ID, test.id);
@@ -146,12 +183,28 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (timerMode) {
+            timerFragment = TestTimerFragment.newInstance(millisLeft);
+            showTimerFragment();
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         if (viewMode) {
             inflater.inflate(R.menu.test_menu_view_mode, menu);
         } else {
             inflater.inflate(R.menu.test_menu, menu);
+            timerAction = menu.findItem(R.id.action_time);
+            if (millisLeft <= 600000) {
+                timerAction.setIcon(getResources().getDrawable(R.drawable.ic_action_time_low));
+            }
+            if (!timerMode) {
+                timerAction.setVisible(false);
+            }
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -179,6 +232,10 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 return true;
             case R.id.action_finish_testing:
                 showFinishTestAlert();
+                return true;
+            case R.id.action_time:
+                showTimerFragment();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -319,6 +376,9 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                             editor.remove(Test.TEST_ID);
                             editor.remove(Extra.USER_ANSWERS_ID);
                             editor.remove(Extra.QUESTION_NUMBER);
+                            if (preferences.contains(TestTimerFragment.MILLIS_LEFT)) {
+                                editor.remove(TestTimerFragment.MILLIS_LEFT);
+                            }
                             editor.apply();
                         }
                         showTestResults(testBall, znoBall);
@@ -365,6 +425,66 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         });
         dialogBuilder.setCancelable(false);
         dialogBuilder.create().show();
+    }
+
+    @Override
+    public void onTick(long millisInFuture) {
+        int minutesLeft = (int) (millisInFuture / 60000);
+        if (minutesLeft % 30 == 0
+                || (minutesLeft < 30 && minutesLeft % 10 == 0)
+                || (minutesLeft < 10 && minutesLeft % 5 == 0)) {
+            showTimerFragment();
+        }
+        if (minutesLeft == 10) {
+            timerAction.setIcon(getResources().getDrawable(R.drawable.ic_action_time_low));
+        }
+    }
+
+    @Override
+    public void onFinish() {
+        final int testBall = test.getTestBall();
+        final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
+        if (userAnswersId == -1) {
+            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
+        } else {
+            userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
+        }
+        if (resumed) {
+            SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.remove(Test.TEST_ID);
+            editor.remove(Extra.USER_ANSWERS_ID);
+            editor.remove(Extra.QUESTION_NUMBER);
+            if (preferences.contains(TestTimerFragment.MILLIS_LEFT)) {
+                editor.remove(TestTimerFragment.MILLIS_LEFT);
+            }
+            editor.apply();
+        }
+        showTestResults(testBall, znoBall);
+    }
+
+    public void showTimerFragment() {
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
+        if(!timerFragment.isAdded()) {
+            ft.add(R.id.test_content_container, timerFragment);
+        } else if (timerFragment.isHidden()) {
+            ft.show(timerFragment);
+        } else {
+            return;
+        }
+        ft.commit();
+        timerFragmentHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (timerFragment.isAdded()) {
+                    FragmentTransaction ft = fm.beginTransaction();
+                    ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
+                    ft.hide(timerFragment);
+                    ft.commit();
+                }
+            }
+        }, TestTimerFragment.SHOW_TIME);
     }
 
 }
