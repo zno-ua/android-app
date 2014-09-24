@@ -33,4 +33,15 @@
         <item name="android:windowBackground">@color/window_background_color</item>
     </style>
 
+    <!-- AppLogo Style -->
+    <style name="AppLogo">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:shadowColor">@color/app_logo_shadow_color</item>
+        <item name="android:shadowDx">2</item>
+        <item name="android:shadowDy">2</item>
+        <item name="android:shadowRadius">2</item>
+        <item name="android:textSize">@dimen/app_logo_text_size</item>
+    </style>
+
 </resources>
