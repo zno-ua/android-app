@@ -30,9 +30,9 @@
             android:paddingStart="15dp"
             android:paddingTop="10dp"
             android:scrollbarStyle="outsideInset"
-            android:stretchMode="spacingWidthUniform"
+            android:stretchMode="columnWidth"
             android:verticalSpacing="10dp"
-            android:visibility="invisible"></GridView>
+            android:visibility="invisible"/>
     </FrameLayout>
 
 </FrameLayout>
