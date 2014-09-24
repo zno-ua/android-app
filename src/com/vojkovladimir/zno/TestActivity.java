@@ -71,6 +71,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("MyLogs","onCreate");
         setContentView(R.layout.activity_test);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -153,6 +154,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Log.i("MyLogs","onSave");
         if (!viewMode) {
             if (userAnswersId == -1) {
                 userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
@@ -167,10 +169,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             if (timerMode) {
                 editor.putLong(TestTimerFragment.MILLIS_LEFT, timerFragment.getMillisLeft());
                 outState.putLong(TestTimerFragment.MILLIS_LEFT, timerFragment.getMillisLeft());
-                timerFragment.cancel();
-                FragmentTransaction ft = fm.beginTransaction();
-                ft.remove(timerFragment);
-                ft.commit();
+
             }
             editor.apply();
         }
@@ -184,11 +183,21 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     @Override
     protected void onStart() {
+        Log.i("MyLogs","onStart");
         super.onStart();
         if (timerMode) {
             timerFragment = TestTimerFragment.newInstance(millisLeft);
             showTimerFragment();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        timerFragment.cancel();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.remove(timerFragment);
+        ft.commitAllowingStateLoss();
     }
 
     @Override
@@ -473,7 +482,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         } else {
             return;
         }
-        ft.commit();
+        ft.commitAllowingStateLoss();
         timerFragmentHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -481,7 +490,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                     FragmentTransaction ft = fm.beginTransaction();
                     ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
                     ft.hide(timerFragment);
-                    ft.commit();
+                    ft.commitAllowingStateLoss();
                 }
             }
         }, TestTimerFragment.SHOW_TIME);
