@@ -71,7 +71,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("MyLogs","onCreate");
+        Log.i("MyLogs", "onCreate");
         setContentView(R.layout.activity_test);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -154,7 +154,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        Log.i("MyLogs","onSave");
+        Log.i("MyLogs", "onSave");
         if (!viewMode) {
             if (userAnswersId == -1) {
                 userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
@@ -183,7 +183,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     @Override
     protected void onStart() {
-        Log.i("MyLogs","onStart");
+        Log.i("MyLogs", "onStart");
         super.onStart();
         if (timerMode) {
             timerFragment = TestTimerFragment.newInstance(millisLeft);
@@ -194,10 +194,12 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     @Override
     protected void onStop() {
         super.onStop();
-        timerFragment.cancel();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.remove(timerFragment);
-        ft.commitAllowingStateLoss();
+        if (timerMode) {
+            timerFragment.cancel();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.remove(timerFragment);
+            ft.commitAllowingStateLoss();
+        }
     }
 
     @Override
@@ -475,7 +477,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     public void showTimerFragment() {
         FragmentTransaction ft = fm.beginTransaction();
         ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
-        if(!timerFragment.isAdded()) {
+        if (!timerFragment.isAdded()) {
             ft.add(R.id.test_content_container, timerFragment);
         } else if (timerFragment.isHidden()) {
             ft.show(timerFragment);
