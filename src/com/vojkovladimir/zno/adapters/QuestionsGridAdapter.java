@@ -51,9 +51,9 @@ public class QuestionsGridAdapter extends BaseAdapter {
         ViewHolder holder;
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.test_questions_gride_item, parent, false);
+            convertView = inflater.inflate(R.layout.test_grid_question, parent, false);
             holder = new ViewHolder();
-            holder.questionNum = (TextView) convertView.findViewById(R.id.test_questions_gride_item_num);
+            holder.questionNum = (TextView) convertView;
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

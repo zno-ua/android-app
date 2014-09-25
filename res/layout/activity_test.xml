@@ -17,21 +17,7 @@
             android:id="@+id/test_questions"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/window_background_color"
-            android:clickable="true"
-            android:columnWidth="48dp"
-            android:gravity="center"
-            android:horizontalSpacing="6dp"
-            android:numColumns="auto_fit"
-            android:paddingBottom="10dp"
-            android:paddingEnd="5dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="5dp"
-            android:paddingStart="15dp"
-            android:paddingTop="10dp"
-            android:scrollbarStyle="outsideInset"
-            android:stretchMode="columnWidth"
-            android:verticalSpacing="10dp"
+            style="@style/Scrollable.Grid"
             android:visibility="invisible"/>
     </FrameLayout>
 

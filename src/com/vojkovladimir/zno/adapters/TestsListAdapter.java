@@ -73,16 +73,16 @@ public class TestsListAdapter extends BaseAdapter {
 		View testItem = convertView;
 
 		if (testItem == null) {
-			testItem = lInflater.inflate(R.layout.tests_list_item, parent,
+			testItem = lInflater.inflate(R.layout.test, parent,
 					false);
 			ViewHolder viewHolder = new ViewHolder();
 
 			viewHolder.testName = (TextView) testItem
-					.findViewById(R.id.tests_list_test_name);
+					.findViewById(R.id.test_name);
 			viewHolder.testProperties = (TextView) testItem
-					.findViewById(R.id.tests_list_test_properties);
+					.findViewById(R.id.test_properties);
 			viewHolder.downloadFrame = (View) testItem
-					.findViewById(R.id.tests_list_download_icon);
+					.findViewById(R.id.test_download_image);
 			testItem.setTag(viewHolder);
 		}
 

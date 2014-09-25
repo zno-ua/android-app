@@ -23,7 +23,10 @@
     <style name="Button" parent="@android:style/Widget.Button">
         <item name="android:background">@drawable/button</item>
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:layout_marginLeft">@dimen/button_margin</item>
+        <item name="android:layout_marginRight">@dimen/button_margin</item>
+        <item name="android:layout_marginBottom">@dimen/button_margin</item>
     </style>
 
     <!-- SplashActivity Theme -->
@@ -42,6 +45,123 @@
         <item name="android:shadowDy">2</item>
         <item name="android:shadowRadius">2</item>
         <item name="android:textSize">@dimen/app_logo_text_size</item>
+    </style>
+
+    <!-- Quote Style -->
+    <style name="Quote">
+        <item name="android:gravity">center</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">@color/quote_color</item>
+        <item name="android:textSize">@dimen/quote_text_size</item>
+    </style>
+
+    <!-- ListHeader Style -->
+    <style name="ListHeader">
+        <item name="android:layout_marginLeft">@dimen/scrollable_view_margin</item>
+        <item name="android:layout_marginRight">@dimen/scrollable_view_margin</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingLeft">@dimen/scrollable_view_padding_middle</item>
+        <item name="android:paddingTop">@dimen/scrollable_view_padding_middle</item>
+        <item name="android:textColor">@color/chooser_text_color</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ListHeaderUnderline">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1.7dp</item>
+        <item name="android:layout_marginLeft">@dimen/scrollable_view_margin</item>
+        <item name="android:layout_marginRight">@dimen/scrollable_view_margin</item>
+        <item name="android:background">@color/chooser_divider_color</item>
+    </style>
+
+    <!-- Scrollable -->
+    <style name="List">
+        <item name="android:layout_marginBottom">@dimen/scrollable_view_margin</item>
+        <item name="android:layout_marginLeft">@dimen/scrollable_view_margin</item>
+        <item name="android:layout_marginRight">@dimen/scrollable_view_margin_small</item>
+        <item name="android:scrollbarStyle">outsideInset</item>
+    </style>
+
+    <style name="Scrollable">
+        <item name="android:paddingBottom">@dimen/scrollable_view_padding</item>
+        <item name="android:paddingLeft">@dimen/scrollable_view_padding</item>
+        <item name="android:paddingRight">@dimen/scrollable_view_padding_small</item>
+        <item name="android:paddingTop">@dimen/scrollable_view_padding</item>
+        <item name="android:scrollbarStyle">outsideInset</item>
+    </style>
+
+    <!-- Scrollable Grid -->
+    <style name="Scrollable.Grid">
+        <item name="android:columnWidth">@dimen/grid_question_column_width</item>
+        <item name="android:verticalSpacing">@dimen/grid_question_spacing</item>
+        <item name="android:horizontalSpacing">@dimen/grid_question_spacing</item>
+        <item name="android:numColumns">auto_fit</item>
+        <item name="android:stretchMode">columnWidth</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="GridQuestion">
+        <item name="android:layout_width">@dimen/grid_question_column_width</item>
+        <item name="android:layout_height">@dimen/grid_question_column_width</item>
+        <item name="android:background">@drawable/item_background</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/item_text_color</item>
+        <item name="android:textSize">@dimen/grid_question_text_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- TextStyles -->
+    <style name="TextMarqueeLine">
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:lines">1</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+
+    <!-- Lesson -->
+    <style name="LessonName" parent="TextMarqueeLine">
+        <item name="android:textColor">@color/list_item_text_color</item>
+        <item name="android:textSize">@dimen/lesson_name_text_size</item>
+    </style>
+
+    <style name="LessonTestsCounter" parent="TextMarqueeLine">
+        <item name="android:textColor">@color/sub_item_text_color</item>
+        <item name="android:textSize">@dimen/lesson_tests_counter_text_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Test -->
+    <style name="TestName" parent="TextMarqueeLine">
+        <item name="android:textColor">@color/list_item_text_color</item>
+        <item name="android:textSize">@dimen/test_name_text_size</item>
+    </style>
+
+    <style name="TestProperties" parent="TextMarqueeLine">
+        <item name="android:textColor">@color/sub_item_text_color</item>
+        <item name="android:textSize">@dimen/test_properties_text_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Question -->
+    <style name="QuestionHeader">
+        <item name="android:background">@color/question_bg_color</item>
+        <item name="android:paddingLeft">@dimen/question_padding</item>
+        <item name="android:paddingRight">@dimen/question_padding</item>
+        <item name="android:paddingTop">@dimen/question_padding_small</item>
+    </style>
+
+    <style name="QuestionText" parent="QuestionHeader">
+        <item name="android:paddingBottom">@dimen/question_padding</item>
+        <item name="android:layout_marginBottom">@dimen/question_margin</item>
+        <item name="android:textColor">@color/question_text_color</item>
+        <item name="android:textSize">@dimen/question_text_size</item>
+    </style>
+
+    <style name="QuestionBalls">
+        <item name="android:progressDrawable">@drawable/seekbar_progress</item>
+        <item name="android:thumb">@drawable/seekbar_thumb</item>
+        <item name="android:layout_margin">@dimen/question_margin</item>
     </style>
 
 </resources>

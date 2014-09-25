@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <Space
         android:layout_width="match_parent"
@@ -12,7 +12,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0" >
+        android:layout_weight="0">
 
         <include layout="@layout/app_logo" />
     </FrameLayout>
@@ -28,11 +28,7 @@
         android:id="@+id/quote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:gravity="center"
-        android:padding="10dp"
-        android:textColor="@color/quote_color"
-        android:textSize="17sp" />
+        style="@style/Quote" />
 
     <include layout="@layout/quote_divider" />
 
@@ -45,33 +41,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/begin_testing_btn"
             android:layout_width="match_parent"
+            style="@style/Button"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:text="@string/begin_testing_btn_text" />
 
         <Button
             android:id="@+id/last_passed_tests_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            style="@style/Button"
             android:text="@string/last_passed_tests_btn_text" />
 
         <Button
             android:id="@+id/records_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            style="@style/Button"
             android:text="@string/records_btn_text" />
 
     </LinearLayout>

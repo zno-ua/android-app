@@ -543,7 +543,7 @@ public class QuestionFragment extends Fragment {
     }
 
     private View createQuestionHeaderView(LayoutInflater inflater, ViewGroup container) {
-        View v = inflater.inflate(R.layout.test_question_header, container, false);
+        View v = inflater.inflate(R.layout.question_header, container, false);
 
         TextView questionId = (TextView) v.findViewById(R.id.test_question_id);
         TextView questionTaskAll = (TextView) v.findViewById(R.id.test_question_task_all);
@@ -555,7 +555,7 @@ public class QuestionFragment extends Fragment {
     }
 
     private View createQuestionText(LayoutInflater inflater, ViewGroup container) {
-        TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
+        TextView questionText = (TextView) inflater.inflate(R.layout.question_text, container, false);
         questionText.setText(Html.fromHtml(question, imgGetter, null));
         questionText.setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -563,13 +563,13 @@ public class QuestionFragment extends Fragment {
     }
 
     private View createStatementQuestionText(LayoutInflater inflater, ViewGroup container) {
-        View v = inflater.inflate(R.layout.test_question_statement, container, false);
+        View v = inflater.inflate(R.layout.question_statement, container, false);
 
-        TextView questionText = (TextView) v.findViewById(R.id.test_question_statement_text);
+        TextView questionText = (TextView) v.findViewById(R.id.question_statement_text);
         questionText.setMovementMethod(LinkMovementMethod.getInstance());
 
-        final TextView ballsText = (TextView) v.findViewById(R.id.test_question_statement_balls);
-        SeekBar ballsSeekBar = (SeekBar) v.findViewById(R.id.question_statement_balls_seekbar);
+        final TextView ballsText = (TextView) v.findViewById(R.id.question_statement_chosen_balls);
+        SeekBar ballsSeekBar = (SeekBar) v.findViewById(R.id.question_statement_balls);
 
         if (viewMode) {
             questionText.setText(Html.fromHtml(question, imgGetter, null));
@@ -605,7 +605,7 @@ public class QuestionFragment extends Fragment {
     }
 
     private View createParentQuestionText(LayoutInflater inflater, ViewGroup container) {
-        final TextView questionText = (TextView) inflater.inflate(R.layout.test_question_text, container, false);
+        final TextView questionText = (TextView) inflater.inflate(R.layout.question_text, container, false);
         questionText.setText(Html.fromHtml(res.getString(R.string.parent_question_text_show), imgGetter, null));
         questionText.setMovementMethod(LinkMovementMethod.getInstance());
         questionText.setSelected(true);
@@ -627,7 +627,7 @@ public class QuestionFragment extends Fragment {
     }
 
     private LinearLayout createAnswersContainer(LayoutInflater inflater, ViewGroup container) {
-        return (LinearLayout) inflater.inflate(R.layout.test_question_answers, container, false);
+        return (LinearLayout) inflater.inflate(R.layout.question_answers_container, container, false);
     }
 
     private ImageGetter imgGetter = new ImageGetter() {

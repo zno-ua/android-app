@@ -3,13 +3,8 @@
     android:id="@+id/test_question_header"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/question_bg_color"
     android:orientation="vertical"
-    android:paddingEnd="10dp"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingStart="10dp"
-    android:paddingTop="5dp" >
+    style="@style/QuestionHeader" >
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -22,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:textColor="@color/question_num_text_color"
-            android:textSize="14sp" />
+            android:textSize="@dimen/question_header_text_size" />
 
         <TextView
             android:id="@+id/test_question_task_all"
@@ -30,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:textColor="@color/question_num_text_color"
-            android:textSize="14sp" />
+            android:textSize="@dimen/question_header_text_size" />
     </FrameLayout>
 
     <View

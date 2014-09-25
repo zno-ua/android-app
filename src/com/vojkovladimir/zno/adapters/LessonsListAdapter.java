@@ -71,16 +71,16 @@ public class LessonsListAdapter extends BaseAdapter {
 		View lessonItem = convertView;
 
 		if (lessonItem == null) {
-			lessonItem = lInflater.inflate(R.layout.lessons_list_item, parent,
+			lessonItem = lInflater.inflate(R.layout.lesson, parent,
 					false);
 			ViewHolder viewHolder = new ViewHolder();
 
 			viewHolder.icon = (ImageView) lessonItem
-					.findViewById(R.id.lessons_list_lesson_icon);
+					.findViewById(R.id.lesson_image);
 			viewHolder.name = (TextView) lessonItem
-					.findViewById(R.id.lessons_list_lesson_name);
+					.findViewById(R.id.lesson_name);
 			viewHolder.testsCounter = (TextView) lessonItem
-					.findViewById(R.id.lessons_list_lesson_tests_counter);
+					.findViewById(R.id.lesson_tests_counter);
 			lessonItem.setTag(viewHolder);
 		}
 
