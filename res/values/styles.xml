@@ -103,10 +103,10 @@
     <style name="GridQuestion">
         <item name="android:layout_width">@dimen/grid_question_column_width</item>
         <item name="android:layout_height">@dimen/grid_question_column_width</item>
-        <item name="android:background">@drawable/item_background</item>
+        <item name="android:background">@drawable/bg_white_blue</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/item_text_color</item>
+        <item name="android:textColor">@color/text_color_gray_white</item>
         <item name="android:textSize">@dimen/grid_question_text_size</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -145,7 +145,7 @@
 
     <!-- Question -->
     <style name="QuestionHeader">
-        <item name="android:background">@color/question_bg_color</item>
+        <item name="android:background">@color/white</item>
         <item name="android:paddingLeft">@dimen/question_padding</item>
         <item name="android:paddingRight">@dimen/question_padding</item>
         <item name="android:paddingTop">@dimen/question_padding_small</item>
@@ -158,10 +158,53 @@
         <item name="android:textSize">@dimen/question_text_size</item>
     </style>
 
-    <style name="QuestionBalls">
-        <item name="android:progressDrawable">@drawable/seekbar_progress</item>
-        <item name="android:thumb">@drawable/seekbar_thumb</item>
+    <style name="UnansweredQuestion" parent="QuestionText">
+        <item name="android:background">@color/orange</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">@dimen/unanswered_question_padding</item>
+    </style>
+
+    <style name="QuestionStatement">
+        <item name="android:progressDrawable">@drawable/seek_bar_progress</item>
+        <item name="android:thumb">@drawable/seek_bar_thumb</item>
         <item name="android:layout_margin">@dimen/question_margin</item>
+    </style>
+
+    <!-- Answer -->
+
+    <style name="AnswerText">
+        <item name="android:textColor">@color/text_color_gray_white</item>
+        <item name="android:textSize">@dimen/question_text_size</item>
+    </style>
+
+    <style name="OnlyCorrect" parent="AnswerText">
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">3</item>
+        <item name="android:minEms">3</item>
+    </style>
+
+    <style name="AnswerShort">
+        <item name="android:layout_marginLeft">@dimen/answer_margin</item>
+        <item name="android:textSize">@dimen/answer_short_text_size</item>
+    </style>
+
+    <style name="AnswerShort.Correct">
+        <item name="android:textColor">@color/green</item>
+    </style>
+
+    <style name="Answer">
+        <item name="android:background">@drawable/bg_white_blue</item>
+        <item name="android:padding">@dimen/answer_margin</item>
+    </style>
+
+    <!-- Timer -->
+    <style name="Timer">
+        <item name="android:padding">@dimen/timer_padding</item>
+        <item name="android:alpha">0.8</item>
+        <item name="android:background">@color/blue_light</item>
+        <item name="android:textColor">@color/text_color_white_gray</item>
+        <item name="android:textSize">@dimen/timer_text_size</item>
     </style>
 
 </resources>

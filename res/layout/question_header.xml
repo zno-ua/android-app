@@ -9,7 +9,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp" >
+        android:layout_marginBottom="@dimen/question_header_underline_height" >
 
         <TextView
             android:id="@+id/test_question_id"
@@ -30,7 +30,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="@dimen/question_header_underline_height"
         android:background="@color/question_underline_color" />
 
 </LinearLayout>

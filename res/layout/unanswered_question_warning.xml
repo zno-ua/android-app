@@ -4,10 +4,5 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:gravity="center"
-    android:background="@drawable/item_bg_orange"
-    android:textColor="@color/item_text_color_selected"
-    android:textSize="18sp"
-    android:textStyle="bold"
-    android:padding="15dp"
     android:text="@string/unanswered_question_warning"
-    android:layout_marginBottom="10dp" />
+    style="@style/UnansweredQuestion" />

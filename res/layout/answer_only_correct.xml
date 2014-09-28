@@ -2,25 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/item_background"
     android:orientation="vertical"
-    android:padding="6dp" >
+    style="@style/Answer">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/answer_three_correct"
-        android:textColor="@color/item_text_color"
-        android:textSize="16sp" />
+        style="@style/AnswerText" />
 
     <EditText
         android:id="@+id/answer_only_correct_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        android:maxLength="3"
-        android:minEms="3"
-        android:textColor="@color/item_text_color"
-        android:textSize="16sp" />
+        style="@style/OnlyCorrect"/>
 
 </LinearLayout>

@@ -2,46 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/item_background"
-    android:clickable="true"
     android:orientation="horizontal"
-    android:padding="6dp" >
+    style="@style/Answer">
 
-    <FrameLayout
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_weight="0" >
-
-        <ImageView
-            android:id="@+id/answer_letter_circle"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:contentDescription="@string/image_desription"
-            android:src="@drawable/letter_circle" />
-
-        <TextView
-            android:id="@+id/answer_letter"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="@color/item_text_color"
-            android:textSize="16sp" />
-    </FrameLayout>
-
-    <Space
-        android:layout_width="6dp"
-        android:layout_height="match_parent" />
+    <include
+        layout="@layout/answer_letter"
+        android:layout_height="@dimen/letter_frame_size"
+        android:layout_width="@dimen/letter_frame_size"
+        android:layout_weight="0" />
 
     <TextView
         android:id="@+id/answer_text"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_gravity="center"
         android:gravity="center_vertical|start"
-        android:minHeight="36dp"
-        android:textColor="@color/item_text_color"
-        android:textSize="16sp" />
+        android:layout_marginLeft="@dimen/answer_space_size"
+        android:minHeight="@dimen/letter_frame_size"
+        style="@style/AnswerText" />
 
 </LinearLayout>

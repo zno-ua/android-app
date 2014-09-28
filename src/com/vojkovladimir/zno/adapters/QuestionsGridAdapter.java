@@ -68,11 +68,11 @@ public class QuestionsGridAdapter extends BaseAdapter {
         }
 
         if (!viewMode && question.isAnswered() || viewMode && question.isCorrect()) {
-            convertView.setBackgroundResource(R.drawable.item_background_selected);
-            holder.questionNum.setTextColor(resources.getColorStateList(R.color.item_text_color_selected));
+            convertView.setBackgroundResource(R.drawable.bg_blue_white);
+            holder.questionNum.setTextColor(resources.getColorStateList(R.color.text_color_white_gray));
         } else {
-            convertView.setBackgroundResource(R.drawable.item_background_unselected);
-            holder.questionNum.setTextColor(resources.getColorStateList(R.color.item_text_color));
+            convertView.setBackgroundResource(R.drawable.bg_white_blue);
+            holder.questionNum.setTextColor(resources.getColorStateList(R.color.text_color_gray_white));
         }
 
         return convertView;

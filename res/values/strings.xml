@@ -60,6 +60,10 @@
     <string name="timer_one_minute">Залишилась %d хвилина</string>
     <string name="timer_two_four_minutes">Залишилось %d хвилини</string>
     <string name="timer_minutes">Залишилось %d хвилин</string>
+    <string name="your_answer_text">Ваша відповідь:</string>
+    <string name="correct_answer_text">Вірна відповідь:</string>
+    <string name="your_combination_text">Ваша комбінація:</string>
+    <string name="correct_combination_text">Вірна комбінація:</string>
 
     <string-array name="quotes_2011">
         <item>Навіть у бактерій та грибків є свої проблеми та бажання їх вирішити. Саме тому ми й існуємо.</item>

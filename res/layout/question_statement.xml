@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/question_bg_color"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <TextView
@@ -14,12 +14,14 @@
     <SeekBar
         android:id="@+id/question_statement_balls"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:progressDrawable="@drawable/seek_bar_progress"
+        style="@style/QuestionStatement"/>
 
     <TextView
         android:id="@+id/question_statement_chosen_balls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/QuestionBalls" />
+        style="@style/QuestionText" />
 
 </LinearLayout>

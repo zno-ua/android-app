@@ -135,22 +135,22 @@ public class QuestionFragment extends Fragment {
 
         switch (type) {
             case Question.TYPE_1:
-                return createTypeOneQuestionView(inflater, container);
+                return createType1QuestionView(inflater, container);
             case Question.TYPE_2:
-                return createTypeTwoQuestionView(inflater, container);
+                return createType2QuestionView(inflater, container);
             case Question.TYPE_3:
-                return createTypeThreeQuestionView(inflater, container);
+                return createType3QuestionView(inflater, container);
             case Question.TYPE_4:
-                return createTypeFourQuestionView(inflater, container);
+                return createType4QuestionView(inflater, container);
             case Question.TYPE_5:
-                return createTypeFiveQuestionView(inflater, container);
+                return createType5QuestionView(inflater, container);
             default:
                 View v = inflater.inflate(R.layout.test_question, container, false);
                 return v;
         }
     }
 
-    private View createTypeOneQuestionView(LayoutInflater inflater, ViewGroup container) {
+    private View createType1QuestionView(LayoutInflater inflater, ViewGroup container) {
         View v = inflater.inflate(R.layout.test_question, container, false);
         LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
@@ -192,17 +192,17 @@ public class QuestionFragment extends Fragment {
                 final int num = i;
                 if (viewMode) {
                     if (correctAnswer.equals(String.valueOf(i + 1))) {
-                        answerItems[i].setBackgroundResource(R.drawable.item_bg_green);
-                        answerItemLetter.setTextColor(res.getColor(R.color.item_text_color_selected));
-                        answerItemText.setTextColor(res.getColor(R.color.item_text_color_selected));
+                        answerItems[i].setBackgroundResource(R.drawable.bg_green);
+                        answerItemLetter.setTextColor(res.getColor(R.color.text_color_white_gray));
+                        answerItemText.setTextColor(res.getColor(R.color.text_color_white_gray));
                         ImageView circle = (ImageView) answerItems[i].findViewById(R.id.answer_letter_circle);
-                        circle.setImageResource(R.drawable.letter_circle_pressed);
+                        circle.setImageResource(R.drawable.circle_white);
                     } else if (userAnswer.equals(String.valueOf(i + 1))) {
-                        answerItems[i].setBackgroundResource(R.drawable.item_bg_orange);
-                        answerItemLetter.setTextColor(res.getColor(R.color.item_text_color_selected));
-                        answerItemText.setTextColor(res.getColor(R.color.item_text_color_selected));
+                        answerItems[i].setBackgroundResource(R.drawable.bg_orange);
+                        answerItemLetter.setTextColor(res.getColor(R.color.text_color_white_gray));
+                        answerItemText.setTextColor(res.getColor(R.color.text_color_white_gray));
                         ImageView circle = (ImageView) answerItems[i].findViewById(R.id.answer_letter_circle);
-                        circle.setImageResource(R.drawable.letter_circle_pressed);
+                        circle.setImageResource(R.drawable.circle_white);
                     }
                     answerItems[i].setClickable(false);
 
@@ -233,7 +233,7 @@ public class QuestionFragment extends Fragment {
         return v;
     }
 
-    private View createTypeTwoQuestionView(LayoutInflater inflater, ViewGroup container) {
+    private View createType2QuestionView(LayoutInflater inflater, ViewGroup container) {
         View v = inflater.inflate(R.layout.test_question, container, false);
         LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
@@ -246,7 +246,7 @@ public class QuestionFragment extends Fragment {
         return v;
     }
 
-    private View createTypeThreeQuestionView(LayoutInflater inflater, ViewGroup container) {
+    private View createType3QuestionView(LayoutInflater inflater, ViewGroup container) {
         View v = inflater.inflate(R.layout.test_question, container, false);
         LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
@@ -278,7 +278,7 @@ public class QuestionFragment extends Fragment {
 
             final int num = i;
             for (int j = 0; j < answerItemLetters[0].length; j++) {
-                answerItemLetters[i][j] = inflater.inflate(R.layout.answers_letter, answerLettersContainer, false);
+                answerItemLetters[i][j] = inflater.inflate(R.layout.answer_letter, answerLettersContainer, false);
                 answerItemLetter = (TextView) answerItemLetters[i][j].findViewById(R.id.answer_letter);
                 answerItemLetter.setText(String.valueOf((char) (firstLetter + j)));
 
@@ -322,32 +322,32 @@ public class QuestionFragment extends Fragment {
                 char userAnswerChar = userAnswer.charAt(i);
                 char correctAnswerChar = correctAnswer.charAt(i);
                 if (userAnswerChar == '0') {
-                    answerItems[i].setBackgroundResource(R.drawable.item_bg_orange);
-                    answerCoupleNum.setTextColor(res.getColor(R.color.item_text_color_selected));
+                    answerItems[i].setBackgroundResource(R.drawable.bg_orange);
+                    answerCoupleNum.setTextColor(res.getColor(R.color.text_color_white_gray));
                     for (int j = 0; j < answerItemLetters[i].length; j++) {
                         ImageView circle = (ImageView) answerItemLetters[i][j].findViewById(R.id.answer_letter_circle);
                         TextView letter = (TextView) answerItemLetters[i][j].findViewById(R.id.answer_letter);
                         if (j == correctAnswerChar - '0' - 1) {
-                            circle.setImageResource(R.drawable.letter_circle_green);
-                            letter.setTextColor(res.getColor(R.color.item_text_color_selected));
+                            circle.setImageResource(R.drawable.circle_green);
+                            letter.setTextColor(res.getColor(R.color.text_color_white_gray));
                         } else {
-                            circle.setImageResource(R.drawable.letter_circle_inverted);
-                            letter.setTextColor(res.getColor(R.color.item_text_color_selected));
+                            circle.setImageResource(R.drawable.circle_white);
+                            letter.setTextColor(res.getColor(R.color.text_color_white_gray));
                         }
                     }
                 } else {
                     ImageView circle = (ImageView) answerItemLetters[i][correctAnswerChar - '0' - 1].findViewById(R.id.answer_letter_circle);
                     TextView letter = (TextView) answerItemLetters[i][correctAnswerChar - '0' - 1].findViewById(R.id.answer_letter);
 
-                    circle.setImageResource(R.drawable.letter_circle_green);
-                    letter.setTextColor(res.getColor(R.color.item_text_color_selected));
+                    circle.setImageResource(R.drawable.circle_green);
+                    letter.setTextColor(res.getColor(R.color.text_color_white_gray));
 
                     if (userAnswerChar != correctAnswerChar) {
                         circle = (ImageView) answerItemLetters[i][userAnswerChar - '0' - 1].findViewById(R.id.answer_letter_circle);
                         letter = (TextView) answerItemLetters[i][userAnswerChar - '0' - 1].findViewById(R.id.answer_letter);
 
-                        circle.setImageResource(R.drawable.letter_circle_orange);
-                        letter.setTextColor(res.getColor(R.color.item_text_color_selected));
+                        circle.setImageResource(R.drawable.circle_orange);
+                        letter.setTextColor(res.getColor(R.color.text_color_white_gray));
                     }
 
                 }
@@ -363,7 +363,7 @@ public class QuestionFragment extends Fragment {
         return v;
     }
 
-    private View createTypeFourQuestionView(LayoutInflater inflater, ViewGroup container) {
+    private View createType4QuestionView(LayoutInflater inflater, ViewGroup container) {
         View v = inflater.inflate(R.layout.test_question, container, false);
         LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
@@ -391,7 +391,7 @@ public class QuestionFragment extends Fragment {
 
             if (userAnswer.isEmpty()) {
                 userAnswerText.setText(R.string.unanswered_question_warning);
-                userAnswerText.setTextColor(res.getColor(R.color.question_bg_color_orange));
+                userAnswerText.setTextColor(res.getColor(R.color.orange));
             } else {
                 SpannableStringBuilder userAnswerCombination = new SpannableStringBuilder();
                 for (int i = 0; i < userAnswer.length(); i++) {
@@ -399,9 +399,9 @@ public class QuestionFragment extends Fragment {
                     userAnswerCombination.insert(i * 2, userAnswerChar + " ");
 
                     if (correctAnswer.indexOf(userAnswerChar) == -1) {
-                        userAnswerCombination.setSpan(new ForegroundColorSpan(res.getColor(R.color.question_bg_color_orange)), i * 2, i * 2 + 2, 0);
+                        userAnswerCombination.setSpan(new ForegroundColorSpan(res.getColor(R.color.orange)), i * 2, i * 2 + 2, 0);
                     } else {
-                        userAnswerCombination.setSpan(new ForegroundColorSpan(res.getColor(R.color.question_bg_color_green)), i * 2, i * 2 + 2, 0);
+                        userAnswerCombination.setSpan(new ForegroundColorSpan(res.getColor(R.color.green)), i * 2, i * 2 + 2, 0);
                     }
                 }
                 userAnswerText.setText(userAnswerCombination);
@@ -453,8 +453,8 @@ public class QuestionFragment extends Fragment {
         return v;
     }
 
-    private View createTypeFiveQuestionView(LayoutInflater inflater,
-                                            ViewGroup container) {
+    private View createType5QuestionView(LayoutInflater inflater,
+                                         ViewGroup container) {
         View v = inflater.inflate(R.layout.test_question, container, false);
         LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
 
@@ -480,9 +480,9 @@ public class QuestionFragment extends Fragment {
             }
 
             if (correctAnswer.equals(userAnswer)) {
-                userAnswerText.setTextColor(res.getColor(R.color.question_bg_color_green));
+                userAnswerText.setTextColor(res.getColor(R.color.green));
             } else {
-                userAnswerText.setTextColor(res.getColor(R.color.question_bg_color_orange));
+                userAnswerText.setTextColor(res.getColor(R.color.orange));
             }
 
             answersContainer.addView(answerItem);

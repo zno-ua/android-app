@@ -2,16 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/item_background"
+    android:orientation="horizontal"
     android:baselineAligned="true"
     android:clickable="false"
-    android:orientation="horizontal"
-    android:padding="6dp" >
+    style="@style/Answer">
 
     <FrameLayout
-        android:layout_width="24dp"
-        android:layout_height="36dp"
-        android:layout_weight="0" >
+        android:layout_width="@dimen/number_width"
+        android:layout_height="@dimen/letter_frame_size"
+        android:layout_weight="0">
 
         <TextView
             android:id="@+id/answer_couple_num"
@@ -19,16 +18,14 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:gravity="center"
-            android:textColor="@color/item_text_color"
-            android:textSize="16sp" />
+            style="@style/AnswerText" />
     </FrameLayout>
 
     <LinearLayout
-         android:id="@+id/answer_couple_letters_container"
+        android:id="@+id/answer_couple_letters_container"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:clickable="false"
-        android:orientation="horizontal" />
+        android:orientation="horizontal"
+        android:layout_weight="1" />
 
 </LinearLayout>
