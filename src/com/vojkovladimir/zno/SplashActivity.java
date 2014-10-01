@@ -23,7 +23,11 @@ public class SplashActivity extends Activity {
         TextView logo;
         logo = (TextView) findViewById(R.id.app_logo);
         ZNOApplication.buildLogo(logo, getResources(), getAssets());
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -47,5 +51,4 @@ public class SplashActivity extends Activity {
             }
         }, SPLASH_TIME_OUT);
     }
-
 }
