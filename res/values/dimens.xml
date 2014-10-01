@@ -3,6 +3,8 @@
 
     <!-- AppLogo -->
     <dimen name="app_logo_text_size">64sp</dimen>
+
+    <!-- Quote -->
     <dimen name="quote_text_size">18sp</dimen>
 
     <!-- Button -->
@@ -22,6 +24,9 @@
     <dimen name="grid_question_column_width">48dp</dimen>
     <dimen name="grid_question_spacing">8dp</dimen>
     <dimen name="grid_question_text_size">16sp</dimen>
+
+    <!-- List Header-->
+    <dimen name="list_header_text_size">14sp</dimen>
 
     <!-- Lesson -->
     <dimen name="lesson_image_height">64dp</dimen>

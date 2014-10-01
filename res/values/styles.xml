@@ -58,12 +58,12 @@
     <!-- ListHeader Style -->
     <style name="ListHeader">
         <item name="android:layout_marginLeft">@dimen/scrollable_view_margin</item>
-        <item name="android:layout_marginRight">@dimen/scrollable_view_margin</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:paddingLeft">@dimen/scrollable_view_padding_middle</item>
         <item name="android:paddingTop">@dimen/scrollable_view_padding_middle</item>
         <item name="android:textColor">@color/chooser_text_color</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/list_header_text_size</item>
     </style>
 
     <style name="ListHeaderUnderline">
