@@ -411,6 +411,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<Lesson> getLessons() {
         ArrayList<Lesson> lessons = new ArrayList<Lesson>();
+        ArrayList<Lesson> lessonsEnd = new ArrayList<Lesson>();
 
         SQLiteDatabase db = getWritableDatabase();
         Cursor c = db.query(TABLE_LESSONS, new String[]{KEY_ID, KEY_NAME, KEY_LINK}, null, null, null, null, null);
@@ -425,9 +426,14 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             do {
                 id = c.getInt(idIndex);
                 lesson = new Lesson(id, c.getString(nameIndex), c.getString(linkIndex), getLessonTestsCount(id));
-                lessons.add(lesson);
+                if ( id == 3 ) {
+                    lessonsEnd.add(lesson);
+                } else {
+                    lessons.add(lesson);
+                }
             } while (c.moveToNext());
         }
+        lessons.addAll(lessonsEnd);
 
         return lessons;
     }
