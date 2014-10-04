@@ -31,6 +31,9 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "ZNO.db";
     private static final int DATABASE_VERSION = 1;
 
+    private static final String HREF_REPLACEMENT = "<a href=\"open.image://?src=";
+    private static final String HREF= "<a href=\"";
+
     private static final String TABLE_LESSONS = "lessons";
     private static final String TABLE_TESTS = "tests";
     private static final String TABLE_QUESTIONS = "questions";
@@ -358,7 +361,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                 values.put(KEY_ID_TEST_QUESTION, question.getInt(ApiService.Keys.ID_TEST_QUESTION));
                 values.put(KEY_TEST_ID, testId);
                 values.put(KEY_PARENT_QUESTION, question.optString(ApiService.Keys.PARENT_QUESTION, ""));
-                values.put(KEY_QUESTION, question.getString(ApiService.Keys.QUESTION));
+                values.put(KEY_QUESTION, question.getString(ApiService.Keys.QUESTION).replace(HREF, HREF_REPLACEMENT));
                 values.put(KEY_ANSWERS, question.getString(ApiService.Keys.ANSWERS));
                 values.put(KEY_CORRECT_ANSWER, question.getString(ApiService.Keys.CORRECT_ANSWER));
                 values.put(KEY_BALLS, balls);

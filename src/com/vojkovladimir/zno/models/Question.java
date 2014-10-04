@@ -29,7 +29,7 @@ public class Question {
 
     public Question(int id, String question, String parentQuestion, String answers, String correctAnswer, int balls, int type, String userAnswer) {
         this.id = id;
-        this.question = question.replace("<a href=\"", "<a href=\"open.image://?src=");
+        this.question = question;
         this.parentQuestion = parentQuestion;
         this.answers = answers;
         this.correctAnswer = correctAnswer;
