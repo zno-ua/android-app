@@ -57,7 +57,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     MenuItem timerAction;
 
     Test test;
-    int userAnswersId = -1;
+    int userAnswersId;
 
     boolean questionsGridVisible;
     ViewPager mPager;
@@ -85,6 +85,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             String action = intent.getAction();
             if (action.equals(Action.PASS_TEST)) {
                 int testId = intent.getIntExtra(Test.TEST_ID, -1);
+                userAnswersId = -1;
                 test = db.getTest(testId);
                 timerMode = intent.getBooleanExtra(Extra.TIMER_MODE, false);
                 resumed = false;
@@ -97,7 +98,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 userAnswersId = intent.getIntExtra(Extra.USER_ANSWERS_ID, -1);
                 int testId = intent.getIntExtra(Test.TEST_ID, -1);
                 test = db.getTest(testId);
-                test.putAnswers(db.getSavedAnswers(userAnswersId));
+                test.putAnswers(db.getUserAnswers(userAnswersId));
                 resumed = true;
                 viewMode = false;
                 timerMode = intent.hasExtra(TestTimerFragment.MILLIS_LEFT);
@@ -112,7 +113,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 int testId = intent.getIntExtra(Test.TEST_ID, -1);
                 userAnswersId = intent.getIntExtra(Extra.USER_ANSWERS_ID, -1);
                 test = db.getTest(testId);
-                test.putAnswers(db.getSavedAnswers(userAnswersId));
+                test.putAnswers(db.getUserAnswers(userAnswersId));
                 viewMode = true;
                 resumed = intent.getBooleanExtra(Extra.RESUMED, false);
                 timerMode = false;
@@ -121,7 +122,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             int testId = savedInstanceState.getInt(Test.TEST_ID);
             userAnswersId = savedInstanceState.getInt(Extra.USER_ANSWERS_ID);
             test = db.getTest(testId);
-            test.putAnswers(db.getSavedAnswers(userAnswersId));
+            test.putAnswers(db.getUserAnswers(userAnswersId));
             questionsGridVisible = savedInstanceState.getBoolean(Extra.QUESTIONS_GRID_VISIBILITY);
             viewMode = savedInstanceState.getBoolean(Extra.VIEW_MODE);
             resumed = savedInstanceState.getBoolean(Extra.RESUMED);
@@ -159,7 +160,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             if (userAnswersId == -1) {
                 userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
             } else {
-                db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers());
+                userAnswersId = db.updateUserAnswers(userAnswersId, test.getAnswers());
             }
             SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
@@ -167,9 +168,9 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             editor.putInt(Extra.USER_ANSWERS_ID, userAnswersId);
             editor.putInt(Extra.QUESTION_NUMBER, mPager.getCurrentItem());
             if (timerMode) {
+                millisLeft = timerFragment.getMillisLeft();
                 editor.putLong(TestTimerFragment.MILLIS_LEFT, timerFragment.getMillisLeft());
                 outState.putLong(TestTimerFragment.MILLIS_LEFT, timerFragment.getMillisLeft());
-
             }
             editor.apply();
         }
@@ -318,6 +319,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                             editor.remove(Extra.QUESTION_NUMBER);
                             editor.apply();
                         }
+                        timerFragment.cancel();
                         finish();
                         break;
                 }
@@ -340,11 +342,22 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                         case DialogInterface.BUTTON_POSITIVE:
                             final int testBall = test.getTestBall();
                             final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
-                            if (userAnswersId == -1) {
-                                userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
-                            } else {
-                                userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
+                            long elapsedTime = 0;
+                            if (timerMode) {
+                                millisLeft = timerFragment.getMillisLeft();
+                                elapsedTime = test.time * 60000 - millisLeft;
                             }
+                            long date = System.currentTimeMillis();
+
+                            if (userAnswersId == -1) {
+                                userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
+                                userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+                            } else {
+                                userAnswersId = db.updateUserAnswers(userAnswersId, test.getAnswers());
+                                userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+                            }
+
+
                             if (resumed) {
                                 SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = preferences.edit();
@@ -376,11 +389,21 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                     case DialogInterface.BUTTON_POSITIVE:
                         final int testBall = test.getTestBall();
                         final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
-                        if (userAnswersId == -1) {
-                            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
-                        } else {
-                            userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
+                        long elapsedTime = 0;
+                        if (timerMode) {
+                            millisLeft = timerFragment.getMillisLeft();
+                            elapsedTime = test.time * 60000 - millisLeft;
                         }
+                        long date = System.currentTimeMillis();
+
+                        if (userAnswersId == -1) {
+                            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
+                            userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+                        } else {
+                            userAnswersId = db.updateUserAnswers(userAnswersId, test.getAnswers());
+                            userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+                        }
+
                         if (resumed) {
                             SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = preferences.edit();
@@ -403,6 +426,9 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     }
 
     public void showTestResults(int testBall, float znoBall) {
+        if (timerMode) {
+            timerFragment.cancel();
+        }
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setMessage("Тест Завершено!\nтестовий бал: " + testBall + "\n" + "рейтинговий бал: " + znoBall + "\nподивитися помилки?");
         dialogBuilder.setPositiveButton("Так", new DialogInterface.OnClickListener() {
@@ -455,11 +481,21 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     public void onFinish() {
         final int testBall = test.getTestBall();
         final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
-        if (userAnswersId == -1) {
-            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
-        } else {
-            userAnswersId = db.updateUserAnswers(userAnswersId, test.lessonId, test.id, test.getAnswers(), testBall, znoBall);
+        long elapsedTime = 0;
+        if (timerMode) {
+            millisLeft = timerFragment.getMillisLeft();
+            elapsedTime = test.time * 60000 - millisLeft;
         }
+        long date = System.currentTimeMillis();
+
+        if (userAnswersId == -1) {
+            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
+            userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+        } else {
+            userAnswersId = db.updateUserAnswers(userAnswersId, test.getAnswers());
+            userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+        }
+
         if (resumed) {
             SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();

@@ -32,7 +32,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     private static final String HREF_REPLACEMENT = "<a href=\"open.image://?src=";
-    private static final String HREF= "<a href=\"";
+    private static final String HREF = "<a href=\"";
 
     private static final String TABLE_LESSONS = "lessons";
     private static final String TABLE_TESTS = "tests";
@@ -41,6 +41,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_ANDROID_META_DATA = "android_metadata";
     private static final String TABLE_SQLITE_SEQUENCE = "sqlite_sequence";
     private static final String TABLE_USER_ANSWERS = "user_answers";
+    private static final String TABLE_USER_RECORDS = "user_records";
 
     private static final String KEY_ID = "id";
     private static final String KEY_LESSON_ID = "lesson_id";
@@ -59,7 +60,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String KEY_LOADED = "loaded";
     private static final String KEY_ANSWERS = "answers";
     private static final String KEY_BALLS = "balls";
-    private static final String KEY_TEST_BALL = "test_ball";
     private static final String KEY_ZNO_BALL = "zno_ball";
     private static final String KEY_CORRECT_ANSWER = "correct_answer";
     private static final String KEY_QUESTION = "question";
@@ -68,14 +68,13 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String KEY_PARENT_QUESTION = "parent_question";
     private static final String KEY_TYPE = "type";
     private static final String KEY_DATE = "date";
-    private static final String KEY_RECORD_BALL = "record_ball";
+    private static final String KEY_ELAPSED_TIME = "elapsed_time";
 
     private static final String CREATE_TABLE_LESSONS =
             "CREATE TABLE " + TABLE_LESSONS + " ("
                     + KEY_ID + " INTEGER PRIMARY KEY, "
                     + KEY_LINK + " TEXT, "
-                    + KEY_NAME + " TEXT, "
-                    + KEY_RECORD_BALL + " REAL DEFAULT -1);";
+                    + KEY_NAME + " TEXT);";
 
     private static final String CREATE_TABLE_TESTS =
             "CREATE TABLE " + TABLE_TESTS + " ("
@@ -113,7 +112,15 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                     + KEY_TEST_ID + " INTEGER, "
                     + KEY_DATE + " INTEGER, "
                     + KEY_ANSWERS + " TEXT, "
-                    + KEY_TEST_BALL + " INTEGER, "
+                    + KEY_ELAPSED_TIME + " INTEGER, "
+                    + KEY_ZNO_BALL + " REAL);";
+
+    private static final String CREATE_TABLE_USER_RECORDS =
+            "CREATE TABLE " + TABLE_USER_RECORDS + " ("
+                    + KEY_LESSON_ID + " INTEGER PRIMARY KEY, "
+                    + KEY_TEST_ID + " INTEGER, "
+                    + KEY_DATE + " INTEGER, "
+                    + KEY_ELAPSED_TIME + " INTEGER, "
                     + KEY_ZNO_BALL + " REAL);";
 
     public ZNODataBaseHelper(Context context) {
@@ -126,6 +133,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_TESTS);
         db.execSQL(CREATE_TABLE_QUESTIONS);
         db.execSQL(CREATE_TABLE_USER_ANSWERS);
+        db.execSQL(CREATE_TABLE_USER_RECORDS);
 
         try {
             JSONArray lessons = loadFromResources(R.raw.lessons);
@@ -261,16 +269,27 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    private void updateRecordBall(SQLiteDatabase db,int lessonId, float newBall) {
-        Cursor c = db.query(TABLE_LESSONS, new String[]{KEY_RECORD_BALL}, KEY_ID + "=" + lessonId, null, null, null, null);
-        if (c.moveToFirst()) {
-            int recordBallIndex = c.getColumnIndex(KEY_RECORD_BALL);
-            float recordBall = c.getFloat(recordBallIndex);
-            if (newBall > recordBall) {
+    private void updateRecords(SQLiteDatabase db, int lessonId, int testId, float newBall, long elapsedTime, long date) {
+        Cursor c = db.query(TABLE_USER_RECORDS, new String[]{KEY_ZNO_BALL}, KEY_LESSON_ID + "=" + lessonId, null, null, null, null);
+        if (c.moveToFirst() && c.getCount() == 1) {
+            int znoBallIndex = c.getColumnIndex(KEY_ZNO_BALL);
+            float oldBall = c.getFloat(znoBallIndex);
+            if (oldBall <= newBall) {
                 ContentValues values = new ContentValues();
-                values.put(KEY_RECORD_BALL, newBall);
-                db.update(TABLE_LESSONS, values, KEY_ID + "=" + lessonId, null);
+                values.put(KEY_TEST_ID, testId);
+                values.put(KEY_ZNO_BALL, newBall);
+                values.put(KEY_ELAPSED_TIME, elapsedTime);
+                values.put(KEY_DATE, date);
+                db.update(TABLE_USER_RECORDS, values, KEY_LESSON_ID + "=" + lessonId, null);
             }
+        } else {
+            ContentValues values = new ContentValues();
+            values.put(KEY_LESSON_ID, lessonId);
+            values.put(KEY_TEST_ID, testId);
+            values.put(KEY_ZNO_BALL, newBall);
+            values.put(KEY_ELAPSED_TIME, elapsedTime);
+            values.put(KEY_DATE, date);
+            db.insert(TABLE_USER_RECORDS, null, values);
         }
     }
 
@@ -279,24 +298,47 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 //    }
 
     public int saveUserAnswers(int lessonId, int testId, String answers) {
+        long row;
         SQLiteDatabase db = getWritableDatabase();
-        int row = insertUserAnswers(db, -1, lessonId, testId, answers, 0, 0.0f);
+        ContentValues values = new ContentValues();
+        values.put(KEY_LESSON_ID, lessonId);
+        values.put(KEY_TEST_ID, testId);
+        values.put(KEY_ANSWERS, answers);
+        row = db.insert(TABLE_USER_ANSWERS, null, values);
         db.close();
-        return row;
+        return (int) row;
     }
 
-    public int saveUserAnswers(int lessonId, int testId, String answers, int testBall, float znoBall) {
+    public int updateUserAnswers(int id, String answers) {
+        long row;
         SQLiteDatabase db = getWritableDatabase();
-        int row = insertUserAnswers(db, -1, lessonId, testId, answers, testBall, znoBall);
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, id);
+        values.put(KEY_ANSWERS, answers);
+        row = db.update(TABLE_USER_ANSWERS, values, KEY_ID + "=" + id, null);
         db.close();
-        return row;
+        return (int) row;
     }
 
-    public int updateUserAnswers(int id, int lessonId, int testId, String answers) {
+    public int completeUserAnswers(int id, float znoBall, long elapsedTime, long date) {
         SQLiteDatabase db = getWritableDatabase();
-        int row = insertUserAnswers(db, id, lessonId, testId, answers, -1, -1);
+        ContentValues values = new ContentValues();
+        long row;
+        values.put(KEY_ID, id);
+        values.put(KEY_ZNO_BALL, znoBall);
+        values.put(KEY_ELAPSED_TIME, elapsedTime);
+        values.put(KEY_DATE, date);
+        row = db.update(TABLE_USER_ANSWERS, values, KEY_ID + "=" + id, null);
+        Cursor c = db.query(TABLE_USER_ANSWERS, new String[]{KEY_LESSON_ID, KEY_TEST_ID}, KEY_ID + "=" + id, null, null, null, null);
+        if (c.moveToFirst()) {
+            int lessonIdIndex = c.getColumnIndex(KEY_LESSON_ID);
+            int testIdIndex = c.getColumnIndex(KEY_TEST_ID);
+            int lessonId = c.getInt(lessonIdIndex);
+            int testId = c.getInt(testIdIndex);
+            updateRecords(db, lessonId, testId, znoBall, elapsedTime, date);
+        }
         db.close();
-        return row;
+        return (int) row;
     }
 
     public void deleteUserAnswers(int id) {
@@ -305,31 +347,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public int updateUserAnswers(int id, int lessonId, int testId, String answers, int testBall, float znoBall) {
-        SQLiteDatabase db = getWritableDatabase();
-        int row = insertUserAnswers(db, id, lessonId, testId, answers, testBall, znoBall);
-        db.close();
-        return row;
-    }
-
-    private int insertUserAnswers(SQLiteDatabase db, int id, int lessonId, int testId, String answers, int testBall, float znoBall) {
-        ContentValues values = new ContentValues();
-        if (id != -1) {
-            values.put(KEY_ID, id);
-        }
-        values.put(KEY_LESSON_ID, lessonId);
-        values.put(KEY_TEST_ID, testId);
-        values.put(KEY_ANSWERS, answers);
-        if (testBall != -1 && znoBall != -1) {
-            values.put(KEY_TEST_BALL, testBall);
-            values.put(KEY_ZNO_BALL, znoBall);
-            updateRecordBall(db, lessonId, znoBall);
-        }
-        values.put(KEY_DATE, System.currentTimeMillis());
-        return (int) db.insertWithOnConflict(TABLE_USER_ANSWERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-    }
-
-    public String getSavedAnswers(int id) {
+    public String getUserAnswers(int id) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.query(TABLE_USER_ANSWERS, new String[]{KEY_ANSWERS}, KEY_ID + "=" + id, null, null, null, null);
         if (c.moveToFirst()) {
@@ -429,7 +447,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             do {
                 id = c.getInt(idIndex);
                 lesson = new Lesson(id, c.getString(nameIndex), c.getString(linkIndex), getLessonTestsCount(id));
-                if ( id == 3 ) {
+                if (id == 3) {
                     lessonsEnd.add(lesson);
                 } else {
                     lessons.add(lesson);
