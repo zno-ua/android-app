@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.android.volley.NoConnectionError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
-import com.vojkovladimir.zno.adapters.TestsListAdapter;
+import com.vojkovladimir.zno.adapters.TestsAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.models.Lesson;
 import com.vojkovladimir.zno.models.Test;
@@ -33,7 +33,7 @@ import com.vojkovladimir.zno.service.ApiService.TestDownloadingFeedBack;
 
 import org.json.JSONException;
 
-public class LessonTestsActivity extends Activity {
+public class TestsActivity extends Activity {
 
 	final Context context = this;
 
@@ -41,7 +41,7 @@ public class LessonTestsActivity extends Activity {
 	ZNODataBaseHelper db;
 
 	ListView testsListView;
-	TestsListAdapter testsListAdapter;
+	TestsAdapter testsAdapter;
 
 	ProgressDialog downloadProgress;
 
@@ -68,7 +68,7 @@ public class LessonTestsActivity extends Activity {
 	OnItemClickListener itemListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-            final TestInfo test = (TestInfo) testsListAdapter.getItem(position);
+            final TestInfo test = (TestInfo) testsAdapter.getItem(position);
 
 			if (test.loaded) {
                 startTest(test.id);
@@ -147,7 +147,7 @@ public class LessonTestsActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_tests_list);
+		setContentView(R.layout.activity_tests);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		app = ZNOApplication.getInstance();
@@ -157,9 +157,9 @@ public class LessonTestsActivity extends Activity {
 
 		setTitle(intent.getStringExtra(Lesson.LESSON_NAME));
 		idLesson = intent.getIntExtra(Lesson.LESSON_ID, -1);
-		testsListAdapter = new TestsListAdapter(this, db.getLessonTests(idLesson));
+		testsAdapter = new TestsAdapter(this, db.getLessonTests(idLesson));
 		testsListView = (ListView) findViewById(R.id.tests_list_view);
-		testsListView.setAdapter(testsListAdapter);
+		testsListView.setAdapter(testsAdapter);
 		testsListView.setOnItemClickListener(itemListener);
 	}
 
@@ -190,7 +190,7 @@ public class LessonTestsActivity extends Activity {
 	}
 
 	public void invalidate() {
-		testsListAdapter.setTestsList(db.getLessonTests(idLesson));
+		testsAdapter.setTestsList(db.getLessonTests(idLesson));
 		testsListView.invalidateViews();
 	}
 

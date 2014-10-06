@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.models.Lesson;
 
-public class LessonsListAdapter extends BaseAdapter {
+public class LessonsAdapter extends BaseAdapter {
 
 	private final String TEST_ONE;
 	private final String TESTS_TWO_FOUR;
@@ -33,7 +33,7 @@ public class LessonsListAdapter extends BaseAdapter {
 		public TextView testsCounter;
 	}
 
-	public LessonsListAdapter(Context context, ArrayList<Lesson> lessonsList) {
+	public LessonsAdapter(Context context, ArrayList<Lesson> lessonsList) {
 		this.lessonsList = lessonsList;
 		PACKAGE_NAME = context.getPackageName();
 		resources = context.getResources();

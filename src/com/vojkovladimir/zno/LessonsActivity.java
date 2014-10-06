@@ -10,22 +10,22 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.vojkovladimir.zno.adapters.LessonsListAdapter;
+import com.vojkovladimir.zno.adapters.LessonsAdapter;
 import com.vojkovladimir.zno.models.Lesson;
 
 import java.util.ArrayList;
 
-public class TestingActivity extends Activity {
+public class LessonsActivity extends Activity {
 
 	ListView lessonsListView;
 
-	LessonsListAdapter lessonsListAdapter;
+	LessonsAdapter lessonsAdapter;
 	ArrayList<Lesson> lessons;
 
 	OnItemClickListener itemListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-			Intent testsList = new Intent(getApplicationContext(), LessonTestsActivity.class);
+			Intent testsList = new Intent(getApplicationContext(), TestsActivity.class);
 			testsList.putExtra(Lesson.LESSON_ID, lessons.get(position).id);
 			testsList.putExtra(Lesson.LESSON_NAME, lessons.get(position).name);
 			startActivity(testsList);
@@ -35,14 +35,14 @@ public class TestingActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_testing);
+		setContentView(R.layout.activity_lessons);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		lessons = new ArrayList<Lesson>();
 		lessons = ZNOApplication.getInstance().getZnoDataBaseHelper().getLessons();
-		lessonsListAdapter = new LessonsListAdapter(this, lessons);
+		lessonsAdapter = new LessonsAdapter(this, lessons);
 		lessonsListView = (ListView) findViewById(R.id.lessons_list_view);
-		lessonsListView.setAdapter(lessonsListAdapter);
+		lessonsListView.setAdapter(lessonsAdapter);
 		lessonsListView.setOnItemClickListener(itemListener);
 	}
 	

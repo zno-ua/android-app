@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.models.TestInfo;
 
-public class TestsListAdapter extends BaseAdapter {
+public class TestsAdapter extends BaseAdapter {
 
 	private final String ZNO_FULL;
 	private final String ZNO_LIGHT;
@@ -34,7 +34,7 @@ public class TestsListAdapter extends BaseAdapter {
 		public View downloadFrame;
 	}
 
-	public TestsListAdapter(Context context, ArrayList<TestInfo> testsList) {
+	public TestsAdapter(Context context, ArrayList<TestInfo> testsList) {
 		lInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.testsList = testsList;

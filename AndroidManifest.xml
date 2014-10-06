@@ -28,25 +28,25 @@
             </intent-filter>
             </activity>
         <activity
-            android:name=".TestingActivity"
+            android:name=".LessonsActivity"
             android:label="@string/testing_activity_label">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vojkovladimir.zno.MainActivity" />
         </activity>
         <activity
-            android:name=".LessonTestsActivity"
+            android:name=".TestsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vojkovladimir.zno.TestingActivity" />
+                android:value="com.vojkovladimir.zno.LessonsActivity" />
         </activity>
         <activity
             android:name=".TestActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vojkovladimir.zno.LessonTestsActivity" />
+                android:value="com.vojkovladimir.zno.TestsActivity" />
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
