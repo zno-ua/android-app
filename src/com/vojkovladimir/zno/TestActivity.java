@@ -1,5 +1,6 @@
 package com.vojkovladimir.zno;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,7 +13,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -71,9 +71,11 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("MyLogs", "onCreate");
         setContentView(R.layout.activity_test);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar bar = getActionBar();
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
 
         app = ZNOApplication.getInstance();
         db = app.getZnoDataBaseHelper();
@@ -155,14 +157,13 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        Log.i("MyLogs", "onSave");
         if (!viewMode) {
             if (userAnswersId == -1) {
                 userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
             } else {
-                userAnswersId = db.updateUserAnswers(userAnswersId, test.getAnswers());
+                db.updateUserAnswers(userAnswersId, test.getAnswers());
             }
-            SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
+            SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putInt(Test.TEST_ID, test.id);
             editor.putInt(Extra.USER_ANSWERS_ID, userAnswersId);
@@ -184,7 +185,6 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     @Override
     protected void onStart() {
-        Log.i("MyLogs", "onStart");
         super.onStart();
         if (timerMode) {
             timerFragment = TestTimerFragment.newInstance(millisLeft);
@@ -312,11 +312,14 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                         if (resumed) {
                             Intent main = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(main);
-                            SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
+                            SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = preferences.edit();
                             editor.remove(Test.TEST_ID);
                             editor.remove(Extra.USER_ANSWERS_ID);
                             editor.remove(Extra.QUESTION_NUMBER);
+                            if (timerMode) {
+                                editor.remove(TestTimerFragment.MILLIS_LEFT);
+                            }
                             editor.apply();
                         }
                         if (timerMode) {
@@ -353,15 +356,15 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
                             if (userAnswersId == -1) {
                                 userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
-                                userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+                                db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
                             } else {
-                                userAnswersId = db.updateUserAnswers(userAnswersId, test.getAnswers());
-                                userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+                                db.updateUserAnswers(userAnswersId, test.getAnswers());
+                                db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
                             }
 
 
                             if (resumed) {
-                                SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
+                                SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = preferences.edit();
                                 editor.remove(Test.TEST_ID);
                                 editor.remove(Extra.USER_ANSWERS_ID);
@@ -400,10 +403,10 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
                         if (userAnswersId == -1) {
                             userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
-                            userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+                            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
                         } else {
-                            userAnswersId = db.updateUserAnswers(userAnswersId, test.getAnswers());
-                            userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+                            db.updateUserAnswers(userAnswersId, test.getAnswers());
+                            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
                         }
 
                         if (resumed) {
@@ -492,14 +495,14 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
         if (userAnswersId == -1) {
             userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
-            userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
         } else {
-            userAnswersId = db.updateUserAnswers(userAnswersId, test.getAnswers());
-            userAnswersId = db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+            db.updateUserAnswers(userAnswersId, test.getAnswers());
+            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
         }
 
         if (resumed) {
-            SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
+            SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
             editor.remove(Test.TEST_ID);
             editor.remove(Extra.USER_ANSWERS_ID);

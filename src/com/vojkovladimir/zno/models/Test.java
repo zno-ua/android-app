@@ -33,14 +33,13 @@ public class Test extends TestInfo {
         }
 
         answers += "]";
-        Log.i("MyLogs", "Test.getAnswers");
         return answers;
     }
 
-    public void putAnswers(String savedAswers) {
-        if (savedAswers != null) {
+    public void putAnswers(String savedAnswers) {
+        if (savedAnswers != null) {
             try {
-                JSONArray answers = new JSONArray(savedAswers);
+                JSONArray answers = new JSONArray(savedAnswers);
                 for (int i = 0; i < answers.length(); i++) {
                     questions.get(i).userAnswer = answers.getString(i);
                 }

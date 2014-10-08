@@ -310,26 +310,21 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         return (int) row;
     }
 
-    public int updateUserAnswers(int id, String answers) {
-        long row;
+    public void updateUserAnswers(int id, String answers) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, id);
         values.put(KEY_ANSWERS, answers);
-        row = db.update(TABLE_USER_ANSWERS, values, KEY_ID + "=" + id, null);
+        db.update(TABLE_USER_ANSWERS, values, KEY_ID + "=" + id, null);
         db.close();
-        return (int) row;
     }
 
-    public int completeUserAnswers(int id, float znoBall, long elapsedTime, long date) {
+    public void completeUserAnswers(int id, float znoBall, long elapsedTime, long date) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        long row;
-        values.put(KEY_ID, id);
         values.put(KEY_ZNO_BALL, znoBall);
         values.put(KEY_ELAPSED_TIME, elapsedTime);
         values.put(KEY_DATE, date);
-        row = db.update(TABLE_USER_ANSWERS, values, KEY_ID + "=" + id, null);
+        db.update(TABLE_USER_ANSWERS, values, KEY_ID + "=" + id, null);
         Cursor c = db.query(TABLE_USER_ANSWERS, new String[]{KEY_LESSON_ID, KEY_TEST_ID}, KEY_ID + "=" + id, null, null, null, null);
         if (c.moveToFirst()) {
             int lessonIdIndex = c.getColumnIndex(KEY_LESSON_ID);
@@ -339,7 +334,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             updateRecords(db, lessonId, testId, znoBall, elapsedTime, date);
         }
         db.close();
-        return (int) row;
     }
 
     public void deleteUserAnswers(int id) {
