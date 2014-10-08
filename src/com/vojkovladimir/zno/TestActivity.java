@@ -319,7 +319,9 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                             editor.remove(Extra.QUESTION_NUMBER);
                             editor.apply();
                         }
-                        timerFragment.cancel();
+                        if (timerMode) {
+                            timerFragment.cancel();
+                        }
                         finish();
                         break;
                 }
