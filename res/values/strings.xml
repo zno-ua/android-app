@@ -13,10 +13,11 @@
     <string name="session_text">сесія</string>
     <string name="task_text">завдання</string>
     <string name="tasks_text">завдань</string>
+    <string name="minutes_short">хв.</string>
     <string name="check_zno_full">Зовнішнє незалежне оцінювання</string>
     <string name="check_zno_lite">Офіційний тест ЗНО</string>
     <string name="exp_zno">Пробне тестування ЗНО</string>
-    <string name="for_year">за</string>
+    <string name="for_">за</string>
     <string name="year">рік</string>
     <string name="zno">ЗНО</string>
     <string name="tests_one">тест</string>
@@ -32,12 +33,10 @@
     <string name="action_questions_list">Список питань</string>
     <string name="parent_question_text_show">Натисніть для відображення тексту.</string>
     <string name="choose_ball">Оберіть бал, на який розраховуєте:</string>
-    <string name="choosed_ball">Обраний бал — </string>
-    <string name="image_desription">Image</string>
-    <string name="loren_ipsum_text">Lorem Ipsum - це текст-"риба", що використовується</string>
+    <string name="chosen_ball">Обраний бал — </string>
 
     <!--TestActivity-->
-    <string name="cancle_test_confirm">Завершити тестування без збереження відповідей?</string>
+    <string name="cancel_test_confirm">Завершити тестування без збереження відповідей?</string>
     
     <!-- Downloading Progress -->
     <string name="progress_test_load">Завантаження тесту</string>
@@ -65,6 +64,21 @@
     <string name="your_combination_text">Ваша комбінація:</string>
     <string name="correct_combination_text">Вірна комбінація:</string>
     <string name="unfinished_test_alert_text">Є незавершений тест! Бажаєте його продовжити?</string>
+
+    <string-array name="months">
+        <item>січня</item>
+        <item>лютого</item>
+        <item>березня</item>
+        <item>квітня</item>
+        <item>травня</item>
+        <item>червня</item>
+        <item>липня</item>
+        <item>серпня</item>
+        <item>вересня</item>
+        <item>жовтня</item>
+        <item>листопада</item>
+        <item>грудня</item>
+    </string-array>
 
     <string-array name="quotes_2011">
         <item>Навіть у бактерій та грибків є свої проблеми та бажання їх вирішити. Саме тому ми й існуємо.</item>

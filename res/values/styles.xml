@@ -83,6 +83,10 @@
         <item name="android:scrollbarStyle">outsideInset</item>
     </style>
 
+    <style name="List.WithoutHeader">
+        <item name="android:layout_marginTop">@dimen/scrollable_view_margin</item>
+    </style>
+
     <!-- Scrollable Grid -->
     <style name="Scrollable.Grid">
         <item name="android:columnWidth">@dimen/grid_question_column_width</item>
@@ -134,6 +138,14 @@
         <item name="android:textColor">@color/sub_item_text_color</item>
         <item name="android:textSize">@dimen/test_properties_text_size</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Record -->
+    <style name="RecordBall">
+        <item name="android:textColor">@color/record_ball_color</item>
+        <item name="android:textSize">23sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingLeft">@dimen/question_padding</item>
     </style>
 
     <!-- Question -->

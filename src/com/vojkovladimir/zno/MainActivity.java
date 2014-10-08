@@ -37,6 +37,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         quoteTitle = getResources().getString(R.string.quotes_2011_title);
         db = ZNOApplication.getInstance().getZnoDataBaseHelper();
         findViewById(R.id.begin_testing_btn).setOnClickListener(this);
+        findViewById(R.id.records_btn).setOnClickListener(this);
     }
 
     protected void onStart() {
@@ -101,8 +102,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.begin_testing_btn:
-                Intent testingActivity = new Intent(this, LessonsActivity.class);
-                startActivity(testingActivity);
+                Intent lessons = new Intent(this, LessonsActivity.class);
+                startActivity(lessons);
+                break;
+            case R.id.records_btn:
+                Intent records = new Intent(this, RecordsActivity.class);
+                startActivity(records);
                 break;
         }
     }

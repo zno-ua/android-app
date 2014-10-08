@@ -41,6 +41,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vojkovladimir.zno.LessonsActivity" />
         </activity>
+
+        <activity
+            android:name=".RecordsActivity"
+            android:label="@string/records_btn_text">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vojkovladimir.zno.MainActivity" />
+        </activity>
+
         <activity
             android:name=".TestActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">

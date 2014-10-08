@@ -573,11 +573,11 @@ public class QuestionFragment extends Fragment {
 
         if (viewMode) {
             questionText.setText(Html.fromHtml(question, imgGetter, null));
-            ballsText.setText(res.getString(R.string.choosed_ball) + " " + userAnswer);
+            ballsText.setText(res.getString(R.string.chosen_ball) + " " + userAnswer);
             ballsSeekBar.setVisibility(View.GONE);
         } else {
             questionText.setText(Html.fromHtml(question + res.getString(R.string.choose_ball), imgGetter, null));
-            ballsText.setText(res.getString(R.string.choosed_ball) + " " + String.valueOf(balls / 2));
+            ballsText.setText(res.getString(R.string.chosen_ball) + " " + String.valueOf(balls / 2));
             ballsSeekBar.setMax(balls);
             ballsSeekBar.setProgress(balls / 2);
             ballsSeekBar.setSecondaryProgress(0);
@@ -596,7 +596,7 @@ public class QuestionFragment extends Fragment {
 
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    ballsText.setText(res.getString(R.string.choosed_ball) + " " + String.valueOf(progress));
+                    ballsText.setText(res.getString(R.string.chosen_ball) + " " + String.valueOf(progress));
                 }
             });
         }

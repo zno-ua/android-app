@@ -300,7 +300,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     public void showCancelTestAlert() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setMessage(R.string.cancle_test_confirm);
+        dialogBuilder.setMessage(R.string.cancel_test_confirm);
         dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {

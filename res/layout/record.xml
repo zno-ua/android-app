@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/test_padding"
+    android:paddingBottom="@dimen/test_padding"
+    android:baselineAligned="false">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="0.8"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/test_padding"
+        android:paddingRight="@dimen/test_padding">
+
+        <TextView
+            android:id="@+id/lesson_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ukrainian"
+            style="@style/TestName" />
+
+        <TextView
+            android:id="@+id/test_properties"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2014, I session"
+            style="@style/TestProperties" />
+
+        <TextView
+            android:id="@+id/additional_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Passed 4 january 10 minutes"
+            style="@style/TestProperties" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical">
+
+            <View
+                android:layout_width="1dp"
+                android:alpha="0.1"
+                android:background="@android:color/black"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/record_ball"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="140"
+                style="@style/RecordBall" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

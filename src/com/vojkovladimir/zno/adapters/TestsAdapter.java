@@ -43,7 +43,7 @@ public class TestsAdapter extends BaseAdapter {
 		ZNO_LIGHT = context.getResources().getString(R.string.check_zno_lite);
 		ZNO = context.getResources().getString(R.string.zno);
 		EXP_ZNO = context.getResources().getString(R.string.exp_zno);
-		FOR_YEAR = context.getResources().getString(R.string.for_year);
+		FOR_YEAR = context.getResources().getString(R.string.for_);
 		YEAR = context.getResources().getString(R.string.year);
 		SESSION = context.getResources().getString(R.string.session_text);
 		TASK_TEXT = context.getResources().getString(R.string.task_text);
