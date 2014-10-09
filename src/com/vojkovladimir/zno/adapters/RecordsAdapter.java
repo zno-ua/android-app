@@ -34,9 +34,9 @@ public class RecordsAdapter extends BaseAdapter {
         public TextView recordBall;
     }
 
-    ArrayList<Record> records;
+    ArrayList<?> records;
 
-    public RecordsAdapter(Context context, ArrayList<Record> records) {
+    public RecordsAdapter(Context context, ArrayList<?> records) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         FOR = context.getResources().getString(R.string.for_);
         YEAR = context.getResources().getString(R.string.year);
@@ -78,7 +78,7 @@ public class RecordsAdapter extends BaseAdapter {
             view.setTag(holder);
         }
 
-        Record record = records.get(position);
+        Record record = (Record) records.get(position);
         String testProperties = String.format("%d " + YEAR, record.year);
         switch (record.session) {
             case 1:

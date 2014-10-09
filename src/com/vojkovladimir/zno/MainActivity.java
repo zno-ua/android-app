@@ -38,6 +38,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         db = ZNOApplication.getInstance().getZnoDataBaseHelper();
         findViewById(R.id.begin_testing_btn).setOnClickListener(this);
         findViewById(R.id.records_btn).setOnClickListener(this);
+        findViewById(R.id.last_passed_tests_btn).setOnClickListener(this);
     }
 
     protected void onStart() {
@@ -106,8 +107,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 startActivity(lessons);
                 break;
             case R.id.records_btn:
-                Intent records = new Intent(this, RecordsActivity.class);
+                Intent records = new Intent(RecordsActivity.Action.VIEW_BEST_SCORES);
                 startActivity(records);
+                break;
+            case R.id.last_passed_tests_btn:
+                Intent passedTests = new Intent(RecordsActivity.Action.VIEW_PASSED_TESTS);
+                startActivity(passedTests);
                 break;
         }
     }

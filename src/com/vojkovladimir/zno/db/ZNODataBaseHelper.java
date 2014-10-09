@@ -10,6 +10,7 @@ import android.util.Log;
 import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.models.Lesson;
+import com.vojkovladimir.zno.models.PassedTest;
 import com.vojkovladimir.zno.models.Question;
 import com.vojkovladimir.zno.models.Record;
 import com.vojkovladimir.zno.models.Test;
@@ -635,6 +636,68 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
         db.close();
         return records;
+    }
+
+    public ArrayList<PassedTest> getPassedTests() {
+        ArrayList<PassedTest> passedTests = new ArrayList<PassedTest>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor recRows;
+        String[] recSelect = {KEY_ID, KEY_LESSON_ID, KEY_TEST_ID, KEY_DATE, KEY_ELAPSED_TIME, KEY_ZNO_BALL};
+        final String SESSION = ZNOApplication.getInstance().getResources().getString(R.string.session_text);
+
+        recRows = db.query(TABLE_USER_ANSWERS, recSelect, null, null, null, null, KEY_DATE + " DESC");
+        if (recRows.moveToFirst()) {
+            Cursor lesson;
+            Cursor test;
+
+            int id;
+            int lessonId;
+            int testId;
+
+            String lessonName;
+            String testName;
+            int year;
+            int session;
+            long date;
+            long elapsedTime;
+            float ball;
+
+            do {
+                id = recRows.getInt(recRows.getColumnIndex(KEY_ID));
+                lessonId = recRows.getInt(recRows.getColumnIndex(KEY_LESSON_ID));
+                lesson = db.query(TABLE_LESSONS, new String[]{KEY_NAME}, KEY_ID + "=" + lessonId, null, null, null, null);
+                if (lesson.moveToFirst()) {
+                    lessonName = lesson.getString(lesson.getColumnIndex(KEY_NAME));
+                } else {
+                    continue;
+                }
+
+                testId = recRows.getInt(recRows.getColumnIndex(KEY_TEST_ID));
+                test = db.query(TABLE_TESTS, new String[]{KEY_NAME, KEY_YEAR}, KEY_ID + "=" + testId, null, null, null, null);
+                if (test.moveToFirst()) {
+                    testName = test.getString(test.getColumnIndex(KEY_NAME));
+                    year = test.getInt(test.getColumnIndex(KEY_YEAR));
+                    if (testName.contains("(I " + SESSION + ")")) {
+                        session = 1;
+                    } else if (testName.contains("(II " + SESSION + ")")) {
+                        session = 2;
+                    } else {
+                        session = 0;
+                    }
+                } else {
+                    continue;
+                }
+
+                date = recRows.getLong(recRows.getColumnIndex(KEY_DATE));
+                elapsedTime = recRows.getLong(recRows.getColumnIndex(KEY_ELAPSED_TIME));
+                ball = recRows.getFloat(recRows.getColumnIndex(KEY_ZNO_BALL));
+                passedTests.add(new PassedTest(id, testId, lessonName, year, session, date, elapsedTime, ball));
+            } while (recRows.moveToNext());
+        }
+
+        db.close();
+        return passedTests;
     }
 
     private JSONArray loadFromResources(int id) throws IOException, JSONException {
