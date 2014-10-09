@@ -196,7 +196,7 @@ public class TestsActivity extends Activity {
 
     public void startTest(final int testId) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-        dialogBuilder.setMessage("Розпочати тест з урахуванням часу?");
+        dialogBuilder.setMessage(getString(R.string.start_with_tracking_time));
         dialogBuilder.setPositiveButton(R.string.dialog_positive_text,new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
