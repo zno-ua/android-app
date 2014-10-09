@@ -59,6 +59,7 @@
     <string name="statement_text_grid_item">П</string>
     <string name="want_to_finish">Бажаєте завершити?</string>
     <string name="has_unanswered_questions">Ви відповіли не на всі запитання!</string>
+    <string name="empty_list">Не має результатів :(</string>
 
     <!-- Timer -->
     <string name="action_time">Залишок часу</string>

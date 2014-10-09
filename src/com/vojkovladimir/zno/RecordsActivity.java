@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.vojkovladimir.zno.adapters.RecordsAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
@@ -62,6 +63,13 @@ public class RecordsActivity extends Activity {
                     startActivity(viewTest);
                 }
             });
+        }
+
+        if (adapter != null && adapter.getCount() == 0) {
+            list.setVisibility(View.GONE);
+            TextView notice = (TextView) findViewById(R.id.empty_list_notice);
+            notice.setText(getString(R.string.empty_list));
+            notice.setVisibility(View.VISIBLE);
         }
     }
 

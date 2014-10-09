@@ -148,6 +148,13 @@
         <item name="android:paddingLeft">@dimen/question_padding</item>
     </style>
 
+    <!-- Empty List Notice -->
+    <style name="EmptyListNotice">
+        <item name="android:textColor">@color/record_ball_color</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:paddingLeft">@dimen/scrollable_view_margin</item>
+    </style>
+
     <!-- Question -->
     <style name="QuestionHeader">
         <item name="android:background">@color/white</item>
