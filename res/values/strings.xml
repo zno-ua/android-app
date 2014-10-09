@@ -52,6 +52,7 @@
     <!-- Downloading Errors -->
     <string name="error_no_connection">Відсутнє з\'єднання з інтернетом</string>
     <string name="error_timeout">Неможливо завантажити тест \nСпробуйте пізніше </string>
+    <string name="error_server_bad">Помилка серверу</string>
 
 
     <string name="quotes_2011_title">Цитата з твору ЗНО-2011:</string>
