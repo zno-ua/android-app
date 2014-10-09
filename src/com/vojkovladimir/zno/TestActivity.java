@@ -31,6 +31,9 @@ import com.vojkovladimir.zno.models.Test;
 
 public class TestActivity extends FragmentActivity implements QuestionFragment.OnAnswerSelectedListener, TestTimerFragment.OnTimerStates {
 
+    final int FINISH_ALERT = 0;
+    final int CANCEL_ALERT = 1;
+
     public interface Action {
         String VIEW_TEST = "com.vojkovladimir.zno.VIEW_TEST";
         String PASS_TEST = "com.vojkovladimir.zno.PASS_TEST";
@@ -232,7 +235,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                     }
                     finish();
                 } else {
-                    showCancelTestAlert();
+                    showAlert(CANCEL_ALERT);
                 }
                 return true;
             case R.id.action_questions_list:
@@ -243,7 +246,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 }
                 return true;
             case R.id.action_finish_testing:
-                showFinishTestAlert();
+                showAlert(FINISH_ALERT);
                 return true;
             case R.id.action_time:
                 showTimerFragment();
@@ -277,7 +280,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             }
             finish();
         } else {
-            showCancelTestAlert();
+            showAlert(CANCEL_ALERT);
         }
     }
 
@@ -292,148 +295,48 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             } else {
                 Question question = test.questions.get(test.questions.size() - 1);
                 if (question.type == Question.TYPE_2 && question.balls != 0 && !question.userAnswer.isEmpty()) {
-                    showConfirmFinishTestAlert();
+                    showAlert(FINISH_ALERT);
                 }
             }
         }
     }
 
-    public void showCancelTestAlert() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setMessage(R.string.cancel_test_confirm);
-        dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        if (userAnswersId != -1) {
-                            db.deleteUserAnswers(userAnswersId);
-                        }
-                        if (resumed) {
-                            Intent main = new Intent(getApplicationContext(), MainActivity.class);
-                            startActivity(main);
-                            SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = preferences.edit();
-                            editor.remove(Test.TEST_ID);
-                            editor.remove(Extra.USER_ANSWERS_ID);
-                            editor.remove(Extra.QUESTION_NUMBER);
-                            if (timerMode) {
-                                editor.remove(TestTimerFragment.MILLIS_LEFT);
-                            }
-                            editor.apply();
-                        }
-                        if (timerMode) {
-                            timerFragment.cancel();
-                        }
-                        finish();
-                        break;
-                }
-            }
-        });
-        dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
-        dialogBuilder.setCancelable(false);
-        dialogBuilder.create().show();
-    }
-
-    public void showFinishTestAlert() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-
-        if (test.hasUnAnsweredQuestions()) {
-            dialogBuilder.setMessage(getString(R.string.has_unanswered_questions) + "\n" + getString(R.string.want_to_finish));
-            dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int which) {
-                    switch (which) {
-                        case DialogInterface.BUTTON_POSITIVE:
-                            final int testBall = test.getTestBall();
-                            final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
-                            long elapsedTime = 0;
-                            if (timerMode) {
-                                millisLeft = timerFragment.getMillisLeft();
-                                elapsedTime = test.time * 60000 - millisLeft;
-                            }
-                            long date = System.currentTimeMillis();
-
-                            if (userAnswersId == -1) {
-                                userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
-                                db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
-                            } else {
-                                db.updateUserAnswers(userAnswersId, test.getAnswers());
-                                db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
-                            }
-
-
-                            if (resumed) {
-                                SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor = preferences.edit();
-                                editor.remove(Test.TEST_ID);
-                                editor.remove(Extra.USER_ANSWERS_ID);
-                                editor.remove(Extra.QUESTION_NUMBER);
-                                editor.apply();
-                            }
-                            showTestResults(testBall, znoBall);
-                            break;
-                    }
-                }
-            });
-            dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
-            dialogBuilder.setCancelable(false);
-            dialogBuilder.create().show();
-        } else {
-            showConfirmFinishTestAlert();
+    @Override
+    public void onTick(long millisInFuture) {
+        int minutesLeft = (int) (millisInFuture / 60000);
+        if (minutesLeft % 30 == 0
+                || (minutesLeft < 30 && minutesLeft % 10 == 0)
+                || (minutesLeft < 10 && minutesLeft % 5 == 0)) {
+            showTimerFragment();
+        }
+        if (minutesLeft == 10) {
+            timerAction.setIcon(getResources().getDrawable(R.drawable.ic_action_time_low));
         }
     }
 
-    public void showConfirmFinishTestAlert() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setMessage(getString(R.string.want_to_finish));
-        dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        final int testBall = test.getTestBall();
-                        final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
-                        long elapsedTime = 0;
-                        if (timerMode) {
-                            millisLeft = timerFragment.getMillisLeft();
-                            elapsedTime = test.time * 60000 - millisLeft;
-                        }
-                        long date = System.currentTimeMillis();
-
-                        if (userAnswersId == -1) {
-                            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
-                            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
-                        } else {
-                            db.updateUserAnswers(userAnswersId, test.getAnswers());
-                            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
-                        }
-
-                        if (resumed) {
-                            SharedPreferences preferences = getSharedPreferences(app.APP_SETTINGS, Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = preferences.edit();
-                            editor.remove(Test.TEST_ID);
-                            editor.remove(Extra.USER_ANSWERS_ID);
-                            editor.remove(Extra.QUESTION_NUMBER);
-                            if (preferences.contains(TestTimerFragment.MILLIS_LEFT)) {
-                                editor.remove(TestTimerFragment.MILLIS_LEFT);
-                            }
-                            editor.apply();
-                        }
-                        showTestResults(testBall, znoBall);
-                        break;
-                }
-            }
-        });
-        dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
-        dialogBuilder.setCancelable(false);
-        dialogBuilder.create().show();
-    }
-
-    public void showTestResults(int testBall, float znoBall) {
+    @Override
+    public void onFinish() {
+        final int testBall = test.getTestBall();
+        final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
+        long elapsedTime = 0;
         if (timerMode) {
-            timerFragment.cancel();
+            millisLeft = timerFragment.getMillisLeft();
+            elapsedTime = test.time * 60000 - millisLeft;
         }
+        long date = System.currentTimeMillis();
+
+        if (userAnswersId == -1) {
+            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
+            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+        } else {
+            db.updateUserAnswers(userAnswersId, test.getAnswers());
+            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+        }
+
+        if (userAnswersId != -1 || resumed) {
+            removeSavedPref();
+        }
+
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setMessage("Тест Завершено!\nтестовий бал: " + testBall + "\n" + "рейтинговий бал: " + znoBall + "\nподивитися помилки?");
         dialogBuilder.setPositiveButton("Так", new DialogInterface.OnClickListener() {
@@ -469,50 +372,72 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         dialogBuilder.create().show();
     }
 
-    @Override
-    public void onTick(long millisInFuture) {
-        int minutesLeft = (int) (millisInFuture / 60000);
-        if (minutesLeft % 30 == 0
-                || (minutesLeft < 30 && minutesLeft % 10 == 0)
-                || (minutesLeft < 10 && minutesLeft % 5 == 0)) {
-            showTimerFragment();
+    public void showAlert(int type) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+        DialogInterface.OnClickListener finish = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        onFinish();
+                        break;
+                }
+            }
+        };
+
+        DialogInterface.OnClickListener cancel = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        cancelTest();
+                        break;
+                }
+            }
+        };
+
+        switch (type) {
+            case FINISH_ALERT:
+                if (test.hasUnAnsweredQuestions()) {
+                    String message = getString(R.string.has_unanswered_questions);
+                    message += "\n" +getString(R.string.want_to_finish);
+                    dialogBuilder.setMessage(message);
+                } else {
+                    dialogBuilder.setMessage(R.string.want_to_finish);
+                }
+                dialogBuilder.setPositiveButton(R.string.dialog_positive_text, finish);
+                break;
+            case CANCEL_ALERT:
+                dialogBuilder.setMessage(R.string.cancel_test_confirm);
+                dialogBuilder.setPositiveButton(R.string.dialog_positive_text, cancel);
+                break;
         }
-        if (minutesLeft == 10) {
-            timerAction.setIcon(getResources().getDrawable(R.drawable.ic_action_time_low));
-        }
+
+        dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
+        dialogBuilder.create().show();
     }
 
-    @Override
-    public void onFinish() {
-        final int testBall = test.getTestBall();
-        final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
-        long elapsedTime = 0;
-        if (timerMode) {
-            millisLeft = timerFragment.getMillisLeft();
-            elapsedTime = test.time * 60000 - millisLeft;
+    public void cancelTest() {
+        if (userAnswersId != -1) {
+            db.deleteUserAnswers(userAnswersId);
         }
-        long date = System.currentTimeMillis();
-
-        if (userAnswersId == -1) {
-            userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
-            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
-        } else {
-            db.updateUserAnswers(userAnswersId, test.getAnswers());
-            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
-        }
-
         if (resumed) {
-            SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.remove(Test.TEST_ID);
-            editor.remove(Extra.USER_ANSWERS_ID);
-            editor.remove(Extra.QUESTION_NUMBER);
-            if (preferences.contains(TestTimerFragment.MILLIS_LEFT)) {
-                editor.remove(TestTimerFragment.MILLIS_LEFT);
-            }
-            editor.apply();
+            Intent main = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(main);
+            removeSavedPref();
         }
-        showTestResults(testBall, znoBall);
+        finish();
+    }
+
+    public void removeSavedPref() {
+        SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(Test.TEST_ID);
+        editor.remove(Extra.USER_ANSWERS_ID);
+        editor.remove(Extra.QUESTION_NUMBER);
+        editor.remove(TestTimerFragment.MILLIS_LEFT);
+        editor.apply();
     }
 
     public void showTimerFragment() {
