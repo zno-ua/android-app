@@ -21,7 +21,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     ZNODataBaseHelper db;
     String[] quotes;
-    String quoteTitle;
     TextView quote;
     TextView logo;
 
@@ -33,8 +32,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         quote = (TextView) findViewById(R.id.quote);
         logo = (TextView) findViewById(R.id.app_logo);
         ZNOApplication.buildLogo(logo, getResources(), getAssets());
-        quotes = getResources().getStringArray(R.array.quotes_2011);
-        quoteTitle = getResources().getString(R.string.quotes_2011_title);
+        quotes = getResources().getStringArray(R.array.quotes);
         db = ZNOApplication.getInstance().getZnoDataBaseHelper();
         findViewById(R.id.begin_testing_btn).setOnClickListener(this);
         findViewById(R.id.records_btn).setOnClickListener(this);
@@ -91,12 +89,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     public void refreshQuote() {
-        String text = quoteTitle + "<br>";
-        Random rand = new Random();
-        int num = rand.nextInt(quotes.length);
-        text += quotes[num];
-        quote.setText(Html.fromHtml(text));
-
+        quote.setText(Html.fromHtml(quotes[new Random().nextInt(quotes.length)]));
     }
 
     @Override
