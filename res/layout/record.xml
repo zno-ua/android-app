@@ -20,21 +20,18 @@
             android:id="@+id/lesson_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ukrainian"
-            style="@style/TestName" />
+            style="@style/LessonName" />
 
         <TextView
-            android:id="@+id/test_properties"
+            android:id="@+id/year_and_session"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2014, I session"
             style="@style/TestProperties" />
 
         <TextView
-            android:id="@+id/additional_info"
+            android:id="@+id/date_and_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Passed 4 january 10 minutes"
             style="@style/TestProperties" />
 
     </LinearLayout>
@@ -59,7 +56,6 @@
                 android:id="@+id/record_ball"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="140"
                 style="@style/RecordBall" />
         </LinearLayout>
 

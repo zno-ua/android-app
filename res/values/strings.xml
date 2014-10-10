@@ -65,6 +65,7 @@
     <string name="timer_one_minute">Залишилась %d хвилина</string>
     <string name="timer_two_four_minutes">Залишилось %d хвилини</string>
     <string name="timer_minutes">Залишилось %d хвилин</string>
+    <string name="passed">Пройдено </string>
 
     <string-array name="months">
         <item>січня</item>

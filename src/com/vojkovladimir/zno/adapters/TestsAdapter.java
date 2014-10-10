@@ -80,7 +80,7 @@ public class TestsAdapter extends BaseAdapter {
 			viewHolder.testName = (TextView) testItem
 					.findViewById(R.id.test_name);
 			viewHolder.testProperties = (TextView) testItem
-					.findViewById(R.id.test_properties);
+					.findViewById(R.id.year_and_session);
 			viewHolder.downloadFrame = (View) testItem
 					.findViewById(R.id.test_download_image);
 			testItem.setTag(viewHolder);
