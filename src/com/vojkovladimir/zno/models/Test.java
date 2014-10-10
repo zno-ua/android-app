@@ -12,7 +12,7 @@ public class Test extends TestInfo {
     public ArrayList<Question> questions;
 
     public Test(TestInfo testInfo, ArrayList<Question> questions) {
-        super(testInfo);
+    super(testInfo);
         this.questions = questions;
     }
 

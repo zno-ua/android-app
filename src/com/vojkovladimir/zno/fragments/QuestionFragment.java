@@ -586,7 +586,7 @@ public class QuestionFragment extends Fragment {
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
                     userAnswer = String.valueOf(seekBar.getProgress());
-                    callBack.onAnswerSelected(idOnTest, userAnswer, false);
+                    callBack.onAnswerSelected(idOnTest, userAnswer, true);
                 }
 
                 @Override

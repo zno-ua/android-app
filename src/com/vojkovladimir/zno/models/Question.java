@@ -43,7 +43,7 @@ public class Question {
                 this.userAnswer += "0";
             }
         } else {
-            this.userAnswer = new String();
+            this.userAnswer = "";
         }
     }
 
@@ -114,8 +114,6 @@ public class Question {
         switch (type) {
             case TYPE_3:
                 return !userAnswer.contains("0");
-            case TYPE_2:
-                return balls != 0;
             default:
                 return !userAnswer.isEmpty();
         }

@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,7 +27,6 @@ import com.vojkovladimir.zno.adapters.QuestionsGridAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.fragments.QuestionFragment;
 import com.vojkovladimir.zno.fragments.TestTimerFragment;
-import com.vojkovladimir.zno.models.Question;
 import com.vojkovladimir.zno.models.Test;
 
 public class TestActivity extends FragmentActivity implements QuestionFragment.OnAnswerSelectedListener, TestTimerFragment.OnTimerStates {
@@ -47,6 +47,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         String TIMER_MODE = "timer_mode";
         String RESUMED = "resumed";
         String QUESTION_NUMBER = "q_num";
+        String ASK_TO_FINISH = "ask_to_finish";
     }
 
     ZNOApplication app;
@@ -54,6 +55,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     boolean viewMode;
     boolean resumed;
+    boolean askToFinish;
 
     boolean timerMode;
     long millisLeft;
@@ -123,6 +125,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 resumed = intent.getBooleanExtra(Extra.RESUMED, false);
                 timerMode = false;
             }
+            askToFinish = true;
         } else {
             int testId = savedInstanceState.getInt(Test.TEST_ID);
             userAnswersId = savedInstanceState.getInt(Extra.USER_ANSWERS_ID);
@@ -137,6 +140,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                     millisLeft = savedInstanceState.getLong(TestTimerFragment.MILLIS_LEFT);
                 }
             }
+            askToFinish = savedInstanceState.getBoolean(Extra.ASK_TO_FINISH);
         }
 
         mPager = (ViewPager) findViewById(R.id.test_question_pager);
@@ -183,6 +187,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         outState.putInt(Extra.USER_ANSWERS_ID, userAnswersId);
         outState.putBoolean(Extra.VIEW_MODE, viewMode);
         outState.putBoolean(Extra.RESUMED, resumed);
+        outState.putBoolean(Extra.ASK_TO_FINISH, askToFinish);
         super.onSaveInstanceState(outState);
     }
 
@@ -293,8 +298,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                     mPager.setCurrentItem(mPager.getCurrentItem() + 1);
                 }
             } else {
-                Question question = test.questions.get(test.questions.size() - 1);
-                if (question.type == Question.TYPE_2 && question.balls != 0 && !question.userAnswer.isEmpty()) {
+                if (askToFinish) {
                     showAlert(FINISH_ALERT);
                 }
             }
@@ -375,6 +379,28 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     public void showAlert(int type) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
+        DialogInterface.OnClickListener resume = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        askToFinish = false;
+                        break;
+                }
+            }
+        };
+
+        DialogInterface.OnClickListener resumeWithAsk = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        askToFinish = true;
+                        break;
+                }
+            }
+        };
+
         DialogInterface.OnClickListener finish = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
@@ -401,20 +427,21 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             case FINISH_ALERT:
                 if (test.hasUnAnsweredQuestions()) {
                     String message = getString(R.string.has_unanswered_questions);
-                    message += "\n" +getString(R.string.want_to_finish);
+                    message += "\n" + getString(R.string.want_to_finish);
                     dialogBuilder.setMessage(message);
+                    dialogBuilder.setNegativeButton(R.string.dialog_negative_text, resumeWithAsk);
                 } else {
                     dialogBuilder.setMessage(R.string.want_to_finish);
+                    dialogBuilder.setNegativeButton(R.string.dialog_negative_text, resume);
                 }
                 dialogBuilder.setPositiveButton(R.string.dialog_positive_text, finish);
                 break;
             case CANCEL_ALERT:
                 dialogBuilder.setMessage(R.string.cancel_test_confirm);
                 dialogBuilder.setPositiveButton(R.string.dialog_positive_text, cancel);
+                dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
                 break;
         }
-
-        dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
         dialogBuilder.create().show();
     }
 
