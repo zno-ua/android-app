@@ -448,11 +448,11 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     public void cancelTest() {
         if (userAnswersId != -1) {
             db.deleteUserAnswers(userAnswersId);
+            removeSavedPref();
         }
         if (resumed) {
             Intent main = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(main);
-            removeSavedPref();
         }
         finish();
     }
