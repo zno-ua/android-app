@@ -2,8 +2,10 @@ package com.vojkovladimir.zno.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -15,6 +17,7 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +25,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -42,10 +47,37 @@ import java.util.regex.Pattern;
 
 public class QuestionFragment extends Fragment {
 
-    private static final char ENG_LETTER = 65;
-    private static final char UKR_LETTER = 1040;
-    private static final String FIRST_LETTER = "first_letter";
-    private static final String ID_ON_TEST = "id_on_test";
+    static final char ENG_LETTER = 65;
+    static final char UKR_LETTER = 1040;
+    static final String FIRST_LETTER = "first_letter";
+    static final String ID_ON_TEST = "id_on_test";
+    static final String HTML_FORMAT = "<html>" +
+            "      <head>" +
+            "            <style>" +
+            "                  body {" +
+            "                        color: #666666;" +
+            "                  }" +
+            "                  table {" +
+            "                        margin: 10px 0;" +
+            "                        display: block;" +
+            "                        border: 1px solid #DBDBDB;" +
+            "                  }" +
+            "                  table td {" +
+            "                        vertical-align: top;" +
+            "                        padding: 10px;" +
+            "                        border-right: 1px solid #DBDBDB;" +
+            "                  }" +
+            "                  table td:last-child {" +
+            "                        border-right: none !important;" +
+            "                  }" +
+            "            </style>" +
+            "      </head>" +
+            "      <body>%s</body>" +
+            "</html>";
+
+    public interface OnAnswerSelectedListener {
+        void onAnswerSelected(int id, String answer, boolean switchToNext);
+    }
 
     int idOnTest;
     int id;
@@ -58,16 +90,11 @@ public class QuestionFragment extends Fragment {
     int type;
     int balls;
     char firstLetter;
-    boolean viewMode;
 
+    boolean viewMode;
+    OnAnswerSelectedListener callBack;
     FileManager fm;
     Resources res;
-
-    OnAnswerSelectedListener callBack;
-
-    public interface OnAnswerSelectedListener {
-        void onAnswerSelected(int id, String answer, boolean switchToNext);
-    }
 
     public static QuestionFragment newInstance(boolean viewMode, int idOnTest, Question question, int taskAll, int lessonId) {
         QuestionFragment f = new QuestionFragment();
@@ -555,11 +582,36 @@ public class QuestionFragment extends Fragment {
     }
 
     private View createQuestionText(LayoutInflater inflater, ViewGroup container) {
-        TextView questionText = (TextView) inflater.inflate(R.layout.question_text, container, false);
-        questionText.setText(Html.fromHtml(question, imgGetter, null));
-        questionText.setMovementMethod(LinkMovementMethod.getInstance());
+        if (question.contains("<table")) {
+            View view = inflater.inflate(R.layout.question_text_web, container, false);
+            String path = "src=\"file://" + getActivity().getApplicationContext().getFilesDir().getPath();
+            String body = question.replace("src=\"", path);
+            WebView webText = (WebView) view.findViewById(R.id.question_text);
+            webText.setWebViewClient(new WebViewClient() {
 
-        return questionText;
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    if (url.contains("open.image")) {
+                        Intent viewImg = new Intent(Intent.ACTION_VIEW);
+                        viewImg.setData(Uri.parse(url));
+                        getActivity().startActivity(viewImg);
+                        return true;
+                    }
+                    return super.shouldOverrideUrlLoading(view, url);
+                }
+
+            });
+//            webText.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+            webText.setFocusable(false);
+            webText.setFocusableInTouchMode(false);
+            webText.loadDataWithBaseURL(null, String.format(HTML_FORMAT, body), "text/html", "utf-8", null);
+            return view;
+        } else {
+            TextView questionText = (TextView) inflater.inflate(R.layout.question_text, container, false);
+            questionText.setText(Html.fromHtml(question, imgGetter, null));
+            questionText.setMovementMethod(LinkMovementMethod.getInstance());
+            return questionText;
+        }
     }
 
     private View createStatementQuestionText(LayoutInflater inflater, ViewGroup container) {
