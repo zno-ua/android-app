@@ -10,10 +10,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,7 +27,8 @@ import com.vojkovladimir.zno.fragments.QuestionFragment;
 import com.vojkovladimir.zno.fragments.TestTimerFragment;
 import com.vojkovladimir.zno.models.Test;
 
-public class TestActivity extends FragmentActivity implements QuestionFragment.OnAnswerSelectedListener, TestTimerFragment.OnTimerStates {
+public class TestActivity extends FragmentActivity implements QuestionFragment.OnAnswerSelectedListener,
+        TestTimerFragment.OnTimeChangedListener {
 
     final int FINISH_ALERT = 0;
     final int CANCEL_ALERT = 1;
@@ -69,9 +68,9 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     PagerAdapter mPagerAdapter;
     GridView questionsGrid;
 
-    FragmentManager fm;
+    FragmentManager manager;
     TestTimerFragment timerFragment;
-    Handler timerFragmentHandler;
+    Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +83,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
         app = ZNOApplication.getInstance();
         db = app.getZnoDataBaseHelper();
+        manager = getSupportFragmentManager();
 
         int startItemNum = 0;
 
@@ -141,6 +141,13 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 }
             }
             askToFinish = savedInstanceState.getBoolean(Extra.ASK_TO_FINISH);
+            if (timerMode) {
+                timerFragment = (TestTimerFragment) manager.getFragment(savedInstanceState, TestTimerFragment.TAG);
+            }
+        }
+
+        if (timerMode && timerFragment == null) {
+            timerFragment = TestTimerFragment.newInstance(millisLeft);
         }
 
         mPager = (ViewPager) findViewById(R.id.test_question_pager);
@@ -158,8 +165,8 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 hideQuestionsGrid();
             }
         });
-        fm = getSupportFragmentManager();
-        timerFragmentHandler = new Handler();
+
+        handler = new Handler();
     }
 
     @Override
@@ -188,26 +195,17 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         outState.putBoolean(Extra.VIEW_MODE, viewMode);
         outState.putBoolean(Extra.RESUMED, resumed);
         outState.putBoolean(Extra.ASK_TO_FINISH, askToFinish);
+        if (timerMode) {
+            manager.putFragment(outState, TestTimerFragment.TAG, timerFragment);
+        }
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (timerMode) {
-            timerFragment = TestTimerFragment.newInstance(millisLeft);
-            showTimerFragment();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (timerMode) {
-            timerFragment.cancel();
-            FragmentTransaction ft = fm.beginTransaction();
-            ft.remove(timerFragment);
-            ft.commitAllowingStateLoss();
+        if (timerMode && timerFragment != null) {
+            showHideTimer();
         }
     }
 
@@ -254,12 +252,27 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                 showAlert(FINISH_ALERT);
                 return true;
             case R.id.action_time:
-                showTimerFragment();
+                if (timerMode && timerFragment != null) {
+                    showHideTimer();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (viewMode) {
+            if (resumed) {
+                Intent main = new Intent(this, MainActivity.class);
+                startActivity(main);
+            }
+            finish();
+        } else {
+            showAlert(CANCEL_ALERT);
+        }
     }
 
     private void showQuestionsGrid() {
@@ -274,19 +287,6 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         questionsGrid.setVisibility(View.INVISIBLE);
         mPager.setVisibility(View.VISIBLE);
         questionsGridVisible = false;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (viewMode) {
-            if (resumed) {
-                Intent main = new Intent(this, MainActivity.class);
-                startActivity(main);
-            }
-            finish();
-        } else {
-            showAlert(CANCEL_ALERT);
-        }
     }
 
     @Override
@@ -306,25 +306,139 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     }
 
     @Override
-    public void onTick(long millisInFuture) {
-        int minutesLeft = (int) (millisInFuture / 60000);
+    public void onTimeIsUp() {
+        millisLeft = 0;
+        finishTest();
+    }
+
+    @Override
+    public void onMinutePassed(long millisLeft) {
+        int minutesLeft = (int) (millisLeft / 60000);
         if (minutesLeft % 30 == 0
                 || (minutesLeft < 30 && minutesLeft % 10 == 0)
                 || (minutesLeft < 10 && minutesLeft % 5 == 0)) {
-            showTimerFragment();
+            showHideTimer();
         }
         if (minutesLeft == 10) {
             timerAction.setIcon(getResources().getDrawable(R.drawable.ic_action_time_low));
         }
     }
 
-    @Override
-    public void onFinish() {
+    public void showHideTimer() {
+        final Runnable hide = new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing() || !isDestroyed()) {
+                    manager.beginTransaction()
+                            .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
+                            .hide(timerFragment)
+                            .commitAllowingStateLoss();
+                }
+            }
+        };
+        if (timerFragment.isAdded()) {
+            if (timerFragment.isHidden()) {
+                manager.beginTransaction()
+                        .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
+                        .show(timerFragment)
+                        .commit();
+                handler.postDelayed(hide, TestTimerFragment.SHOW_TIME);
+            } else if (timerFragment.isVisible()) {
+                handler.postDelayed(hide, TestTimerFragment.SHOW_TIME);
+            } else {
+                manager.beginTransaction()
+                        .hide(timerFragment)
+                        .commit();
+                manager.beginTransaction()
+                        .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
+                        .show(timerFragment)
+                        .commit();
+                handler.postDelayed(hide, TestTimerFragment.SHOW_TIME);
+            }
+        } else {
+            manager.beginTransaction()
+                    .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
+                    .add(R.id.test_content_container, timerFragment, TestTimerFragment.TAG)
+                    .commit();
+            handler.postDelayed(hide, TestTimerFragment.SHOW_TIME);
+        }
+
+    }
+
+    public void showAlert(int type) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+        DialogInterface.OnClickListener resume = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        askToFinish = false;
+                        break;
+                }
+            }
+        };
+
+        DialogInterface.OnClickListener resumeWithAsk = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        askToFinish = true;
+                        break;
+                }
+            }
+        };
+
+        DialogInterface.OnClickListener finish = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        finishTest();
+                        break;
+                }
+            }
+        };
+
+        DialogInterface.OnClickListener cancel = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        cancelTest();
+                        break;
+                }
+            }
+        };
+
+        switch (type) {
+            case FINISH_ALERT:
+                if (test.hasUnAnsweredQuestions()) {
+                    String message = getString(R.string.has_unanswered_questions);
+                    message += "\n" + getString(R.string.want_to_finish);
+                    dialogBuilder.setMessage(message);
+                    dialogBuilder.setNegativeButton(R.string.dialog_negative_text, resumeWithAsk);
+                } else {
+                    dialogBuilder.setMessage(R.string.want_to_finish);
+                    dialogBuilder.setNegativeButton(R.string.dialog_negative_text, resume);
+                }
+                dialogBuilder.setPositiveButton(R.string.dialog_positive_text, finish);
+                break;
+            case CANCEL_ALERT:
+                dialogBuilder.setMessage(R.string.cancel_test_confirm);
+                dialogBuilder.setPositiveButton(R.string.dialog_positive_text, cancel);
+                dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
+                break;
+        }
+        dialogBuilder.create().show();
+    }
+
+    public void finishTest() {
         final int testBall = test.getTestBall();
         final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
         long elapsedTime = 0;
         if (timerMode) {
-            millisLeft = timerFragment.getMillisLeft();
             elapsedTime = test.time * 60000 - millisLeft;
         }
         long date = System.currentTimeMillis();
@@ -376,75 +490,6 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         dialogBuilder.create().show();
     }
 
-    public void showAlert(int type) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-
-        DialogInterface.OnClickListener resume = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        askToFinish = false;
-                        break;
-                }
-            }
-        };
-
-        DialogInterface.OnClickListener resumeWithAsk = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        askToFinish = true;
-                        break;
-                }
-            }
-        };
-
-        DialogInterface.OnClickListener finish = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        onFinish();
-                        break;
-                }
-            }
-        };
-
-        DialogInterface.OnClickListener cancel = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        cancelTest();
-                        break;
-                }
-            }
-        };
-
-        switch (type) {
-            case FINISH_ALERT:
-                if (test.hasUnAnsweredQuestions()) {
-                    String message = getString(R.string.has_unanswered_questions);
-                    message += "\n" + getString(R.string.want_to_finish);
-                    dialogBuilder.setMessage(message);
-                    dialogBuilder.setNegativeButton(R.string.dialog_negative_text, resumeWithAsk);
-                } else {
-                    dialogBuilder.setMessage(R.string.want_to_finish);
-                    dialogBuilder.setNegativeButton(R.string.dialog_negative_text, resume);
-                }
-                dialogBuilder.setPositiveButton(R.string.dialog_positive_text, finish);
-                break;
-            case CANCEL_ALERT:
-                dialogBuilder.setMessage(R.string.cancel_test_confirm);
-                dialogBuilder.setPositiveButton(R.string.dialog_positive_text, cancel);
-                dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
-                break;
-        }
-        dialogBuilder.create().show();
-    }
-
     public void cancelTest() {
         if (userAnswersId != -1) {
             db.deleteUserAnswers(userAnswersId);
@@ -465,30 +510,6 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         editor.remove(Extra.QUESTION_NUMBER);
         editor.remove(TestTimerFragment.MILLIS_LEFT);
         editor.apply();
-    }
-
-    public void showTimerFragment() {
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
-        if (!timerFragment.isAdded()) {
-            ft.add(R.id.test_content_container, timerFragment);
-        } else if (timerFragment.isHidden()) {
-            ft.show(timerFragment);
-        } else {
-            return;
-        }
-        ft.commitAllowingStateLoss();
-        timerFragmentHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (timerFragment.isAdded()) {
-                    FragmentTransaction ft = fm.beginTransaction();
-                    ft.setCustomAnimations(R.animator.fade_in, R.animator.fade_out);
-                    ft.hide(timerFragment);
-                    ft.commitAllowingStateLoss();
-                }
-            }
-        }, TestTimerFragment.SHOW_TIME);
     }
 
 }

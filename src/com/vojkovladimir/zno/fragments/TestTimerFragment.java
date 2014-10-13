@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +14,19 @@ import com.vojkovladimir.zno.R;
 
 public class TestTimerFragment extends Fragment {
 
+    public static final String TAG = "test_timer";
     public static final String MILLIS_LEFT = "millis_left";
     public static final int SHOW_TIME = 5000;
 
+    public interface OnTimeChangedListener {
+        void onTimeIsUp();
+        void onMinutePassed(long millisLeft);
+    }
+
+    TextView timerText;
+    Timer timer;
     long millisLeft;
-    CountDownTimer timer;
-    OnTimerStates callBack;
+    OnTimeChangedListener callBack;
 
     public static TestTimerFragment newInstance(long millisLeft) {
         TestTimerFragment f = new TestTimerFragment();
@@ -33,7 +39,7 @@ public class TestTimerFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        callBack = (OnTimerStates) activity;
+        callBack = (OnTimeChangedListener) activity;
     }
 
     @Override
@@ -44,40 +50,18 @@ public class TestTimerFragment extends Fragment {
         } else {
             millisLeft = getArguments().getLong(MILLIS_LEFT);
         }
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final TextView timeText = (TextView) inflater.inflate(R.layout.timer, container, false);
-        timeText.setText(getTimerText(millisLeft));
-        if (millisLeft / 60000 <= 10) {
-            timeText.setBackgroundColor(getResources().getColor(R.color.red));
-        }
-        timer = new CountDownTimer(millisLeft, 1000) {
-            @Override
-            public void onTick(long millisInFuture) {
-                millisLeft = millisInFuture;
-                if ((millisInFuture % 60000) / 1000 == 0) {
-                    timeText.setText(getTimerText(millisInFuture));
-                    if (millisInFuture / 60000 <= 10) {
-                        timeText.setBackgroundColor(getResources().getColor(R.color.red));
-                    }
-                    callBack.onTick(millisInFuture);
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                callBack.onFinish();
-            }
-        };
-        return timeText;
+        timerText = (TextView) inflater.inflate(R.layout.timer, container, false);
+        timerText.setText(getTimerText(millisLeft));
+        return timerText;
     }
 
     private String getTimerText(long millisLeft) {
         int minutes = (int) (millisLeft / 60000);
-        if (minutes >= 20 || (minutes >= 0 && minutes <10)) {
+        if (minutes >= 20 || (minutes >= 0 && minutes < 10)) {
             switch (minutes % 10) {
                 case 1:
                     return String.format(getResources().getString(R.string.timer_one_minute), minutes);
@@ -91,9 +75,16 @@ public class TestTimerFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(MILLIS_LEFT, millisLeft);
+    }
+
+    @Override
     public void onStart() {
-        timer.start();
         super.onStart();
+        timer = new Timer(millisLeft);
+        timer.start();
     }
 
     @Override
@@ -106,13 +97,32 @@ public class TestTimerFragment extends Fragment {
         return millisLeft;
     }
 
-    public void cancel() {
-        timer.cancel();
-    }
+    class Timer extends CountDownTimer {
 
-    public interface OnTimerStates {
-        void onTick(long millisInFuture);
-        void onFinish();
+        private static final long COUNT_DOWN_INTERVAL = 1000;
+
+        public Timer(long millisInFuture) {
+            super(millisInFuture, COUNT_DOWN_INTERVAL);
+            millisLeft = millisInFuture;
+        }
+
+        @Override
+        public void onTick(long millisInFuture) {
+            millisLeft = millisInFuture;
+            if ((millisInFuture % 60000) / 1000 == 0) {
+                timerText.setText(getTimerText(millisInFuture));
+                callBack.onMinutePassed(millisInFuture);
+            }
+            if (millisInFuture / 60000 <= 10) {
+                timerText.setBackgroundColor(getResources().getColor(R.color.red));
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            callBack.onTimeIsUp();
+        }
+
     }
 
 }
