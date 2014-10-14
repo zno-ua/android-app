@@ -256,6 +256,15 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                     showHideTimer();
                 }
                 return true;
+            case R.id.action_share:
+                /*
+                    Write share
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);*/
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

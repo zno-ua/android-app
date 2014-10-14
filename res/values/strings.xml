@@ -30,7 +30,6 @@
     <string name="question">Запитання</string>
     <string name="answer_three_correct">Введіть 3 цифри, які ви вважаєте вірними (в будь-якому порядку):</string>
     <string name="answer_short">Введіть відповідь:</string>
-    <string name="action_questions_list">Список питань</string>
     <string name="parent_question_text_show">Натисніть для відображення тексту.</string>
     <string name="choose_ball">Оберіть бал, на який розраховуєте:</string>
     <string name="chosen_ball">Обраний бал — </string>
@@ -40,6 +39,12 @@
     <string name="correct_combination_text">Вірна комбінація:</string>
     <string name="unfinished_test_alert_text">Є незавершений тест! Бажаєте його продовжити?</string>
     <string name="start_with_tracking_time">Розпочати тест з урахуванням часу?</string>
+
+    <!-- Action -->
+    <string name="action_questions_list">Список питань</string>
+    <string name="action_finish_testing">Завершити тестування</string>
+    <string name="action_time">Залишок часу</string>
+    <string name="action_share">Поділитися</string>
 
     <!--TestActivity-->
     <string name="cancel_test_confirm">Завершити тестування без збереження відповідей?</string>
@@ -54,14 +59,12 @@
     <string name="error_timeout">Неможливо завантажити тест \nСпробуйте пізніше </string>
     <string name="error_server_bad">Помилка серверу</string>
 
-    <string name="action_finish_testing">Завершити тестування</string>
     <string name="statement_text_grid_item">П</string>
     <string name="want_to_finish">Бажаєте завершити?</string>
     <string name="has_unanswered_questions">Ви відповіли не на всі запитання!</string>
     <string name="empty_list">Не має результатів :(</string>
 
     <!-- Timer -->
-    <string name="action_time">Залишок часу</string>
     <string name="timer_one_minute">Залишилась %d хвилина</string>
     <string name="timer_two_four_minutes">Залишилось %d хвилини</string>
     <string name="timer_minutes">Залишилось %d хвилин</string>

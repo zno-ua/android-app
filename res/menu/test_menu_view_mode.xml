@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_action_share"
+        android:showAsAction="always"
+        android:title="@string/action_share" />
+
+    <item
         android:id="@+id/action_questions_list"
         android:icon="@drawable/ic_action_questions_list"
         android:showAsAction="always"
