@@ -17,7 +17,6 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +53,9 @@ public class QuestionFragment extends Fragment {
     static final String HTML_FORMAT = "<html>" +
             "      <head>" +
             "            <style>" +
+            "                  img {" +
+            "                       max-width: 100%%;" +
+            "                  }" +
             "                  body {" +
             "                        color: #666666;" +
             "                  }" +
@@ -61,6 +63,9 @@ public class QuestionFragment extends Fragment {
             "                        margin: 10px 0;" +
             "                        display: block;" +
             "                        border: 1px solid #DBDBDB;" +
+            "                  }" +
+            "                  table img {" +
+            "                       max-width: none !important;" +
             "                  }" +
             "                  table td {" +
             "                        vertical-align: top;" +
@@ -601,10 +606,9 @@ public class QuestionFragment extends Fragment {
                 }
 
             });
-//            webText.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
             webText.setFocusable(false);
             webText.setFocusableInTouchMode(false);
-            webText.loadDataWithBaseURL(null, String.format(HTML_FORMAT, body), "text/html", "utf-8", null);
+            webText.loadDataWithBaseURL(null, String.format(HTML_FORMAT, body) , "text/html", "utf-8", null);
             return view;
         } else {
             TextView questionText = (TextView) inflater.inflate(R.layout.question_text, container, false);
