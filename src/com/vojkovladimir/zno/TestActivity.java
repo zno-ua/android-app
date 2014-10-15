@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
@@ -80,6 +81,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
         }
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         app = ZNOApplication.getInstance();
         db = app.getZnoDataBaseHelper();
