@@ -391,7 +391,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         }
 
         JSONObject ball;
-        String ballsArray = new String();
+        String ballsArray = "";
         values.clear();
 
         for (int i = 0; i < testBalls.length(); i++) {
@@ -401,6 +401,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
         values.put(KEY_BALLS, ballsArray);
         values.put(KEY_LOADED, 1);
+        values.put(KEY_LAST_UPDATE, System.currentTimeMillis() / 1000);
         status = db.update(TABLE_TESTS, values, KEY_ID + "=" + testId, null);
         db.close();
 
