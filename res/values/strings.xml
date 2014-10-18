@@ -39,6 +39,7 @@
     <string name="correct_combination_text">Вірна комбінація:</string>
     <string name="unfinished_test_alert_text">Є незавершений тест! Бажаєте його продовжити?</string>
     <string name="start_with_tracking_time">Розпочати тест з урахуванням часу?</string>
+    <string name="unanswered_question_warning">Ви не відповіли на це запитання</string>
 
     <!-- Action -->
     <string name="action_questions_list">Список питань</string>
@@ -49,15 +50,17 @@
     <!--TestActivity-->
     <string name="cancel_test_confirm">Завершити тестування без збереження відповідей?</string>
 
-    <!-- Downloading Progress -->
+    <!-- Downloading Test Massage -->
     <string name="progress_test_load">Завантаження тесту</string>
+    <string name="progress_test_save">Збереження тесту</string>
     <string name="progress_test_load_images">Завантаження зображень</string>
-    <string name="unanswered_question_warning">Ви не відповіли на це запитання</string>
+    <string name="test_load_complete">Тест Завантажено</string>
 
     <!-- Downloading Errors -->
     <string name="error_no_connection">Відсутнє з\'єднання з інтернетом</string>
     <string name="error_timeout">Неможливо завантажити тест \nСпробуйте пізніше </string>
     <string name="error_server_bad">Помилка серверу</string>
+    <string name="error_unknown">Невідома помилка</string>
 
     <string name="statement_text_grid_item">П</string>
     <string name="want_to_finish">Бажаєте завершити?</string>

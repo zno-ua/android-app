@@ -1,5 +1,6 @@
 package com.vojkovladimir.zno;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -22,7 +23,6 @@ import android.widget.Toast;
 import com.android.volley.NoConnectionError;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
-import com.android.volley.VolleyError;
 import com.vojkovladimir.zno.adapters.TestsAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.models.Lesson;
@@ -30,9 +30,9 @@ import com.vojkovladimir.zno.models.Test;
 import com.vojkovladimir.zno.models.TestInfo;
 import com.vojkovladimir.zno.service.ApiService;
 import com.vojkovladimir.zno.service.ApiService.ApiBinder;
-import com.vojkovladimir.zno.service.ApiService.TestDownloadingFeedBack;
+import com.vojkovladimir.zno.service.ApiService.TestDLCallBack;
 
-public class TestsActivity extends Activity {
+public class TestsActivity extends Activity implements TestDLCallBack, OnItemClickListener {
 
     final Context context = this;
 
@@ -42,7 +42,8 @@ public class TestsActivity extends Activity {
     ListView testsListView;
     TestsAdapter testsAdapter;
 
-    ProgressDialog downloadProgress;
+    ProgressDialog dlProgress;
+    AlertDialog dlCancelAlert;
 
     ApiService apiService;
     boolean apiBound = false;
@@ -64,92 +65,14 @@ public class TestsActivity extends Activity {
 
     };
 
-    OnItemClickListener itemListener = new OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-            final TestInfo test = (TestInfo) testsAdapter.getItem(position);
-
-            if (test.loaded) {
-                startTest(test.id);
-            } else {
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-
-                dialogBuilder.setMessage(R.string.dialog_load_test_text);
-                dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case DialogInterface.BUTTON_POSITIVE:
-                                downloadProgress = new ProgressDialog(context);
-                                downloadProgress.setCancelable(false);
-                                downloadProgress.setMessage(getResources().getString(R.string.progress_test_load));
-                                downloadProgress.show();
-                                apiService.downLoadTest(new TestDownloadingFeedBack() {
-
-                                    @Override
-                                    public void onTestLoaded() {
-                                        runOnUiThread(new Runnable() {
-                                            public void run() {
-                                                invalidate();
-                                            }
-                                        });
-                                        downloadProgress.dismiss();
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                startTest(test.id);
-                                            }
-                                        });
-                                    }
-
-                                    @Override
-                                    public void onError(Exception e) {
-                                        downloadProgress.dismiss();
-                                        if (e instanceof VolleyError) {
-                                            if (e instanceof NoConnectionError) {
-                                                Toast.makeText(context, getString(R.string.error_no_connection), Toast.LENGTH_SHORT).show();
-                                            } else if (e instanceof TimeoutError) {
-                                                Toast.makeText(context, getString(R.string.error_timeout), Toast.LENGTH_SHORT).show();
-                                            } else if (e instanceof ServerError) {
-                                                Toast.makeText(context, getString(R.string.error_server_bad), Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                        e.printStackTrace();
-                                    }
-
-                                    @Override
-                                    public void onExtraDownloadingStart(int max) {
-                                        downloadProgress.dismiss();
-                                        downloadProgress = new ProgressDialog(context);
-                                        downloadProgress.setCancelable(false);
-                                        downloadProgress.setMessage(getResources().getString(R.string.progress_test_load_images));
-                                        downloadProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                                        downloadProgress.setMax(max);
-                                        downloadProgress.setProgress(0);
-                                        downloadProgress.show();
-                                    }
-
-                                    @Override
-                                    public void onExtraDownloadingProgressInc() {
-                                        downloadProgress.incrementProgressBy(1);
-                                    }
-                                }, test.id);
-                                break;
-                        }
-                    }
-                });
-                dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
-                dialogBuilder.create().show();
-            }
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tests);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar bar = getActionBar();
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
 
         app = ZNOApplication.getInstance();
         db = app.getZnoDataBaseHelper();
@@ -161,7 +84,17 @@ public class TestsActivity extends Activity {
         testsAdapter = new TestsAdapter(this, db.getLessonTests(idLesson));
         testsListView = (ListView) findViewById(R.id.tests_list_view);
         testsListView.setAdapter(testsAdapter);
-        testsListView.setOnItemClickListener(itemListener);
+        testsListView.setOnItemClickListener(this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -181,13 +114,32 @@ public class TestsActivity extends Activity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
+    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+        final TestInfo test = (TestInfo) testsAdapter.getItem(position);
+
+        if (test.loaded) {
+            startTest(test.id);
+        } else {
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+            dialogBuilder.setMessage(R.string.dialog_load_test_text);
+            dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            dlProgress = new ProgressDialog(context);
+                            dlProgress.setMessage(getResources().getString(R.string.progress_test_load));
+                            dlProgress.setCancelable(false);
+                            dlProgress.show();
+                            apiService.downLoadTest(test.id, TestsActivity.this);
+                            break;
+                    }
+                }
+            });
+            dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
+            dialogBuilder.create().show();
         }
-        return super.onOptionsItemSelected(item);
     }
 
     public void invalidate() {
@@ -217,6 +169,82 @@ public class TestsActivity extends Activity {
             }
         });
         dialogBuilder.create().show();
+    }
+
+    @Override
+    public void onDownloadImagesStart(final int max) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dlProgress.dismiss();
+                dlProgress = new ProgressDialog(context);
+                dlProgress.setCancelable(false);
+                dlProgress.setMessage(getResources().getString(R.string.progress_test_load_images));
+                dlProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                dlProgress.setMax(max);
+                dlProgress.setProgress(0);
+                dlProgress.show();
+            }
+        });
+    }
+
+    @Override
+    public void onImageDownloaded() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dlProgress.incrementProgressBy(1);
+            }
+        });
+    }
+
+    @Override
+    public void onSavingTest() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dlProgress.dismiss();
+                dlProgress.setCancelable(false);
+                dlProgress = new ProgressDialog(context);
+                dlProgress.setMessage(getString(R.string.progress_test_save));
+                dlProgress.show();
+            }
+        });
+    }
+
+    @Override
+    public void onTestDownloaded() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                dlProgress.dismiss();
+                if (dlCancelAlert != null) {
+                    dlCancelAlert.dismiss();
+                }
+                invalidate();
+                Toast.makeText(getApplicationContext(), R.string.test_load_complete, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onError(final Exception e) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dlProgress.dismiss();
+                int msgId;
+                if (e instanceof NoConnectionError) {
+                    msgId = R.string.error_no_connection;
+                } else if (e instanceof TimeoutError) {
+                    msgId = R.string.error_timeout;
+                } else if (e instanceof ServerError) {
+                    msgId = R.string.error_server_bad;
+                } else {
+                    msgId = R.string.error_unknown;
+                }
+                Toast.makeText(context, msgId, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

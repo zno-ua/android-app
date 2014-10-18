@@ -5,13 +5,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.vojkovladimir.zno.FileManager;
 import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
@@ -21,17 +20,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class ApiService extends Service {
 
     private static final String SITE_URL = "http://zno-ua.net";
     private static final String API_URL = SITE_URL + "/api/v1/";
     //	private static final String GET_TESTS = "test/?format=json";
-    private static final String GET_TEST = "question/?format=json&test=";
-    private static final String GET_TEST_BALLS = "result/?format=json&test_id=%d&limit=0";
+    private static final String GET_TEST = API_URL + "question/?format=json&test=";
+    private static final String GET_TEST_BALLS = API_URL + "result/?format=json&test_id=%d&limit=0";
 
-    public static final String DOWNLOAD_TEST_ACTION = "api.download.test";
-    public static final String LOG_TAG = "MyLogs";
     public static final String REQUEST_TAG = "api_request";
 
     public static interface Keys {
@@ -61,129 +59,138 @@ public class ApiService extends Service {
         String ZNO_BALL = "zno_ball";
     }
 
-    public interface TestDownloadingFeedBack {
-        void onTestLoaded();
+    public interface TestDLCallBack {
+        void onDownloadImagesStart(int imagesCount);
+
+        void onImageDownloaded();
+
+        void onSavingTest();
+
+        void onTestDownloaded();
 
         void onError(Exception e);
-
-        void onExtraDownloadingStart(int max);
-
-        void onExtraDownloadingProgressInc();
     }
 
-    private final IBinder mBinder = new ApiBinder();
+    class DLTestThread extends Thread {
 
-    private ZNOApplication app;
-    private ZNODataBaseHelper db;
-    private FileManager fm;
+        int id;
+        TestDLCallBack callBack;
+
+        public DLTestThread(int id, TestDLCallBack callBack) {
+            this.id = id;
+            this.callBack = callBack;
+        }
+
+        @Override
+        public void run() {
+
+            ErrorListener errorListener = new ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    callBack.onError(volleyError);
+                }
+            };
+
+            try {
+                JSONArray questions = getQuestions(id, errorListener);
+                JSONArray balls = getBalls(id, errorListener);
+                ArrayList<String> imagesUrls = getImagesUrls(questions);
+                callBack.onDownloadImagesStart(imagesUrls.size());
+
+                for (String url : imagesUrls) {
+                    String path = url.substring(0, url.lastIndexOf('/'));
+                    String name = url.substring(url.lastIndexOf('/') + 1);
+                    Bitmap image = getImage(url, errorListener);
+                    fm.saveBitmap(path, name, image);
+                    callBack.onImageDownloaded();
+                }
+
+                callBack.onSavingTest();
+                db.updateQuestions(id, questions, balls);
+                callBack.onTestDownloaded();
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                callBack.onError(e);
+                e.printStackTrace();
+            } catch (JSONException e) {
+                callBack.onError(e);
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    final IBinder mBinder = new ApiBinder();
+    ZNOApplication app;
+    ZNODataBaseHelper db;
+    FileManager fm;
 
     @Override
     public void onCreate() {
         app = ZNOApplication.getInstance();
         db = app.getZnoDataBaseHelper();
         fm = new FileManager(getApplicationContext());
-        Log.i(LOG_TAG, "ApiService: started");
         super.onCreate();
     }
 
-    public void downLoadTest(final TestDownloadingFeedBack feedBack, final int id) {
-        final ErrorListener errorListener = new ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i(LOG_TAG, error.toString());
-                app.cancelPendingRequests(REQUEST_TAG);
-                feedBack.onError(error);
-            }
-        };
-
-        Listener<JSONObject> testListener = new Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(final JSONObject testResponse) {
-
-                Listener<JSONObject> testBallsListener = new Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject ballsResponse) {
-                        try {
-                            final JSONArray questions = testResponse.getJSONArray(Keys.OBJECTS);
-                            final JSONArray balls = ballsResponse.getJSONArray(Keys.OBJECTS);
-                            JSONObject question;
-                            JSONArray images;
-                            ArrayList<String> imageUrls = new ArrayList<String>();
-                            for (int i = 0; i < questions.length(); i++) {
-                                question = questions.getJSONObject(i);
-                                images = question.optJSONArray(Keys.IMAGES);
-                                if (images != null) {
-                                    final String path = question.getString(Keys.IMAGES_RELATIVE_URL);
-                                    for (int j = 0; j < images.length(); j++) {
-                                        String name = images.getJSONObject(j).getString(ApiService.Keys.NAME);
-                                        String imageRelPath = path + "/" + name;
-                                        if (!fm.isFileExists(imageRelPath)) {
-                                            imageUrls.add(imageRelPath);
-                                        }
-                                    }
-                                }
-                            }
-
-                            final Thread onTestLoaded = new Thread(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    try {
-                                        if (db.updateQuestions(id, questions, balls)) {
-                                            feedBack.onTestLoaded();
-                                        } else {
-                                            app.getRequestQueue().cancelAll(REQUEST_TAG);
-                                            feedBack.onError(new Exception("update test error"));
-                                        }
-                                    } catch (JSONException e) {
-                                        feedBack.onError(e);
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-
-                            if (imageUrls.size() != 0) {
-                                final RequestsCounter counter = new RequestsCounter(imageUrls.size(), onTestLoaded, feedBack);
-
-                                for (final String url : imageUrls) {
-                                    Listener<Bitmap> imageListener = new Listener<Bitmap>() {
-
-                                        @Override
-                                        public void onResponse(Bitmap image) {
-                                            String path = url.substring(0, url.lastIndexOf('/'));
-                                            String name = url.substring(url.lastIndexOf('/') + 1);
-                                            fm.saveBitmap(path, name, image);
-                                            counter.requestFinished();
-                                        }
-                                    };
-                                    ImageRequest imageRequest = new ImageRequest(ApiService.SITE_URL + url, imageListener, 0, 0, null, errorListener);
-                                    app.addToRequestQueue(imageRequest, REQUEST_TAG);
-                                }
-                            } else {
-                                onTestLoaded.start();
-                            }
-                        } catch (JSONException e) {
-                            Log.i(LOG_TAG, e.toString());
-                            app.getRequestQueue().cancelAll(REQUEST_TAG);
-                            feedBack.onError(e);
-                        }
-                    }
-                };
-
-                JsonObjectRequest ballsRequest = new JsonObjectRequest(API_URL + String.format(GET_TEST_BALLS, id), null, testBallsListener, errorListener);
-                app.addToRequestQueue(ballsRequest);
-            }
-        };
-
-        JsonObjectRequest testRequest = new JsonObjectRequest(API_URL + GET_TEST + id, null, testListener, errorListener);
-        app.addToRequestQueue(testRequest);
+    public void downLoadTest(int id, TestDLCallBack callBack) {
+        new DLTestThread(id, callBack).start();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    private JSONArray getQuestions(int id, ErrorListener errorListener) throws ExecutionException,
+            InterruptedException, JSONException {
+        RequestFuture<JSONObject> testFuture = RequestFuture.newFuture();
+        JsonObjectRequest request = new JsonObjectRequest(GET_TEST + id, null, testFuture, errorListener);
+        app.addToRequestQueue(request, REQUEST_TAG);
+        return testFuture.get().getJSONArray(Keys.OBJECTS);
+    }
+
+    private JSONArray getBalls(int id, ErrorListener errorListener) throws ExecutionException,
+            InterruptedException, JSONException {
+        RequestFuture<JSONObject> ballsFuture = RequestFuture.newFuture();
+        app.addToRequestQueue(new JsonObjectRequest(String.format(GET_TEST_BALLS, id), null, ballsFuture, errorListener), REQUEST_TAG);
+        return ballsFuture.get().getJSONArray(Keys.OBJECTS);
+    }
+
+    private ArrayList<String> getImagesUrls(JSONArray questions) throws JSONException {
+        ArrayList<String> imageUrls = new ArrayList<String>();
+        JSONObject question;
+        JSONArray images;
+        String imgRelPath;
+        String name;
+        String imageUrl;
+
+        for (int i = 0; i < questions.length(); i++) {
+            question = questions.getJSONObject(i);
+            images = question.optJSONArray(Keys.IMAGES);
+
+            if (images != null) {
+                imgRelPath = question.getString(Keys.IMAGES_RELATIVE_URL);
+
+                for (int j = 0; j < images.length(); j++) {
+                    name = images.getJSONObject(j).getString(ApiService.Keys.NAME);
+                    imageUrl = imgRelPath + "/" + name;
+
+                    if (!fm.isFileExists(imageUrl)) {
+                        imageUrls.add(imageUrl);
+                    }
+                }
+
+            }
+        }
+
+        return imageUrls;
+    }
+
+    private Bitmap getImage(String imageUrl, ErrorListener errorListener) throws JSONException,
+            ExecutionException, InterruptedException {
+        RequestFuture<Bitmap> imageFuture = RequestFuture.newFuture();
+        ImageRequest imageRequest = new ImageRequest(SITE_URL + imageUrl, imageFuture, 0, 0, null, errorListener);
+        app.addToRequestQueue(imageRequest, REQUEST_TAG);
+        return imageFuture.get();
     }
 
     @Override
@@ -197,26 +204,4 @@ public class ApiService extends Service {
         }
     }
 
-    private class RequestsCounter {
-
-        int pendingRequests = 0;
-        TestDownloadingFeedBack feedBack;
-        Thread onTestLoaded;
-
-        public RequestsCounter(int pendingRequests, Thread onTestLoaded, TestDownloadingFeedBack feedBack) {
-            this.feedBack = feedBack;
-            this.onTestLoaded = onTestLoaded;
-            this.pendingRequests = pendingRequests;
-            feedBack.onExtraDownloadingStart(pendingRequests);
-        }
-
-        public void requestFinished() {
-            pendingRequests--;
-            feedBack.onExtraDownloadingProgressInc();
-            if (pendingRequests == 0) {
-                onTestLoaded.start();
-            }
-        }
-
-    }
 }
