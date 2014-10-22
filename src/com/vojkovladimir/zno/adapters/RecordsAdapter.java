@@ -98,7 +98,7 @@ public class RecordsAdapter extends BaseAdapter {
         int day = date.get(Calendar.DAY_OF_MONTH);
         int month = date.get(Calendar.MONTH);
 
-        String additionalInfo = PASSED + day + " " + MONTHS[month];
+        String additionalInfo = PASSED + " " + day + " " + MONTHS[month];
         int minutes = (int) (record.elapsedTime / 60000);
         if (minutes != 0) {
             additionalInfo += String.format(", " + FOR + " %d " + MIN, minutes);
