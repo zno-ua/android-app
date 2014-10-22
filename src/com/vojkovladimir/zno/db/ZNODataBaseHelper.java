@@ -53,10 +53,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String KEY_LINK = "link";
     private static final String KEY_NAME = "name";
     private static final String KEY_TASK_ALL = "task_all";
-    private static final String KEY_TASK_MATCHES = "task_matches";
-    private static final String KEY_TASK_OPEN_ANSWER = "task_open_answer";
-    private static final String KEY_TASK_TEST = "task_test";
-    private static final String KEY_TASK_VARS = "task_vars";
     private static final String KEY_TIME = "time";
     private static final String KEY_YEAR = "year";
     private static final String KEY_LOADED = "loaded";
@@ -84,10 +80,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                     + KEY_LESSON_ID + " INTEGER, "
                     + KEY_NAME + " TEXT, "
                     + KEY_TASK_ALL + " INTEGER, "
-                    + KEY_TASK_MATCHES + " INTEGER, "
-                    + KEY_TASK_OPEN_ANSWER + " INTEGER, "
-                    + KEY_TASK_TEST + " INTEGER, "
-                    + KEY_TASK_VARS + " INTEGER, "
                     + KEY_TIME + " INTEGER, "
                     + KEY_YEAR + " INTEGER, "
                     + KEY_LAST_UPDATE + " INTEGER, "
@@ -220,15 +212,9 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         int lessonId;
         String name;
         int taskAll;
-        int taskMatches;
-        int taskOpenAnswers;
-        int taskTest;
-        int taskVars;
         int time;
         int year;
         int lastUpdate;
-
-        long status;
 
         for (int i = 0; i < tests.length(); i++) {
             try {
@@ -238,10 +224,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                 lessonId = test.getInt(ApiService.Keys.LESSON_ID);
                 name = test.getString(ApiService.Keys.NAME);
                 taskAll = test.getInt(ApiService.Keys.TASK_ALL);
-                taskMatches = test.getInt(ApiService.Keys.TASK_MATCHES);
-                taskOpenAnswers = test.getInt(ApiService.Keys.TASK_OPEN_ANSWER);
-                taskTest = test.getInt(ApiService.Keys.TASK_TEST);
-                taskVars = test.getInt(ApiService.Keys.TASK_VARS);
                 time = test.getInt(ApiService.Keys.TIME);
                 year = test.getInt(ApiService.Keys.YEAR);
                 lastUpdate = test.getInt(ApiService.Keys.LAST_UPDATE);
@@ -251,20 +233,12 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                 values.put(KEY_LESSON_ID, lessonId);
                 values.put(KEY_NAME, name);
                 values.put(KEY_TASK_ALL, taskAll);
-                values.put(KEY_TASK_MATCHES, taskMatches);
-                values.put(KEY_TASK_OPEN_ANSWER, taskOpenAnswers);
-                values.put(KEY_TASK_TEST, taskTest);
-                values.put(KEY_TASK_VARS, taskVars);
                 values.put(KEY_TIME, time);
                 values.put(KEY_YEAR, year);
                 values.put(KEY_LOADED, 0);
                 values.put(KEY_LAST_UPDATE, lastUpdate);
 
-                status = db.insert(TABLE_TESTS, null, values);
-
-                if (status == -1) {
-                    Log.e(LOG_TAG, "Error while inserting test! test id: " + id + ".");
-                }
+                db.insert(TABLE_TESTS, null, values);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -468,8 +442,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getWritableDatabase();
         Cursor c = db.query(TABLE_TESTS, new String[]{KEY_ID, KEY_LESSON_ID,
-                        KEY_NAME, KEY_TASK_ALL, KEY_TASK_MATCHES, KEY_TASK_OPEN_ANSWER,
-                        KEY_TASK_TEST, KEY_TASK_VARS, KEY_TIME, KEY_YEAR, KEY_LOADED},
+                        KEY_NAME, KEY_TASK_ALL, KEY_TIME, KEY_YEAR, KEY_LOADED},
                 KEY_LESSON_ID + "=" + id, null, null, null, KEY_YEAR + " DESC");
         TestInfo testInfo;
 
@@ -477,10 +450,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             int idIndex = c.getColumnIndex(KEY_ID);
             int nameIndex = c.getColumnIndex(KEY_NAME);
             int taskAllIndex = c.getColumnIndex(KEY_TASK_ALL);
-            int taskMatchesIndex = c.getColumnIndex(KEY_TASK_MATCHES);
-            int taskOpenAnswersIndex = c.getColumnIndex(KEY_TASK_OPEN_ANSWER);
-            int taskTestIndex = c.getColumnIndex(KEY_TASK_OPEN_ANSWER);
-            int taskVarsIndex = c.getColumnIndex(KEY_TASK_ALL);
             int timeIndex = c.getColumnIndex(KEY_TIME);
             int yearIndex = c.getColumnIndex(KEY_YEAR);
             int loadedIndex = c.getColumnIndex(KEY_LOADED);
@@ -488,11 +457,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             do {
                 testInfo = new TestInfo(c.getInt(idIndex), id,
                         c.getString(nameIndex), c.getInt(taskAllIndex),
-                        c.getInt(taskMatchesIndex),
-                        c.getInt(taskOpenAnswersIndex),
-                        c.getInt(taskTestIndex), c.getInt(taskVarsIndex),
                         c.getInt(timeIndex), c.getInt(yearIndex),
-                        (c.getInt(loadedIndex) == 0) ? false : true);
+                        (c.getInt(loadedIndex) != 0));
                 testsList.add(testInfo);
             } while (c.moveToNext());
         }
@@ -550,8 +516,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         c.close();
 
         c = db.query(TABLE_TESTS, new String[]{KEY_ID, KEY_LESSON_ID,
-                        KEY_NAME, KEY_TASK_ALL, KEY_TASK_MATCHES, KEY_TASK_OPEN_ANSWER,
-                        KEY_TASK_TEST, KEY_TASK_VARS, KEY_TIME, KEY_YEAR, KEY_LOADED},
+                        KEY_NAME, KEY_TASK_ALL, KEY_TIME, KEY_YEAR, KEY_LOADED},
                 KEY_ID + "=" + id, null, null, null, null);
 
         if (c.moveToFirst()) {
@@ -559,20 +524,14 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             int lessonId = c.getColumnIndex(KEY_LESSON_ID);
             int nameIndex = c.getColumnIndex(KEY_NAME);
             int taskAllIndex = c.getColumnIndex(KEY_TASK_ALL);
-            int taskMatchesIndex = c.getColumnIndex(KEY_TASK_MATCHES);
-            int taskOpenAnswersIndex = c.getColumnIndex(KEY_TASK_OPEN_ANSWER);
-            int taskTestIndex = c.getColumnIndex(KEY_TASK_OPEN_ANSWER);
-            int taskVarsIndex = c.getColumnIndex(KEY_TASK_ALL);
             int timeIndex = c.getColumnIndex(KEY_TIME);
             int yearIndex = c.getColumnIndex(KEY_YEAR);
             int loadedIndex = c.getColumnIndex(KEY_LOADED);
 
             testInfo = new TestInfo(c.getInt(idIndex), c.getInt(lessonId),
                     c.getString(nameIndex), c.getInt(taskAllIndex),
-                    c.getInt(taskMatchesIndex), c.getInt(taskOpenAnswersIndex),
-                    c.getInt(taskTestIndex), c.getInt(taskVarsIndex),
                     c.getInt(timeIndex), c.getInt(yearIndex),
-                    (c.getInt(loadedIndex) == 0) ? false : true);
+                    (c.getInt(loadedIndex) != 0));
 
         }
 
