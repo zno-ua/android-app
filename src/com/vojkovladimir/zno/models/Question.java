@@ -25,23 +25,19 @@ public class Question {
     public String correctAnswer;
     public int balls;
     public int type;
-    public String userAnswer;
+    private String userAnswer;
 
-    public Question(int id, String question, String parentQuestion, String answers, String correctAnswer, int balls, int type, String userAnswer) {
-        this.id = id;
-        this.question = question;
-        this.parentQuestion = parentQuestion;
-        this.answers = answers;
-        this.correctAnswer = correctAnswer;
-        this.balls = balls;
-        this.type = type;
-        if (userAnswer != null) {
-            this.userAnswer = userAnswer;
-        } else if (type == TYPE_3) {
-            this.userAnswer = "";
-            for (int i = 0; i < Integer.parseInt(this.answers.split("-")[0]); i++) {
-                this.userAnswer += "0";
-            }
+    public void setUserAnswer(String userAnswer) {
+        this.userAnswer = userAnswer;
+    }
+
+    public String getUserAnswer() {
+        return userAnswer;
+    }
+
+    public void makeUserAnswer() {
+        if (type == TYPE_3) {
+            this.userAnswer = String.format("%0" + answers.split("-")[0] + "d", 0);
         } else {
             this.userAnswer = "";
         }

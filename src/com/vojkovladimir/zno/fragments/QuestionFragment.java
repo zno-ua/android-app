@@ -112,7 +112,7 @@ public class QuestionFragment extends Fragment {
         f.parentQuestion = question.parentQuestion;
         f.answers = question.answers;
         f.correctAnswer = question.correctAnswer;
-        f.userAnswer = question.userAnswer;
+        f.userAnswer = question.getUserAnswer();
         f.type = question.type;
         f.balls = question.balls;
         return f;

@@ -403,12 +403,11 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<Lesson> getLessons() {
         ArrayList<Lesson> lessons = new ArrayList<Lesson>();
-        ArrayList<Lesson> lessonsEnd = new ArrayList<Lesson>();
 
         SQLiteDatabase db = getWritableDatabase();
         Cursor c = db.query(TABLE_LESSONS, new String[]{KEY_ID, KEY_NAME, KEY_LINK}, null, null, null, null, null);
         Lesson lesson;
-        int id;
+        Lesson worldHist = null;
 
         if (c.moveToFirst()) {
             int idIndex = c.getColumnIndex(KEY_ID);
@@ -416,16 +415,25 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             int linkIndex = c.getColumnIndex(KEY_LINK);
 
             do {
-                id = c.getInt(idIndex);
-                lesson = new Lesson(id, c.getString(nameIndex), c.getString(linkIndex), getLessonTestsCount(id));
-                if (id == 3) {
-                    lessonsEnd.add(lesson);
+                lesson = new Lesson();
+                lesson.id = c.getInt(idIndex);
+                lesson.name = c.getString(nameIndex);
+                lesson.link = c.getString(linkIndex);
+                lesson.testsCount = getLessonTestsCount(lesson.id);
+
+                if (lesson.id == 3) {
+                    worldHist = lesson;
                 } else {
                     lessons.add(lesson);
                 }
+
             } while (c.moveToNext());
+
+            if (worldHist != null) {
+                lessons.add(worldHist);
+            }
         }
-        lessons.addAll(lessonsEnd);
+
 
         return lessons;
     }
@@ -438,13 +446,13 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<TestInfo> getLessonTests(int id) {
-        ArrayList<TestInfo> testsList = new ArrayList<TestInfo>();
+        ArrayList<TestInfo> tests = new ArrayList<TestInfo>();
+        ArrayList<TestInfo> notLoaded = new ArrayList<TestInfo>();
 
         SQLiteDatabase db = getWritableDatabase();
         Cursor c = db.query(TABLE_TESTS, new String[]{KEY_ID, KEY_LESSON_ID,
                         KEY_NAME, KEY_TASK_ALL, KEY_TIME, KEY_YEAR, KEY_LOADED},
                 KEY_LESSON_ID + "=" + id, null, null, null, KEY_YEAR + " DESC");
-        TestInfo testInfo;
 
         if (c.moveToFirst()) {
             int idIndex = c.getColumnIndex(KEY_ID);
@@ -454,36 +462,34 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             int yearIndex = c.getColumnIndex(KEY_YEAR);
             int loadedIndex = c.getColumnIndex(KEY_LOADED);
 
+            TestInfo testInfo;
+
             do {
-                testInfo = new TestInfo(c.getInt(idIndex), id,
-                        c.getString(nameIndex), c.getInt(taskAllIndex),
-                        c.getInt(timeIndex), c.getInt(yearIndex),
-                        (c.getInt(loadedIndex) != 0));
-                testsList.add(testInfo);
+                testInfo = new TestInfo();
+
+                testInfo.id = c.getInt(idIndex);
+                testInfo.lessonId = id;
+                testInfo.name = c.getString(nameIndex);
+                testInfo.taskAll = c.getInt(taskAllIndex);
+                testInfo.time = c.getInt(timeIndex);
+                testInfo.year = c.getInt(yearIndex);
+                testInfo.loaded = c.getInt(loadedIndex) != 0;
+
+                if (testInfo.loaded) {
+                    tests.add(testInfo);
+                } else {
+                    notLoaded.add(testInfo);
+                }
             } while (c.moveToNext());
         }
 
-        ArrayList<TestInfo> part1 = new ArrayList<TestInfo>();
-        ArrayList<TestInfo> part2 = new ArrayList<TestInfo>();
+        tests.addAll(notLoaded);
 
-        for (TestInfo currTest : testsList) {
-            if (currTest.loaded) {
-                part1.add(currTest);
-            } else {
-                part2.add(currTest);
-            }
-        }
-
-        testsList = new ArrayList<TestInfo>();
-        testsList.addAll(part1);
-        testsList.addAll(part2);
-
-        return testsList;
+        return tests;
     }
 
     public Test getTest(int id) {
         ArrayList<Question> questions = new ArrayList<Question>();
-        TestInfo testInfo = null;
 
         SQLiteDatabase db = getWritableDatabase();
 
@@ -501,15 +507,19 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             int typeQuestionIndex = c.getColumnIndex(KEY_TYPE_QUESTION);
 
             Question question;
+
             do {
-                question = new Question(c.getInt(idTestQuestionIndex),
-                        c.getString(questionIndex),
-                        c.getString(parentQuestionIndex),
-                        c.getString(answersIndex),
-                        c.getString(correctAnswerIndex),
-                        c.getInt(ballsIndex),
-                        c.getInt(typeQuestionIndex),
-                        null);
+                question = new Question();
+
+                question.id = c.getInt(idTestQuestionIndex);
+                question.question = c.getString(questionIndex);
+                question.parentQuestion = c.getString(parentQuestionIndex);
+                question.answers = c.getString(answersIndex);
+                question.correctAnswer = c.getString(correctAnswerIndex);
+                question.balls = c.getInt(ballsIndex);
+                question.type = c.getInt(typeQuestionIndex);
+                question.makeUserAnswer();
+
                 questions.add(question);
             } while (c.moveToNext());
         }
@@ -528,73 +538,78 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             int yearIndex = c.getColumnIndex(KEY_YEAR);
             int loadedIndex = c.getColumnIndex(KEY_LOADED);
 
-            testInfo = new TestInfo(c.getInt(idIndex), c.getInt(lessonId),
-                    c.getString(nameIndex), c.getInt(taskAllIndex),
-                    c.getInt(timeIndex), c.getInt(yearIndex),
-                    (c.getInt(loadedIndex) != 0));
+            TestInfo testInfo = new TestInfo();
 
+            testInfo.id = c.getInt(idIndex);
+            testInfo.lessonId = c.getInt(lessonId);
+            testInfo.name = c.getString(nameIndex);
+            testInfo.taskAll = c.getInt(taskAllIndex);
+            testInfo.time = c.getInt(timeIndex);
+            testInfo.year = c.getInt(yearIndex);
+            testInfo.loaded = c.getInt(loadedIndex) != 0;
+
+            return new Test(testInfo, questions);
         }
 
-        return new Test(testInfo, questions);
+        return null;
     }
 
     public ArrayList<Record> getRecords() {
         ArrayList<Record> records = new ArrayList<Record>();
         SQLiteDatabase db = getReadableDatabase();
 
-        Cursor recRows;
-        String[] recSelect = {KEY_LESSON_ID, KEY_TEST_ID, KEY_DATE, KEY_ELAPSED_TIME, KEY_ZNO_BALL};
+        Cursor cRecords;
+        String[] columns = {KEY_LESSON_ID, KEY_TEST_ID, KEY_DATE, KEY_ELAPSED_TIME, KEY_ZNO_BALL};
         final String SESSION = ZNOApplication.getInstance().getResources().getString(R.string.session_text);
 
-        recRows = db.query(TABLE_USER_RECORDS, recSelect, null, null, null, null, null, null);
-        if (recRows.moveToFirst()) {
+        cRecords = db.query(TABLE_USER_RECORDS, columns, null, null, null, null, null, null);
+        if (cRecords.moveToFirst()) {
+            Record record;
             Cursor lesson;
             Cursor test;
 
             int lessonId;
             int testId;
-
-            String lessonName;
             String testName;
-            int year;
-            int session;
-            long date;
-            long elapsedTime;
-            float ball;
 
             do {
-                lessonId = recRows.getInt(recRows.getColumnIndex(KEY_LESSON_ID));
+                record = new Record();
+                lessonId = cRecords.getInt(cRecords.getColumnIndex(KEY_LESSON_ID));
                 lesson = db.query(TABLE_LESSONS, new String[]{KEY_NAME}, KEY_ID + "=" + lessonId, null, null, null, null);
+
                 if (lesson.moveToFirst()) {
-                    lessonName = lesson.getString(lesson.getColumnIndex(KEY_NAME));
+                    record.lessonName = lesson.getString(lesson.getColumnIndex(KEY_NAME));
                 } else {
                     continue;
                 }
 
-                testId = recRows.getInt(recRows.getColumnIndex(KEY_TEST_ID));
+                testId = cRecords.getInt(cRecords.getColumnIndex(KEY_TEST_ID));
                 test = db.query(TABLE_TESTS, new String[]{KEY_NAME, KEY_YEAR}, KEY_ID + "=" + testId, null, null, null, null);
+
                 if (test.moveToFirst()) {
                     testName = test.getString(test.getColumnIndex(KEY_NAME));
-                    year = test.getInt(test.getColumnIndex(KEY_YEAR));
+                    record.year = test.getInt(test.getColumnIndex(KEY_YEAR));
                     if (testName.contains("(I " + SESSION + ")")) {
-                        session = 1;
+                        record.session = 1;
                     } else if (testName.contains("(II " + SESSION + ")")) {
-                        session = 2;
+                        record.session = 2;
                     } else {
-                        session = 0;
+                        record.session = 0;
                     }
                 } else {
                     continue;
                 }
 
-                date = recRows.getLong(recRows.getColumnIndex(KEY_DATE));
-                elapsedTime = recRows.getLong(recRows.getColumnIndex(KEY_ELAPSED_TIME));
-                ball = recRows.getFloat(recRows.getColumnIndex(KEY_ZNO_BALL));
-                records.add(new Record(lessonName, year, session, date, elapsedTime, ball));
-            } while (recRows.moveToNext());
+                record.date = cRecords.getLong(cRecords.getColumnIndex(KEY_DATE));
+                record.elapsedTime = cRecords.getLong(cRecords.getColumnIndex(KEY_ELAPSED_TIME));
+                record.ball = cRecords.getFloat(cRecords.getColumnIndex(KEY_ZNO_BALL));
+
+                records.add(record);
+            } while (cRecords.moveToNext());
         }
 
         db.close();
+
         return records;
     }
 
@@ -610,49 +625,45 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         if (recRows.moveToFirst()) {
             Cursor lesson;
             Cursor test;
+            PassedTest passedTest;
 
-            int id;
             int lessonId;
-            int testId;
-
-            String lessonName;
             String testName;
-            int year;
-            int session;
-            long date;
-            long elapsedTime;
-            float ball;
 
             do {
-                id = recRows.getInt(recRows.getColumnIndex(KEY_ID));
+                passedTest = new PassedTest();
+                passedTest.id = recRows.getInt(recRows.getColumnIndex(KEY_ID));
                 lessonId = recRows.getInt(recRows.getColumnIndex(KEY_LESSON_ID));
                 lesson = db.query(TABLE_LESSONS, new String[]{KEY_NAME}, KEY_ID + "=" + lessonId, null, null, null, null);
+
                 if (lesson.moveToFirst()) {
-                    lessonName = lesson.getString(lesson.getColumnIndex(KEY_NAME));
+                    passedTest.lessonName = lesson.getString(lesson.getColumnIndex(KEY_NAME));
                 } else {
                     continue;
                 }
 
-                testId = recRows.getInt(recRows.getColumnIndex(KEY_TEST_ID));
-                test = db.query(TABLE_TESTS, new String[]{KEY_NAME, KEY_YEAR}, KEY_ID + "=" + testId, null, null, null, null);
+                passedTest.testId = recRows.getInt(recRows.getColumnIndex(KEY_TEST_ID));
+                test = db.query(TABLE_TESTS, new String[]{KEY_NAME, KEY_YEAR}, KEY_ID + "=" + passedTest.testId, null, null, null, null);
+
                 if (test.moveToFirst()) {
                     testName = test.getString(test.getColumnIndex(KEY_NAME));
-                    year = test.getInt(test.getColumnIndex(KEY_YEAR));
+                    passedTest.year = test.getInt(test.getColumnIndex(KEY_YEAR));
                     if (testName.contains("(I " + SESSION + ")")) {
-                        session = 1;
+                        passedTest.session = 1;
                     } else if (testName.contains("(II " + SESSION + ")")) {
-                        session = 2;
+                        passedTest.session = 2;
                     } else {
-                        session = 0;
+                        passedTest.session = 0;
                     }
                 } else {
                     continue;
                 }
 
-                date = recRows.getLong(recRows.getColumnIndex(KEY_DATE));
-                elapsedTime = recRows.getLong(recRows.getColumnIndex(KEY_ELAPSED_TIME));
-                ball = recRows.getFloat(recRows.getColumnIndex(KEY_ZNO_BALL));
-                passedTests.add(new PassedTest(id, testId, lessonName, year, session, date, elapsedTime, ball));
+                passedTest.date = recRows.getLong(recRows.getColumnIndex(KEY_DATE));
+                passedTest.elapsedTime = recRows.getLong(recRows.getColumnIndex(KEY_ELAPSED_TIME));
+                passedTest.ball = recRows.getFloat(recRows.getColumnIndex(KEY_ZNO_BALL));
+
+                passedTests.add(passedTest);
             } while (recRows.moveToNext());
         }
 

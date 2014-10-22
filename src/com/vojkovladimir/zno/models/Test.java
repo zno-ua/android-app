@@ -12,7 +12,7 @@ public class Test extends TestInfo {
     public ArrayList<Question> questions;
 
     public Test(TestInfo testInfo, ArrayList<Question> questions) {
-    super(testInfo);
+        super(testInfo);
         this.questions = questions;
     }
 
@@ -21,12 +21,12 @@ public class Test extends TestInfo {
 
         for (int i = 0; i < questions.size(); i++) {
             Question question = questions.get(i);
-            if (question .type==Question.TYPE_2&&question .balls!=0){
-                if(question.userAnswer.isEmpty()){
-                    question.userAnswer = String.valueOf(question.balls / 2);
+            if (question.type == Question.TYPE_2 && question.balls != 0) {
+                if (question.getUserAnswer().isEmpty()) {
+                    question.setUserAnswer(String.valueOf(question.balls / 2));
                 }
             }
-            answers += String.format("\"%s\"", questions.get(i).userAnswer);
+            answers += String.format("\"%s\"", questions.get(i).getUserAnswer());
             if (i != questions.size() - 1) {
                 answers += ",";
             }
@@ -41,7 +41,7 @@ public class Test extends TestInfo {
             try {
                 JSONArray answers = new JSONArray(savedAnswers);
                 for (int i = 0; i < answers.length(); i++) {
-                    questions.get(i).userAnswer = answers.getString(i);
+                    questions.get(i).setUserAnswer(answers.getString(i));
                 }
             } catch (JSONException e) {
                 Log.e("MyLogs", e.toString());

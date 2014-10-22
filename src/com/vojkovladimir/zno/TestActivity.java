@@ -302,7 +302,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     @Override
     public void onAnswerSelected(int id, String answer, boolean switchToNext) {
-        test.questions.get(id).userAnswer = answer;
+        test.questions.get(id).setUserAnswer(answer);
         if (switchToNext) {
             if (test.hasUnAnsweredQuestions()) {
                 if (mPager.getCurrentItem() + 1 < test.questions.size()) {
