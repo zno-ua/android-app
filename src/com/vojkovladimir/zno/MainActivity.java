@@ -14,11 +14,13 @@ import android.widget.TextView;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.fragments.TestTimerFragment;
 import com.vojkovladimir.zno.models.Test;
+import com.vojkovladimir.zno.service.ApiService;
 
 import java.util.Random;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
+    ZNOApplication app;
     ZNODataBaseHelper db;
     String[] quotes;
     TextView quote;
@@ -28,12 +30,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         quote = (TextView) findViewById(R.id.quote);
         logo = (TextView) findViewById(R.id.app_logo);
         ZNOApplication.buildLogo(logo, getResources(), getAssets());
         quotes = getResources().getStringArray(R.array.quotes);
-        db = ZNOApplication.getInstance().getZnoDataBaseHelper();
+        app = ZNOApplication.getInstance();
+        db = app.getZnoDataBaseHelper();
         findViewById(R.id.begin_testing_btn).setOnClickListener(this);
         findViewById(R.id.records_btn).setOnClickListener(this);
         findViewById(R.id.last_passed_tests_btn).setOnClickListener(this);
@@ -47,41 +49,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-        final SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
-        if (preferences.contains(TestActivity.Extra.USER_ANSWERS_ID)) {
-            final int userAnswersId = preferences.getInt(TestActivity.Extra.USER_ANSWERS_ID, -1);
-            final int questionNumber = preferences.getInt(TestActivity.Extra.QUESTION_NUMBER, -1);
-            final int testId = preferences.getInt(Test.TEST_ID, -1);
-
+        if (app.hasSavedSession()) {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
             dialogBuilder.setMessage(getString(R.string.unfinished_test_alert_text));
             dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    Intent startedActivity;
-                    startedActivity = new Intent(TestActivity.Action.CONTINUE_PASSAGE_TEST);
-                    startedActivity.putExtra(Test.TEST_ID, testId);
-                    startedActivity.putExtra(TestActivity.Extra.USER_ANSWERS_ID, userAnswersId);
-                    startedActivity.putExtra(TestActivity.Extra.QUESTION_NUMBER, questionNumber);
-                    if (preferences.contains(TestTimerFragment.MILLIS_LEFT)) {
-                        startedActivity.putExtra(TestTimerFragment.MILLIS_LEFT, preferences.getLong(TestTimerFragment.MILLIS_LEFT, -1));
-                    }
-                    startActivity(startedActivity);
+                    app.startSavedSession(MainActivity.this);
                 }
             });
             dialogBuilder.setNegativeButton(R.string.dialog_negative_text, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
+                    int userAnswersId = app.getSavedSessionUserAnswersId();
                     db.deleteUserAnswers(userAnswersId);
-                    SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.remove(Test.TEST_ID);
-                    editor.remove(TestActivity.Extra.USER_ANSWERS_ID);
-                    editor.remove(TestActivity.Extra.QUESTION_NUMBER);
-                    if (preferences.contains(TestTimerFragment.MILLIS_LEFT)) {
-                        editor.remove(TestTimerFragment.MILLIS_LEFT);
-                    }
-                    editor.apply();
+                    app.removeSavedSession();
                 }
             });
             dialogBuilder.create().show();
@@ -102,7 +84,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.records_btn:
                 Intent records = new Intent(RecordsActivity.Action.VIEW_BEST_SCORES);
                 startActivity(records);
-                break;
+                 break;
             case R.id.last_passed_tests_btn:
                 Intent passedTests = new Intent(RecordsActivity.Action.VIEW_PASSED_TESTS);
                 startActivity(passedTests);

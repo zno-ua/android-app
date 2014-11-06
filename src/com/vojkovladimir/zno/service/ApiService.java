@@ -1,10 +1,15 @@
 package com.vojkovladimir.zno.service;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.VolleyError;
@@ -12,6 +17,8 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.vojkovladimir.zno.FileManager;
+import com.vojkovladimir.zno.MainActivity;
+import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 
@@ -26,11 +33,14 @@ public class ApiService extends Service {
 
     private static final String SITE_URL = "http://zno-ua.net";
     private static final String API_URL = SITE_URL + "/api/v1/";
-    //	private static final String GET_TESTS = "test/?format=json";
+    private static final String GET_TESTS = API_URL + "test/?format=json";
     private static final String GET_TEST = API_URL + "question/?format=json&test=";
     private static final String GET_TEST_BALLS = API_URL + "result/?format=json&test_id=%d&limit=0";
 
+    private static final int ZNO_UPDATE_NOTIFY = 0x1;
+
     public static final String REQUEST_TAG = "api_request";
+    public static final String ACTION_CHECK_FOR_UPDATES = "api.CHECK_FOR_UPDATES";
 
     public static interface Keys {
         String OBJECTS = "objects";
@@ -41,10 +51,6 @@ public class ApiService extends Service {
         String LINK = "link";
         String NAME = "name";
         String TASK_ALL = "task_all";
-        String TASK_MATCHES = "task_matches";
-        String TASK_OPEN_ANSWER = "task_open_answer";
-        String TASK_TEST = "task_test";
-        String TASK_VARS = "task_vars";
         String YEAR = "year";
         String TIME = "time";
         String ANSWERS = "answers";
@@ -69,6 +75,108 @@ public class ApiService extends Service {
         void onTestDownloaded();
 
         void onError(Exception e);
+    }
+
+    class CheckForUpdatesThread extends Thread implements TestDLCallBack, ErrorListener {
+
+        @Override
+        public void run() {
+            NotificationManager mNotifyMgr =
+                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(ApiService.this);
+            Notification notification;
+            boolean successful = false;
+            try {
+                DLTestThread dlTestThread;
+                JSONArray tests = getTests(this);
+                ArrayList<Integer> ids = db.getTestsForUpdate(tests);
+                mBuilder.setSmallIcon(android.R.drawable.stat_notify_sync)
+                        .setContentTitle(getString(R.string.zno))
+                        .setProgress(0, 0, true)
+                        .setContentText(getString(R.string.updating_db));
+                notification = mBuilder.build();
+                notification.flags = Notification.FLAG_NO_CLEAR;
+                mNotifyMgr.notify(ZNO_UPDATE_NOTIFY, notification);
+                if (ids.size() > 0) {
+                    for (int i = 0; i < ids.size(); i++) {
+                        dlTestThread = new DLTestThread(ids.get(i), this);
+                        dlTestThread.start();
+                        dlTestThread.join();
+                        mBuilder.setProgress(ids.size(), i + 1, false)
+                                .setContentText(getString(R.string.downloading_tests))
+                                .setSmallIcon(android.R.drawable.stat_sys_download);
+                        notification = mBuilder.build();
+                        notification.flags = Notification.FLAG_NO_CLEAR;
+                        mNotifyMgr.notify(ZNO_UPDATE_NOTIFY, notification);
+                    }
+                }
+                db.updateTests(tests);
+                successful = true;
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } finally {
+                if (successful) {
+                    app.setLastUpdate(System.currentTimeMillis());
+                    ComponentName mainActivity =
+                            new ComponentName(ApiService.this, MainActivity.class);
+                    Intent main = Intent.makeMainActivity(mainActivity);
+                    main.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    PendingIntent startApp =
+                            PendingIntent.getActivity(
+                                    ApiService.this,
+                                    0,
+                                    main,
+                                    PendingIntent.FLAG_ONE_SHOT
+                            );
+                    mBuilder.setContentIntent(startApp);
+                    mBuilder.setContentText(getString(R.string.db_updated))
+                            .setSmallIcon(android.R.drawable.stat_sys_download_done);
+                    mBuilder.setProgress(0, 0, false);
+                    notification = mBuilder.build();
+                    notification.flags = Notification.FLAG_ONLY_ALERT_ONCE |
+                            Notification.FLAG_AUTO_CANCEL;
+                    mNotifyMgr.notify(ZNO_UPDATE_NOTIFY, notification);
+                } else {
+                    mNotifyMgr.cancel(ZNO_UPDATE_NOTIFY);
+                }
+                ApiService.this.stopSelf();
+            }
+        }
+
+        @Override
+        public void onDownloadImagesStart(int imagesCount) {
+
+        }
+
+        @Override
+        public void onImageDownloaded() {
+
+        }
+
+        @Override
+        public void onSavingTest() {
+
+        }
+
+        @Override
+        public void onTestDownloaded() {
+
+        }
+
+        @Override
+        public void onError(Exception e) {
+            this.interrupt();
+        }
+
+        @Override
+        public void onErrorResponse(VolleyError volleyError) {
+            this.interrupt();
+        }
     }
 
     class DLTestThread extends Thread {
@@ -106,7 +214,7 @@ public class ApiService extends Service {
                 }
 
                 callBack.onSavingTest();
-                db.updateQuestions(id, questions, balls);
+                db.updateTest(id, questions, balls);
                 callBack.onTestDownloaded();
 
             } catch (InterruptedException e) {
@@ -118,7 +226,6 @@ public class ApiService extends Service {
                 callBack.onError(e);
                 e.printStackTrace();
             }
-
         }
 
     }
@@ -138,6 +245,14 @@ public class ApiService extends Service {
 
     public void downLoadTest(int id, TestDLCallBack callBack) {
         new DLTestThread(id, callBack).start();
+    }
+
+    private JSONArray getTests(ErrorListener errorListener) throws ExecutionException,
+            InterruptedException, JSONException {
+        RequestFuture<JSONObject> testFuture = RequestFuture.newFuture();
+        JsonObjectRequest request = new JsonObjectRequest(GET_TESTS, null, testFuture, errorListener);
+        app.addToRequestQueue(request, REQUEST_TAG);
+        return testFuture.get().getJSONArray(Keys.OBJECTS);
     }
 
     private JSONArray getQuestions(int id, ErrorListener errorListener) throws ExecutionException,
@@ -185,12 +300,27 @@ public class ApiService extends Service {
         return imageUrls;
     }
 
+    private void checkForTestsUpdates() {
+        new CheckForUpdatesThread().start();
+    }
+
     private Bitmap getImage(String imageUrl, ErrorListener errorListener) throws JSONException,
             ExecutionException, InterruptedException {
         RequestFuture<Bitmap> imageFuture = RequestFuture.newFuture();
         ImageRequest imageRequest = new ImageRequest(SITE_URL + imageUrl, imageFuture, 0, 0, null, errorListener);
         app.addToRequestQueue(imageRequest, REQUEST_TAG);
         return imageFuture.get();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        String action = intent.getAction();
+        if (action != null && action.equals(ACTION_CHECK_FOR_UPDATES)) {
+            checkForTestsUpdates();
+            return START_REDELIVER_INTENT;
+        }
+        stopSelf();
+        return START_STICKY;
     }
 
     @Override

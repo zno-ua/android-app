@@ -1,27 +1,36 @@
 package com.vojkovladimir.zno;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
+import com.vojkovladimir.zno.fragments.TestTimerFragment;
+import com.vojkovladimir.zno.models.Test;
+import com.vojkovladimir.zno.service.ApiService;
 
 import java.util.Calendar;
 
 public class ZNOApplication extends Application {
 
-    public static String LOG_TAG = "MyLogs";
     public static final String TAG = ZNOApplication.class.getSimpleName();
     public static final String APP_SETTINGS = "settings";
+    public static final String LAST_UPDATE = "last_update";
+
+    /// Interval of time after which will checking for updates. Now it is 24 hours.
+    private static final long CHECK_FOR_UPDATES_INTERVAL = 86400000;
 
     private static ZNOApplication mInstance;
     private RequestQueue mRequestQueue;
@@ -31,7 +40,6 @@ public class ZNOApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-        Log.v(LOG_TAG, "App Instance created.");
     }
 
     public static synchronized ZNOApplication getInstance() {
@@ -70,6 +78,73 @@ public class ZNOApplication extends Application {
         }
     }
 
+    public long getLastUpdate() {
+        SharedPreferences preferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE);
+        return preferences.getLong(LAST_UPDATE, 0);
+    }
+
+    public void setLastUpdate(long lastUpdate) {
+        SharedPreferences preferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putLong(LAST_UPDATE, lastUpdate);
+        editor.apply();
+    }
+
+    public void onWiFiConnected() {
+        long currentDate = System.currentTimeMillis();
+        long lastUpdate = getLastUpdate();
+
+        if (currentDate - lastUpdate >= CHECK_FOR_UPDATES_INTERVAL) {
+            startService(new Intent(ApiService.ACTION_CHECK_FOR_UPDATES));
+        }
+    }
+
+    public void saveTestSession(int id, int userAnswersId, int questionNumber, long millisLeft) {
+        SharedPreferences preferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(Test.TEST_ID, id)
+                .putInt(TestActivity.Extra.USER_ANSWERS_ID, userAnswersId)
+                .putInt(TestActivity.Extra.QUESTION_NUMBER, questionNumber);
+        if (millisLeft != 0) {
+            editor.putLong(TestTimerFragment.MILLIS_LEFT, millisLeft);
+        }
+        editor.apply();
+    }
+
+    public void removeSavedSession() {
+        SharedPreferences preferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE);
+        preferences.edit().remove(Test.TEST_ID)
+                .remove(TestActivity.Extra.USER_ANSWERS_ID)
+                .remove(TestActivity.Extra.QUESTION_NUMBER)
+                .remove(TestTimerFragment.MILLIS_LEFT).apply();
+    }
+
+    public boolean hasSavedSession() {
+        SharedPreferences preferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE);
+        return preferences.contains(TestActivity.Extra.USER_ANSWERS_ID);
+    }
+
+    public int getSavedSessionUserAnswersId() {
+        SharedPreferences preferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE);
+        return preferences.getInt(TestActivity.Extra.USER_ANSWERS_ID, -1);
+    }
+
+    public void startSavedSession(Activity parent) {
+        SharedPreferences preferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE);
+        int userAnswersId = preferences.getInt(TestActivity.Extra.USER_ANSWERS_ID, -1);
+        int questionNumber = preferences.getInt(TestActivity.Extra.QUESTION_NUMBER, -1);
+        int testId = preferences.getInt(Test.TEST_ID, -1);
+
+        Intent startedActivity = new Intent(TestActivity.Action.CONTINUE_PASSAGE_TEST);
+        startedActivity.putExtra(Test.TEST_ID, testId);
+        startedActivity.putExtra(TestActivity.Extra.USER_ANSWERS_ID, userAnswersId);
+        startedActivity.putExtra(TestActivity.Extra.QUESTION_NUMBER, questionNumber);
+        if (preferences.contains(TestTimerFragment.MILLIS_LEFT)) {
+            startedActivity.putExtra(TestTimerFragment.MILLIS_LEFT, preferences.getLong(TestTimerFragment.MILLIS_LEFT, -1));
+        }
+        parent.startActivity(startedActivity);
+    }
+
     public static void buildLogo(TextView logoTextView, Resources resources, AssetManager assets) {
         String appName = resources.getString(R.string.app_name);
         Calendar calendar = Calendar.getInstance();
@@ -85,7 +160,5 @@ public class ZNOApplication extends Application {
         logoTextView.setText(spannableString);
         logoTextView.setTypeface(ptSansBold);
     }
-
-    ;
 
 }

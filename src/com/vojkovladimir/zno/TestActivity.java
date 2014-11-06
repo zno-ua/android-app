@@ -179,17 +179,11 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             } else {
                 db.updateUserAnswers(userAnswersId, test.getAnswers());
             }
-            SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt(Test.TEST_ID, test.id);
-            editor.putInt(Extra.USER_ANSWERS_ID, userAnswersId);
-            editor.putInt(Extra.QUESTION_NUMBER, mPager.getCurrentItem());
             if (timerMode) {
                 millisLeft = timerFragment.getMillisLeft();
-                editor.putLong(TestTimerFragment.MILLIS_LEFT, timerFragment.getMillisLeft());
                 outState.putLong(TestTimerFragment.MILLIS_LEFT, timerFragment.getMillisLeft());
             }
-            editor.apply();
+            app.saveTestSession(test.id, userAnswersId, mPager.getCurrentItem(), millisLeft);
         }
         outState.putInt(Test.TEST_ID, test.id);
         outState.putBoolean(Extra.QUESTIONS_GRID_VISIBILITY, questionsGridVisible);
@@ -463,7 +457,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         }
 
         if (userAnswersId != -1 || resumed) {
-            removeSavedPref();
+            app.removeSavedSession();
         }
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
@@ -488,10 +482,6 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             public void onClick(DialogInterface dialogInterface, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_NEGATIVE:
-                        if (resumed) {
-                            Intent main = new Intent(getApplicationContext(), MainActivity.class);
-                            startActivity(main);
-                        }
                         finish();
                         break;
                 }
@@ -504,23 +494,13 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     public void cancelTest() {
         if (userAnswersId != -1) {
             db.deleteUserAnswers(userAnswersId);
-            removeSavedPref();
+            app.removeSavedSession();
         }
         if (resumed) {
             Intent main = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(main);
         }
         finish();
-    }
-
-    public void removeSavedPref() {
-        SharedPreferences preferences = getSharedPreferences(ZNOApplication.APP_SETTINGS, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.remove(Test.TEST_ID);
-        editor.remove(Extra.USER_ANSWERS_ID);
-        editor.remove(Extra.QUESTION_NUMBER);
-        editor.remove(TestTimerFragment.MILLIS_LEFT);
-        editor.apply();
     }
 
 }
