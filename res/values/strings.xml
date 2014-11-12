@@ -50,7 +50,7 @@
     <!--TestActivity-->
     <string name="cancel_test_confirm">Завершити тестування без збереження відповідей?</string>
 
-    <!-- Updating Test DataBase Massage -->
+    <!-- Updating Test DataBase Message -->
     <string name="updating_db">Оновлення тестів.</string>
     <string name="downloading_tests">Завантаження тестів.</string>
     <string name="db_updated">Оновлення тестів завершено.</string>
