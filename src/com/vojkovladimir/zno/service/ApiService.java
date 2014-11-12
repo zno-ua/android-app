@@ -87,18 +87,21 @@ public class ApiService extends Service {
                     new NotificationCompat.Builder(ApiService.this);
             Notification notification;
             boolean successful = false;
+            boolean notify = false;
             try {
                 DLTestThread dlTestThread;
                 JSONArray tests = getTests(this);
                 ArrayList<Integer> ids = db.getTestsForUpdate(tests);
-                mBuilder.setSmallIcon(android.R.drawable.stat_notify_sync)
-                        .setContentTitle(getString(R.string.zno))
-                        .setProgress(0, 0, true)
-                        .setContentText(getString(R.string.updating_db));
-                notification = mBuilder.build();
-                notification.flags = Notification.FLAG_NO_CLEAR;
-                mNotifyMgr.notify(ZNO_UPDATE_NOTIFY, notification);
+
                 if (ids.size() > 0) {
+                    mBuilder.setSmallIcon(android.R.drawable.stat_notify_sync)
+                            .setContentTitle(getString(R.string.zno))
+                            .setProgress(0, 0, true)
+                            .setContentText(getString(R.string.updating_db));
+                    notification = mBuilder.build();
+                    notification.flags = Notification.FLAG_NO_CLEAR;
+                    mNotifyMgr.notify(ZNO_UPDATE_NOTIFY, notification);
+                    notify = true;
                     for (int i = 0; i < ids.size(); i++) {
                         dlTestThread = new DLTestThread(ids.get(i), this);
                         dlTestThread.start();
@@ -120,7 +123,7 @@ public class ApiService extends Service {
             } catch (JSONException e) {
                 e.printStackTrace();
             } finally {
-                if (successful) {
+                if (successful && notify) {
                     app.setLastUpdate(System.currentTimeMillis());
                     ComponentName mainActivity =
                             new ComponentName(ApiService.this, MainActivity.class);
