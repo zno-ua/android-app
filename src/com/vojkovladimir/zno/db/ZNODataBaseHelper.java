@@ -505,6 +505,10 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                 testInfo = new TestInfo();
 
                 testInfo.id = c.getInt(idIndex);
+                // Hide math 2014 test
+                if (id == 43) {
+                    continue;
+                }
                 testInfo.lessonId = id;
                 testInfo.name = c.getString(nameIndex);
                 testInfo.taskAll = c.getInt(taskAllIndex);
