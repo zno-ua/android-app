@@ -2,33 +2,42 @@ package com.vojkovladimir.zno;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.vojkovladimir.zno.adapters.QuestionsAdapter;
 import com.vojkovladimir.zno.adapters.QuestionsGridAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.fragments.QuestionFragment;
 import com.vojkovladimir.zno.fragments.TestTimerFragment;
+import com.vojkovladimir.zno.models.Record;
 import com.vojkovladimir.zno.models.Test;
 
-public class TestActivity extends FragmentActivity implements QuestionFragment.OnAnswerSelectedListener,
+import java.util.Calendar;
+import java.util.Locale;
+
+public class TestActivity extends FragmentActivity
+        implements QuestionFragment.OnAnswerSelectedListener,
         TestTimerFragment.OnTimeChangedListener {
 
     final int FINISH_ALERT = 0;
@@ -63,10 +72,36 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
 
     Test test;
     int userAnswersId;
+    int currentPage;
 
     boolean questionsGridVisible;
     ViewPager mPager;
     PagerAdapter mPagerAdapter;
+    ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int i, float v, int i2) {
+        }
+
+        @Override
+        public void onPageSelected(int i) {
+            if (viewMode) {
+                if (currentPage > 0 && i == 0) {
+                    contentList.addView(results, 0);
+                } else if (currentPage == 0 && i > 0) {
+                    contentList.removeView(results);
+                }
+
+            }
+            currentPage = i;
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int i) {
+
+        }
+    };
+    View results;
+    ViewGroup contentList;
     GridView questionsGrid;
 
     FragmentManager manager;
@@ -87,7 +122,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         db = app.getZnoDataBaseHelper();
         manager = getSupportFragmentManager();
 
-        int startItemNum = 0;
+        currentPage = 0;
 
         if (savedInstanceState == null) {
             Intent intent = getIntent();
@@ -117,7 +152,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
                         millisLeft = test.time * 60000;
                     }
                 }
-                startItemNum = intent.getIntExtra(Extra.QUESTION_NUMBER, 0);
+                currentPage = intent.getIntExtra(Extra.QUESTION_NUMBER, 0);
             } else if (action.equals(Action.VIEW_TEST)) {
                 int testId = intent.getIntExtra(Test.TEST_ID, -1);
                 userAnswersId = intent.getIntExtra(Extra.USER_ANSWERS_ID, -1);
@@ -152,11 +187,15 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             timerFragment = TestTimerFragment.newInstance(millisLeft);
         }
 
-        mPager = (ViewPager) findViewById(R.id.test_question_pager);
-        mPagerAdapter = new QuestionsAdapter(getApplicationContext(), getSupportFragmentManager(), test, viewMode);
-        mPager.setAdapter(mPagerAdapter);
-        mPager.setCurrentItem(startItemNum);
+        if (viewMode) {
+            createResultsView();
+        }
 
+        mPager = (ViewPager) findViewById(R.id.test_question_pager);
+        mPagerAdapter = new QuestionsAdapter(this, getSupportFragmentManager(), test, viewMode);
+        mPager.setAdapter(mPagerAdapter);
+        mPager.setCurrentItem(currentPage);
+        mPager.setOnPageChangeListener(onPageChangeListener);
         questionsGrid = (GridView) findViewById(R.id.test_questions);
         questionsGrid.setAdapter(new QuestionsGridAdapter(getApplicationContext(), test, viewMode));
         questionsGrid.setOnItemClickListener(new OnItemClickListener() {
@@ -270,14 +309,64 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
     @Override
     public void onBackPressed() {
         if (viewMode) {
-            if (resumed) {
-                Intent main = new Intent(this, MainActivity.class);
-                startActivity(main);
-            }
             finish();
         } else {
             showAlert(CANCEL_ALERT);
         }
+    }
+
+    private void createResultsView() {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        Record result = db.getResult(userAnswersId);
+        contentList = (ViewGroup) findViewById(R.id.test_content_list);
+        results = inflater.inflate(R.layout.test_result, contentList, false);
+        contentList.addView(results, 0);
+
+        TextView lessonName = (TextView) results.findViewById(R.id.lesson_name);
+        TextView ratingBall = (TextView) results.findViewById(R.id.rating_ball);
+        TextView dateAndTime = (TextView) results.findViewById(R.id.date_and_time);
+
+        lessonName.setText(result.lessonName + "\n" + result.year + " " + getString(R.string.year));
+
+        SpannableString ball;
+        if (result.ball % 1 == 0) {
+            ball = new SpannableString(String.valueOf((int) result.ball));
+        } else {
+            ball = new SpannableString(String.format(Locale.US, "%.1f", result.ball));
+            ball.setSpan(new RelativeSizeSpan(0.5f), ball.length() - 2, ball.length(), 0);
+        }
+
+        if (result.ball >= 190.0f) {
+            int highBallColor = getResources().getColor(R.color.dark_green);
+            ball.setSpan(new ForegroundColorSpan(highBallColor), 0, ball.length(), 0);
+        }
+        ratingBall.setText(ball);
+
+        String[] months = getResources().getStringArray(R.array.months);
+        String dateFormat = getString(R.string.test_passed_date_format);
+        String timeFormat;
+        String min = getString(R.string.min);
+        String sec = getString(R.string.sec);
+
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(result.date);
+        int day = date.get(Calendar.DAY_OF_MONTH);
+        int month = date.get(Calendar.MONTH);
+
+        if (result.elapsedTime == 0) {
+            timeFormat = "";
+        } else {
+            timeFormat = " " + getString(R.string.test_passed_time_format);
+            int minutes = (int) (result.elapsedTime / 60000);
+            if (minutes == 0) {
+                int seconds = (int) ((result.elapsedTime % 60000) / 1000);
+                timeFormat = String.format(timeFormat, seconds, sec);
+            } else {
+                timeFormat = String.format(timeFormat, minutes, min);
+            }
+        }
+        dateFormat = String.format(dateFormat, day, months[month], timeFormat);
+        dateAndTime.setText(dateFormat);
     }
 
     private void showQuestionsGrid() {
@@ -299,14 +388,19 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         test.questions.get(id).setUserAnswer(answer);
         if (switchToNext) {
             if (test.hasUnAnsweredQuestions()) {
-                if (mPager.getCurrentItem() + 1 < test.questions.size()) {
-                    mPager.setCurrentItem(mPager.getCurrentItem() + 1);
-                }
+                switchToNext();
             } else {
                 if (askToFinish) {
                     showAlert(FINISH_ALERT);
                 }
             }
+        }
+    }
+
+    public void switchToNext() {
+        int next = mPager.getCurrentItem() + 1;
+        if (next < mPagerAdapter.getCount()) {
+            mPager.setCurrentItem(next);
         }
     }
 
@@ -444,7 +538,7 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
         final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
         long elapsedTime = 0;
         if (timerMode) {
-            elapsedTime = test.time * 60000 - millisLeft;
+            elapsedTime = test.time * 60000 - timerFragment.getMillisLeft();
         }
         long date = System.currentTimeMillis();
 
@@ -460,45 +554,18 @@ public class TestActivity extends FragmentActivity implements QuestionFragment.O
             app.removeSavedSession();
         }
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setMessage("Тест Завершено!\nтестовий бал: " + testBall + "\n" + "рейтинговий бал: " + znoBall + "\nподивитися помилки?");
-        dialogBuilder.setPositiveButton("Так", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        Intent viewResults = new Intent(TestActivity.Action.VIEW_TEST);
-                        viewResults.putExtra(Test.TEST_ID, test.id);
-                        viewResults.putExtra(Extra.USER_ANSWERS_ID, userAnswersId);
-                        viewResults.putExtra(Extra.RESUMED, resumed);
-                        startActivity(viewResults);
-                        finish();
-                        break;
-                }
-            }
-        });
-        dialogBuilder.setNegativeButton("Ні", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        finish();
-                        break;
-                }
-            }
-        });
-        dialogBuilder.setCancelable(false);
-        dialogBuilder.create().show();
+        Intent viewResults = new Intent(TestActivity.Action.VIEW_TEST);
+        viewResults.putExtra(Test.TEST_ID, test.id);
+        viewResults.putExtra(Extra.USER_ANSWERS_ID, userAnswersId);
+        viewResults.putExtra(Extra.RESUMED, resumed);
+        startActivity(viewResults);
+        finish();
     }
 
     public void cancelTest() {
         if (userAnswersId != -1) {
             db.deleteUserAnswers(userAnswersId);
             app.removeSavedSession();
-        }
-        if (resumed) {
-            Intent main = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(main);
         }
         finish();
     }

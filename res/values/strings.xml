@@ -19,6 +19,8 @@
     <string name="exp_zno">Пробне тестування ЗНО</string>
     <string name="for_">за</string>
     <string name="year">рік</string>
+    <string name="min">хв</string>
+    <string name="sec">сек</string>
     <string name="zno">ЗНО</string>
     <string name="tests_one">тест</string>
     <string name="tests_two_four">тести</string>
@@ -49,6 +51,9 @@
 
     <!--TestActivity-->
     <string name="cancel_test_confirm">Завершити тестування без збереження відповідей?</string>
+    <string name="rating_ball">Рейтинговий бал:</string>
+    <string name="test_passed_date_format" formatted="false">Тест пройдено %d %s%s.</string>
+    <string name="test_passed_time_format" formatted="false">за %d %s</string>
 
     <!-- Updating Test DataBase Message -->
     <string name="updating_db">Оновлення тестів.</string>

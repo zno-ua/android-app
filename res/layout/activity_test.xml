@@ -4,21 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <LinearLayout
+        android:id="@+id/test_content_list"
+        android:animateLayoutChanges="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/test_question_pager"
+        <FrameLayout
+            android:id="@+id/test_questions_container"
+            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="0dp">
 
-        <GridView
-            android:id="@+id/test_questions"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            style="@style/Scrollable.Grid"
-            android:visibility="invisible"/>
-    </FrameLayout>
+            <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/test_question_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <GridView
+                android:id="@+id/test_questions"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                style="@style/Scrollable.Grid"
+                android:visibility="invisible" />
+        </FrameLayout>
+    </LinearLayout>
 
 </FrameLayout>

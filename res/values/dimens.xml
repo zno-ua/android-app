@@ -71,6 +71,10 @@
     <dimen name="timer_text_size">18sp</dimen>
     <dimen name="timer_padding">15dp</dimen>
 
+    <!-- Test Result -->
+    <dimen name="test_results_lesson_text_size">18sp</dimen>
+
+    <dimen name="record_ball_text_size">24sp</dimen>
     <dimen name="list_divider_height">10dp</dimen>
 
 </resources>

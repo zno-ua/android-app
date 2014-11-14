@@ -143,7 +143,7 @@
     <!-- Record -->
     <style name="RecordBall">
         <item name="android:textColor">@color/record_ball_color</item>
-        <item name="android:textSize">23sp</item>
+        <item name="android:textSize">@dimen/record_ball_text_size</item>
         <item name="android:textStyle">bold</item>
         <item name="android:paddingLeft">@dimen/question_padding</item>
     </style>
@@ -183,8 +183,15 @@
         <item name="android:layout_margin">@dimen/question_margin</item>
     </style>
 
-    <!-- Answer -->
+    <!-- Test Result -->
+    <style name="TestResult" parent="QuestionHeader">
+        <item name="android:layout_marginLeft">@dimen/scrollable_view_padding</item>
+        <item name="android:layout_marginRight">@dimen/scrollable_view_padding</item>
+        <item name="android:layout_marginTop">@dimen/scrollable_view_padding</item>
+        <item name="android:padding">@dimen/question_margin</item>
+    </style>
 
+    <!-- Answer -->
     <style name="AnswerText">
         <item name="android:textColor">@color/text_color_gray_white</item>
         <item name="android:textSize">@dimen/question_text_size</item>
