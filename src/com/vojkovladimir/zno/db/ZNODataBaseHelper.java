@@ -29,6 +29,13 @@ import java.util.List;
 public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
     private static final String AND = " AND ";
+    private static final String AS = " AS ";
+    private static final String ON = " ON ";
+    private static final String SELECT = "SELECT ";
+    private static final String FROM = "FROM ";
+    private static final String INNER = "INNER ";
+    private static final String JOIN = "JOIN ";
+    private static final String WHERE = " WHERE ";
     private static String LOG_TAG = "MyLogs";
 
     private static final String DATABASE_NAME = "ZNO.db";
@@ -328,6 +335,40 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public Record getResult(int id) {
+        Record result = null;
+        String TEST_NAME = "test_name";
+        String T = "T";
+        String L = "L";
+        String A = "A";
+        String query =
+                SELECT + L + "." + KEY_NAME + ", " +
+                        KEY_YEAR + ", " +
+                        T + "." + KEY_NAME + AS + TEST_NAME + ", " +
+                        KEY_DATE + ", " +
+                        KEY_ELAPSED_TIME + ", " +
+                        KEY_ZNO_BALL + " " +
+                        FROM + TABLE_USER_ANSWERS + AS  + A + " " +
+                        INNER + JOIN + TABLE_TESTS + AS + T +
+                        ON + T + "." + KEY_ID + "=" + KEY_TEST_ID + " " +
+                        INNER + JOIN + TABLE_LESSONS + AS + L +
+                        ON + L + "." + KEY_ID + "=" + T + "." + KEY_LESSON_ID +
+                        WHERE + " " + A + "." + KEY_ID + "=" + id;
+
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if (c.moveToFirst()) {
+            result = new Record();
+            result.lessonName = c.getString(0);
+            result.year = c.getInt(1);
+            result.session = parseSession(c.getString(2));
+            result.date = c.getLong(3);
+            result.elapsedTime = c.getInt(4);
+            result.ball = c.getFloat(5);
+        }
+
+        return result;
+    }
+
     public ArrayList<Integer> getTestsForUpdate(JSONArray tests) throws JSONException {
         SQLiteDatabase db = getReadableDatabase();
         ArrayList<Integer> ids = new ArrayList<Integer>();
@@ -506,7 +547,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
                 testInfo.id = c.getInt(idIndex);
                 // Hide math 2014 test
-                if (id == 43) {
+                if (testInfo.id == 43) {
                     continue;
                 }
                 testInfo.lessonId = id;
@@ -603,7 +644,6 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         Cursor cRecords;
         String[] projection = {KEY_LESSON_ID, KEY_TEST_ID, KEY_DATE, KEY_ELAPSED_TIME, KEY_ZNO_BALL};
         String selection;
-        String SESSION = ZNOApplication.getInstance().getResources().getString(R.string.session_text);
 
         cRecords = db.query(TABLE_USER_RECORDS, projection, null, null, null, null, null, null);
         if (cRecords.moveToFirst()) {
@@ -636,13 +676,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                 if (test.moveToFirst()) {
                     testName = test.getString(test.getColumnIndex(KEY_NAME));
                     record.year = test.getInt(test.getColumnIndex(KEY_YEAR));
-                    if (testName.contains("(I " + SESSION + ")")) {
-                        record.session = 1;
-                    } else if (testName.contains("(II " + SESSION + ")")) {
-                        record.session = 2;
-                    } else {
-                        record.session = 0;
-                    }
+                    record.session = parseSession(testName);
                 } else {
                     continue;
                 }
@@ -657,6 +691,16 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
 
         return records;
+    }
+
+    private int parseSession(String testName) {
+        String SESSION = ZNOApplication.getInstance().getResources().getString(R.string.session_text);
+        if (testName.contains("(I " + SESSION + ")")) {
+            return 1;
+        } else if (testName.contains("(II " + SESSION + ")")) {
+            return 2;
+        }
+        return 0;
     }
 
     public ArrayList<PassedTest> getPassedTests() {
