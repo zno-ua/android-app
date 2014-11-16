@@ -543,6 +543,10 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         String[] projection = {KEY_LESSON_ID};
         String selection = KEY_LESSON_ID + " = " + id;
         Cursor c = db.query(TABLE_TESTS, projection, selection, null, null, null, null);
+        // Hide math 2014 test
+        if (id == 4) {
+            return c.getCount() - 1;
+        }
         return c.getCount();
     }
 
