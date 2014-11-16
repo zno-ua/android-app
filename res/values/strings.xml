@@ -59,6 +59,8 @@
     <string name="one_minute_rod">хвилину</string>
     <string name="two_four_minutes_rod">хвилини</string>
     <string name="minutes_rod">хвилин</string>
+    <string name="share_template" formatted="false">Мій результат тестування з %s — %.1f балів.\nПройти цей тест:
+        http://zno-ua.net/test/%s/%d?utm-source=android</string>
 
     <!-- Updating Test DataBase Message -->
     <string name="updating_db">Оновлення тестів.</string>

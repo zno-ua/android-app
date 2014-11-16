@@ -27,8 +27,11 @@ import com.vojkovladimir.zno.adapters.QuestionsGridAdapter;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.fragments.QuestionFragment;
 import com.vojkovladimir.zno.fragments.TestTimerFragment;
+import com.vojkovladimir.zno.models.Lesson;
 import com.vojkovladimir.zno.models.Record;
 import com.vojkovladimir.zno.models.Test;
+
+import java.util.Locale;
 
 public class TestActivity extends FragmentActivity
         implements QuestionFragment.OnAnswerSelectedListener,
@@ -65,6 +68,7 @@ public class TestActivity extends FragmentActivity
     MenuItem timerAction;
 
     Test test;
+    Record result;
     int userAnswersId;
     int currentPage;
 
@@ -182,6 +186,7 @@ public class TestActivity extends FragmentActivity
         }
 
         if (viewMode) {
+            result = db.getResult(userAnswersId);
             createResultsView();
         }
 
@@ -286,13 +291,16 @@ public class TestActivity extends FragmentActivity
                 }
                 return true;
             case R.id.action_share:
-                /*
-                    Write share
+                String shareTemplate = getString(R.string.share_template);
+                Lesson lesson = db.getLesson(test.lessonId);
+                String shareText =
+                        String.format(Locale.US, shareTemplate,
+                                lesson.nameRod, result.znoBall, lesson.link, test.id);
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, shareText);
                 sendIntent.setType("text/plain");
-                startActivity(sendIntent);*/
+                startActivity(sendIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -311,7 +319,6 @@ public class TestActivity extends FragmentActivity
 
     private void createResultsView() {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        Record result = db.getResult(userAnswersId);
         contentList = (ViewGroup) findViewById(R.id.test_content_list);
         results = inflater.inflate(R.layout.test_result, contentList, false);
         contentList.addView(results, 0);
