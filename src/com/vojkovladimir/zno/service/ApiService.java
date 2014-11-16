@@ -50,6 +50,7 @@ public class ApiService extends Service {
         String LESSON_ID = "lesson_id";
         String LINK = "link";
         String NAME = "name";
+        String NAME_ROD = "name_rod";
         String TASK_ALL = "task_all";
         String YEAR = "year";
         String TIME = "time";

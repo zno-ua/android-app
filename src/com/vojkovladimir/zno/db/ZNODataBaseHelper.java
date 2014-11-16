@@ -60,6 +60,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ID_TEST_QUESTION = "id_test_question";
     private static final String KEY_LINK = "link";
     private static final String KEY_NAME = "name";
+    private static final String KEY_NAME_ROD = "name_rod";
     private static final String KEY_TASK_ALL = "task_all";
     private static final String KEY_TIME = "time";
     private static final String KEY_YEAR = "year";
@@ -81,7 +82,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_LESSONS + " ("
                     + KEY_ID + " INTEGER PRIMARY KEY, "
                     + KEY_LINK + " TEXT, "
-                    + KEY_NAME + " TEXT);";
+                    + KEY_NAME + " TEXT, "
+                    + KEY_NAME_ROD + " TEXT);";
 
     private static final String CREATE_TABLE_TESTS =
             "CREATE TABLE " + TABLE_TESTS + " ("
@@ -185,6 +187,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         int id;
         String link;
         String name;
+        String nameRod;
 
         long status;
 
@@ -195,11 +198,13 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                 id = lesson.getInt(ApiService.Keys.ID);
                 link = lesson.getString(ApiService.Keys.LINK).replace("-", "_");
                 name = lesson.getString(ApiService.Keys.NAME);
+                nameRod = lesson.getString(ApiService.Keys.NAME_ROD);
 
                 values.clear();
                 values.put(KEY_ID, id);
                 values.put(KEY_LINK, link);
                 values.put(KEY_NAME, name);
+                values.put(KEY_NAME_ROD, nameRod);
 
                 status = db.insert(TABLE_LESSONS, null, values);
 
@@ -352,7 +357,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                         KEY_ELAPSED_TIME + ", " +
                         KEY_ZNO_BALL + ", " +
                         KEY_TEST_BALL + " " +
-                        FROM + TABLE_USER_ANSWERS + AS  + A + " " +
+                        FROM + TABLE_USER_ANSWERS + AS + A + " " +
                         INNER + JOIN + TABLE_TESTS + AS + T +
                         ON + T + "." + KEY_ID + "=" + KEY_TEST_ID + " " +
                         INNER + JOIN + TABLE_LESSONS + AS + L +
@@ -485,22 +490,20 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     public ArrayList<Lesson> getLessons() {
         ArrayList<Lesson> lessons = new ArrayList<Lesson>();
 
-        SQLiteDatabase db = getWritableDatabase();
-        String[] projection = {KEY_ID, KEY_NAME, KEY_LINK};
+        SQLiteDatabase db = getReadableDatabase();
+        String[] projection = {KEY_ID, KEY_NAME, KEY_NAME_ROD, KEY_LINK};
         Cursor c = db.query(TABLE_LESSONS, projection, null, null, null, null, null);
         Lesson lesson;
         Lesson worldHist = null;
 
         if (c.moveToFirst()) {
-            int idIndex = c.getColumnIndex(KEY_ID);
-            int nameIndex = c.getColumnIndex(KEY_NAME);
-            int linkIndex = c.getColumnIndex(KEY_LINK);
 
             do {
                 lesson = new Lesson();
-                lesson.id = c.getInt(idIndex);
-                lesson.name = c.getString(nameIndex);
-                lesson.link = c.getString(linkIndex);
+                lesson.id = c.getInt(0);
+                lesson.name = c.getString(1);
+                lesson.nameRod = c.getString(2).replace("_", "-");
+                lesson.link = c.getString(3);
                 lesson.testsCount = getLessonTestsCount(lesson.id);
 
                 if (lesson.id == 3) {
@@ -517,6 +520,22 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         }
 
         return lessons;
+    }
+
+    public Lesson getLesson(int id) {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] projection = {KEY_ID, KEY_NAME, KEY_NAME_ROD, KEY_LINK};
+        String selection = KEY_ID + "=" + id;
+        Cursor c = db.query(TABLE_LESSONS, projection, selection, null, null, null, null);
+        c.moveToFirst();
+        Lesson lesson = new Lesson();
+
+        lesson.id = c.getInt(0);
+        lesson.name = c.getString(1);
+        lesson.nameRod = c.getString(2);
+        lesson.link = c.getString(3);
+
+        return lesson;
     }
 
     public int getLessonTestsCount(int id) {
