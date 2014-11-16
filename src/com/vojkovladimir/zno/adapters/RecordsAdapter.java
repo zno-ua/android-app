@@ -1,9 +1,6 @@
 package com.vojkovladimir.zno.adapters;
 
 import android.content.Context;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +8,11 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.vojkovladimir.zno.R;
+import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.models.Record;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
 
 public class RecordsAdapter extends BaseAdapter {
 
@@ -104,24 +101,14 @@ public class RecordsAdapter extends BaseAdapter {
             additionalInfo += String.format(", " + FOR + " %d " + MIN, minutes);
         }
 
-        SpannableString recordBall;
-        if (record.znoBall % 1 == 0) {
-            recordBall = new SpannableString(String.valueOf((int) record.znoBall));
-        } else {
-            recordBall = new SpannableString(String.format(Locale.US, "%.1f", record.znoBall));
-            recordBall.setSpan(new RelativeSizeSpan(0.5f), recordBall.length() - 2, recordBall.length(), 0);
-        }
-
-
-        if (record.znoBall >= 190.0f) {
-            recordBall.setSpan(new ForegroundColorSpan(HIGH_BALL_COLOR), 0, recordBall.length(), 0);
-        }
+        int ballType = (record.znoBall >= 190f) ? Record.GOOD_BALL :
+                (record.znoBall < 124f) ? Record.BAD_BALL : 0;
 
         ViewHolder holder = (ViewHolder) view.getTag();
         holder.lessonName.setText(record.lessonName);
         holder.testProperties.setText(testProperties);
         holder.additionalInfo.setText(additionalInfo);
-        holder.recordBall.setText(recordBall);
+        holder.recordBall.setText(ZNOApplication.buildBall(record.znoBall, false, ballType));
 
         return view;
     }

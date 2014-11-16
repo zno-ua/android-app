@@ -322,8 +322,8 @@ public class TestActivity extends FragmentActivity
         TextView elapsedTime = (TextView) results.findViewById(R.id.elapsed_time);
 
         lessonName.setText(result.lessonName);
-        int ballType =
-                (result.znoBall >= 190f)? Record.GOOD_BALL: (result.znoBall < 124f)? Record.BAD_BALL: 0;
+        int ballType = (result.znoBall >= 190f) ? Record.GOOD_BALL :
+                (result.znoBall < 124f) ? Record.BAD_BALL : 0;
 
         testBall.setText(ZNOApplication.buildBall(result.testBall, false, ballType));
         ratingBall.setText(ZNOApplication.buildBall(result.znoBall, true, ballType));
