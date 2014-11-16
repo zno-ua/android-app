@@ -9,8 +9,10 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -18,10 +20,12 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.vojkovladimir.zno.db.ZNODataBaseHelper;
 import com.vojkovladimir.zno.fragments.TestTimerFragment;
+import com.vojkovladimir.zno.models.Record;
 import com.vojkovladimir.zno.models.Test;
 import com.vojkovladimir.zno.service.ApiService;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 public class ZNOApplication extends Application {
 
@@ -159,6 +163,32 @@ public class ZNOApplication extends Application {
 
         logoTextView.setText(spannableString);
         logoTextView.setTypeface(ptSansBold);
+    }
+
+    public static SpannableStringBuilder buildBall(float ball, boolean withEmoji, int type) {
+        Resources resources = ZNOApplication.getInstance().getResources();
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        if (ball % 1 == 0) {
+            builder.insert(0, String.valueOf((int) ball));
+        } else {
+            builder.insert(0, String.format(Locale.US, "%.1f", ball));
+            builder.setSpan(new RelativeSizeSpan(0.5f), builder.length() - 2, builder.length(), 0);
+        }
+
+        if (type == Record.GOOD_BALL) {
+            if (withEmoji) {
+                builder.append(" ").append(resources.getString(R.string.happy));
+            }
+            int highScoreColor = resources.getColor(R.color.dark_green);
+            builder.setSpan(new ForegroundColorSpan(highScoreColor), 0, builder.length(), 0);
+        } else if (type == Record.BAD_BALL) {
+            if (withEmoji) {
+                builder.append(" ").append(resources.getString(R.string.sad));
+            }
+            int lowScoreColor = resources.getColor(R.color.red);
+            builder.setSpan(new ForegroundColorSpan(lowScoreColor), 0, builder.length(), 0);
+        }
+        return builder;
     }
 
 }

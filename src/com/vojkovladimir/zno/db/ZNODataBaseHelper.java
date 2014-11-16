@@ -67,6 +67,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ANSWERS = "answers";
     private static final String KEY_BALLS = "balls";
     private static final String KEY_ZNO_BALL = "zno_ball";
+    private static final String KEY_TEST_BALL = "test_ball";
     private static final String KEY_CORRECT_ANSWER = "correct_answer";
     private static final String KEY_QUESTION = "question";
     private static final String KEY_TYPE_QUESTION = "type_question";
@@ -115,6 +116,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                     + KEY_DATE + " INTEGER, "
                     + KEY_ANSWERS + " TEXT, "
                     + KEY_ELAPSED_TIME + " INTEGER, "
+                    + KEY_TEST_BALL + " INTEGER, "
                     + KEY_ZNO_BALL + " REAL);";
 
     private static final String CREATE_TABLE_USER_RECORDS =
@@ -299,10 +301,11 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         db.update(TABLE_USER_ANSWERS, values, KEY_ID + "=" + id, null);
     }
 
-    public void completeUserAnswers(int id, float znoBall, long elapsedTime, long date) {
+    public void completeUserAnswers(int id, int testBall, float znoBall, long elapsedTime, long date) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_ZNO_BALL, znoBall);
+        values.put(KEY_TEST_BALL, testBall);
         values.put(KEY_ELAPSED_TIME, elapsedTime);
         values.put(KEY_DATE, date);
         db.update(TABLE_USER_ANSWERS, values, KEY_ID + "=" + id, null);
@@ -347,7 +350,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                         T + "." + KEY_NAME + AS + TEST_NAME + ", " +
                         KEY_DATE + ", " +
                         KEY_ELAPSED_TIME + ", " +
-                        KEY_ZNO_BALL + " " +
+                        KEY_ZNO_BALL + ", " +
+                        KEY_TEST_BALL + " " +
                         FROM + TABLE_USER_ANSWERS + AS  + A + " " +
                         INNER + JOIN + TABLE_TESTS + AS + T +
                         ON + T + "." + KEY_ID + "=" + KEY_TEST_ID + " " +
@@ -363,7 +367,8 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             result.session = parseSession(c.getString(2));
             result.date = c.getLong(3);
             result.elapsedTime = c.getInt(4);
-            result.ball = c.getFloat(5);
+            result.znoBall = c.getFloat(5);
+            result.testBall = c.getInt(6);
         }
 
         return result;
@@ -683,7 +688,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
                 record.date = cRecords.getLong(cRecords.getColumnIndex(KEY_DATE));
                 record.elapsedTime = cRecords.getLong(cRecords.getColumnIndex(KEY_ELAPSED_TIME));
-                record.ball = cRecords.getFloat(cRecords.getColumnIndex(KEY_ZNO_BALL));
+                record.znoBall = cRecords.getFloat(cRecords.getColumnIndex(KEY_ZNO_BALL));
 
                 records.add(record);
             } while (cRecords.moveToNext());
@@ -758,7 +763,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
                 passedTest.date = recRows.getLong(recRows.getColumnIndex(KEY_DATE));
                 passedTest.elapsedTime = recRows.getLong(recRows.getColumnIndex(KEY_ELAPSED_TIME));
-                passedTest.ball = recRows.getFloat(recRows.getColumnIndex(KEY_ZNO_BALL));
+                passedTest.znoBall = recRows.getFloat(recRows.getColumnIndex(KEY_ZNO_BALL));
 
                 passedTests.add(passedTest);
             } while (recRows.moveToNext());

@@ -191,6 +191,32 @@
         <item name="android:padding">@dimen/question_margin</item>
     </style>
 
+    <style name="ResultLessonHeader">
+        <item name="android:textSize">@dimen/result_lesson_header_text_size</item>
+        <item name="android:textColor">@color/quote_color</item>
+    </style>
+
+    <style name="ResultBallTimeHeader">
+        <item name="android:textSize">@dimen/result_time_ball_header_text_size</item>
+        <item name="android:textColor">@color/sub_item_text_color</item>
+    </style>
+
+    <style name="ResultBallTime">
+        <item name="android:textSize">@dimen/result_time_ball_text_size</item>
+        <item name="android:textColor">@color/quote_color</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ResultRowSeparator">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_width">1dp</item>
+        <item name="android:alpha">0.1</item>
+        <item name="android:background">@android:color/black</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
     <!-- Answer -->
     <style name="AnswerText">
         <item name="android:textColor">@color/text_color_gray_white</item>

@@ -105,15 +105,15 @@ public class RecordsAdapter extends BaseAdapter {
         }
 
         SpannableString recordBall;
-        if (record.ball % 1 == 0) {
-            recordBall = new SpannableString(String.valueOf((int) record.ball));
+        if (record.znoBall % 1 == 0) {
+            recordBall = new SpannableString(String.valueOf((int) record.znoBall));
         } else {
-            recordBall = new SpannableString(String.format(Locale.US, "%.1f", record.ball));
+            recordBall = new SpannableString(String.format(Locale.US, "%.1f", record.znoBall));
             recordBall.setSpan(new RelativeSizeSpan(0.5f), recordBall.length() - 2, recordBall.length(), 0);
         }
 
 
-        if (record.ball >= 190.0f) {
+        if (record.znoBall >= 190.0f) {
             recordBall.setSpan(new ForegroundColorSpan(HIGH_BALL_COLOR), 0, recordBall.length(), 0);
         }
 

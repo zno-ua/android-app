@@ -10,9 +10,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,9 +29,6 @@ import com.vojkovladimir.zno.fragments.QuestionFragment;
 import com.vojkovladimir.zno.fragments.TestTimerFragment;
 import com.vojkovladimir.zno.models.Record;
 import com.vojkovladimir.zno.models.Test;
-
-import java.util.Calendar;
-import java.util.Locale;
 
 public class TestActivity extends FragmentActivity
         implements QuestionFragment.OnAnswerSelectedListener,
@@ -323,50 +317,42 @@ public class TestActivity extends FragmentActivity
         contentList.addView(results, 0);
 
         TextView lessonName = (TextView) results.findViewById(R.id.lesson_name);
+        TextView testBall = (TextView) results.findViewById(R.id.test_ball);
         TextView ratingBall = (TextView) results.findViewById(R.id.rating_ball);
-        TextView dateAndTime = (TextView) results.findViewById(R.id.date_and_time);
+        TextView elapsedTime = (TextView) results.findViewById(R.id.elapsed_time);
 
-        lessonName.setText(result.lessonName + "\n" + result.year + " " + getString(R.string.year));
+        lessonName.setText(result.lessonName);
+        int ballType =
+                (result.znoBall >= 190f)? Record.GOOD_BALL: (result.znoBall < 124f)? Record.BAD_BALL: 0;
 
-        SpannableString ball;
-        if (result.ball % 1 == 0) {
-            ball = new SpannableString(String.valueOf((int) result.ball));
-        } else {
-            ball = new SpannableString(String.format(Locale.US, "%.1f", result.ball));
-            ball.setSpan(new RelativeSizeSpan(0.5f), ball.length() - 2, ball.length(), 0);
-        }
+        testBall.setText(ZNOApplication.buildBall(result.testBall, false, ballType));
+        ratingBall.setText(ZNOApplication.buildBall(result.znoBall, true, ballType));
 
-        if (result.ball >= 190.0f) {
-            int highBallColor = getResources().getColor(R.color.dark_green);
-            ball.setSpan(new ForegroundColorSpan(highBallColor), 0, ball.length(), 0);
-        }
-        ratingBall.setText(ball);
-
-        String[] months = getResources().getStringArray(R.array.months);
-        String dateFormat = getString(R.string.test_passed_date_format);
-        String timeFormat;
-        String min = getString(R.string.min);
-        String sec = getString(R.string.sec);
-
-        Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(result.date);
-        int day = date.get(Calendar.DAY_OF_MONTH);
-        int month = date.get(Calendar.MONTH);
-
-        if (result.elapsedTime == 0) {
-            timeFormat = "";
-        } else {
-            timeFormat = " " + getString(R.string.test_passed_time_format);
+        if (result.elapsedTime / 60000 > 0) {
             int minutes = (int) (result.elapsedTime / 60000);
-            if (minutes == 0) {
-                int seconds = (int) ((result.elapsedTime % 60000) / 1000);
-                timeFormat = String.format(timeFormat, seconds, sec);
+            String time;
+            if (minutes >= 20 || (minutes >= 0 && minutes < 10)) {
+                switch (minutes % 10) {
+                    case 1:
+                        time = getString(R.string.one_minute_rod);
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                        time = getString(R.string.two_four_minutes_rod);
+                        break;
+                    default:
+                        time = getString(R.string.minutes_rod);
+                }
             } else {
-                timeFormat = String.format(timeFormat, minutes, min);
+                time = getString(R.string.minutes_rod);
             }
+            time = String.format("%d %s", minutes, time);
+            elapsedTime.setText(time);
+        } else {
+            results.findViewById(R.id.result_time_block_separator).setVisibility(View.INVISIBLE);
+            results.findViewById(R.id.result_time_block).setVisibility(View.INVISIBLE);
         }
-        dateFormat = String.format(dateFormat, day, months[month], timeFormat);
-        dateAndTime.setText(dateFormat);
     }
 
     private void showQuestionsGrid() {
@@ -544,10 +530,10 @@ public class TestActivity extends FragmentActivity
 
         if (userAnswersId == -1) {
             userAnswersId = db.saveUserAnswers(test.lessonId, test.id, test.getAnswers());
-            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+            db.completeUserAnswers(userAnswersId, testBall, znoBall, elapsedTime, date);
         } else {
             db.updateUserAnswers(userAnswersId, test.getAnswers());
-            db.completeUserAnswers(userAnswersId, znoBall, elapsedTime, date);
+            db.completeUserAnswers(userAnswersId, testBall, znoBall, elapsedTime, date);
         }
 
         if (userAnswersId != -1 || resumed) {
