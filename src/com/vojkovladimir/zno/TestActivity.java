@@ -62,6 +62,7 @@ public class TestActivity extends FragmentActivity
     boolean viewMode;
     boolean resumed;
     boolean askToFinish;
+    boolean isDestroying = false;
 
     boolean timerMode;
     long millisLeft;
@@ -233,6 +234,12 @@ public class TestActivity extends FragmentActivity
             manager.putFragment(outState, TestTimerFragment.TAG, timerFragment);
         }
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        isDestroying = true;
     }
 
     @Override
@@ -420,7 +427,7 @@ public class TestActivity extends FragmentActivity
         final Runnable hide = new Runnable() {
             @Override
             public void run() {
-                if (!isFinishing() || !isDestroyed()) {
+                if (!isDestroying) {
                     manager.beginTransaction()
                             .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
                             .hide(timerFragment)
