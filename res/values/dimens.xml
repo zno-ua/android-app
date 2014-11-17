@@ -2,16 +2,16 @@
 <resources>
 
     <!-- AppLogo -->
-    <dimen name="app_logo_text_size">64sp</dimen>
+    <dimen name="app_logo_text_size">60sp</dimen>
 
     <!-- Quote -->
-    <dimen name="quote_text_size">18sp</dimen>
+    <dimen name="quote_text_size">16sp</dimen>
 
     <!-- Button -->
-    <dimen name="button_text_size">18sp</dimen>
-    <dimen name="button_margin">10dp</dimen>
+    <dimen name="button_text_size">16sp</dimen>
+    <dimen name="button_margin">8dp</dimen>
     <dimen name="button_corner_radius">3dp</dimen>
-    <dimen name="button_padding">10dp</dimen>
+    <dimen name="button_padding">8dp</dimen>
 
     <!-- Scrollable -->
     <dimen name="scrollable_view_margin">15dp</dimen>
@@ -80,7 +80,7 @@
     <dimen name="space_medium">10dp</dimen>
     <dimen name="space_large">15dp</dimen>
 
-    <dimen name="record_ball_text_size">24sp</dimen>
+    <dimen name="record_ball_text_size">20sp</dimen>
     <dimen name="list_divider_height">10dp</dimen>
 
 </resources>
