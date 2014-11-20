@@ -108,6 +108,8 @@ public class Question {
 
     public boolean isAnswered() {
         switch (type) {
+            case TYPE_2:
+                return !(userAnswer.isEmpty() || userAnswer.equals(String.valueOf(balls/2)));
             case TYPE_3:
                 return !userAnswer.contains("0");
             default:
