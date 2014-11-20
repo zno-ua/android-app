@@ -38,9 +38,8 @@
     <dimen name="test_padding">10dp</dimen>
     <dimen name="test_name_text_size">18sp</dimen>
     <dimen name="test_properties_text_size">14sp</dimen>
-    <dimen name="test_download_image_width">48dp</dimen>
-    <dimen name="test_download_image_height">48dp</dimen>
-    <dimen name="test_download_image_separator_height">32dp</dimen>
+    <dimen name="test_download_image_size">48dp</dimen>
+    <dimen name="test_download_image_separator_height">28dp</dimen>
 
     <!-- Question -->
     <dimen name="question_padding">10dp</dimen>

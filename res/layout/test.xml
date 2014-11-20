@@ -51,10 +51,10 @@
 
             <ImageView
                 android:layout_gravity="center_vertical"
-                android:layout_width="@dimen/test_download_image_width"
-                android:layout_height="@dimen/test_download_image_height"
-                android:alpha="0.23"
-                android:src="@drawable/ic_action_download" />
+                android:layout_width="@dimen/test_download_image_size"
+                android:layout_height="@dimen/test_download_image_size"
+                android:alpha="0.1"
+                android:src="@drawable/ic_download" />
         </LinearLayout>
 
     </FrameLayout>
