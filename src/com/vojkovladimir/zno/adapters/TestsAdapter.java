@@ -128,6 +128,8 @@ public class TestsAdapter extends BaseAdapter {
 
 		viewHolder.testName.setText(testName);
 		viewHolder.testProperties.setText(testProperties);
+        viewHolder.testName.setSelected(true);
+        viewHolder.testName.setSelected(true);
 
 		return testItem;
 	}

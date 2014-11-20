@@ -108,6 +108,7 @@ public class RecordsAdapter extends BaseAdapter {
         holder.lessonName.setText(record.lessonName);
         holder.testProperties.setText(testProperties);
         holder.additionalInfo.setText(additionalInfo);
+        holder.additionalInfo.setSelected(true);
         holder.recordBall.setText(ZNOApplication.buildBall(record.znoBall, false, ballType));
 
         return view;

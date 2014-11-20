@@ -43,7 +43,9 @@
                 android:value="com.vojkovladimir.zno.LessonsActivity" />
         </activity>
 
-        <activity android:name=".RecordsActivity">
+        <activity
+            android:name=".RecordsActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vojkovladimir.zno.MainActivity" />

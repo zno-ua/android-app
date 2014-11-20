@@ -53,6 +53,9 @@ public class QuestionFragment extends Fragment {
     static final String HTML_FORMAT = "<html>" +
             "      <head>" +
             "            <style>" +
+            "html, body, table {" +
+            "   font-size: 24pt;" +
+            "}" +
             "                  img {" +
             "                       max-width: 100%%;" +
             "                  }" +

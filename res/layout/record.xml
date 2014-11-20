@@ -36,29 +36,19 @@
 
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0.2">
+    <View
+        android:layout_width="1dp"
+        android:alpha="0.1"
+        android:layout_gravity="center_vertical"
+        android:background="@android:color/black"
+        android:layout_height="@dimen/record_ball_text_size" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical">
+    <TextView
+        android:id="@+id/record_ball"
+        android:layout_weight="0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/RecordBall" />
 
-            <View
-                android:layout_width="1dp"
-                android:alpha="0.1"
-                android:background="@android:color/black"
-                android:layout_height="match_parent" />
-
-            <TextView
-                android:id="@+id/record_ball"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/RecordBall" />
-        </LinearLayout>
-
-    </FrameLayout>
 
 </LinearLayout>

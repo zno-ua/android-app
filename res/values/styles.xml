@@ -111,7 +111,7 @@
     <!-- TextStyles -->
     <style name="TextMarqueeLine">
         <item name="android:ellipsize">marquee</item>
-        <item name="android:lines">1</item>
+        <item name="android:marqueeRepeatLimit">marquee_forever</item>
         <item name="android:singleLine">true</item>
     </style>
 
@@ -145,7 +145,10 @@
         <item name="android:textColor">@color/record_ball_color</item>
         <item name="android:textSize">@dimen/record_ball_text_size</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:paddingLeft">@dimen/question_padding</item>
+        <item name="android:padding">@dimen/question_padding</item>
+        <item name="android:typeface">normal</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center_vertical</item>
     </style>
 
     <!-- Empty List Notice -->

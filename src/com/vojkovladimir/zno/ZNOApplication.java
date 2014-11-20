@@ -170,6 +170,10 @@ public class ZNOApplication extends Application {
         SpannableStringBuilder builder = new SpannableStringBuilder();
         if (ball % 1 == 0) {
             builder.insert(0, String.valueOf((int) ball));
+            if (!withEmoji) {
+                builder.append("  ");
+                builder.setSpan(new RelativeSizeSpan(0.95f), builder.length() - 2, builder.length(), 0);
+            }
         } else {
             builder.insert(0, String.format(Locale.US, "%.1f", ball));
             builder.setSpan(new RelativeSizeSpan(0.5f), builder.length() - 2, builder.length(), 0);
