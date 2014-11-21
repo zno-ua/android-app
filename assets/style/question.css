@@ -1,0 +1,26 @@
+img {
+  max-width: 100%;
+}
+body {
+  color: #666666;
+  margin: 0 !important;
+}
+table {
+  margin-top: 10px;
+  border: 1px solid #DBDBDB;
+  display: block;
+  width:100%;
+  table-layout: fixed;
+  word-wrap: break-word !important;
+}
+table td {
+  border-right: 1px solid #DBDBDB;
+  vertical-align: top;
+  padding: 5px;
+}
+table td img {
+  max-width: 100% !important;
+}
+table td:last-child {
+  border-right: none !important;
+}

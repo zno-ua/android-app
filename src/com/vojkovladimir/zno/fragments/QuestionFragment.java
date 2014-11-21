@@ -17,6 +17,7 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,7 @@ import android.widget.TextView.OnEditorActionListener;
 import com.vojkovladimir.zno.FileManager;
 import com.vojkovladimir.zno.R;
 import com.vojkovladimir.zno.TestActivity;
+import com.vojkovladimir.zno.ZNOApplication;
 import com.vojkovladimir.zno.models.Question;
 import com.vojkovladimir.zno.models.Test;
 
@@ -46,42 +48,25 @@ import java.util.regex.Pattern;
 
 public class QuestionFragment extends Fragment {
 
-    static final char ENG_LETTER = 65;
-    static final char UKR_LETTER = 1040;
-    static final String FIRST_LETTER = "first_letter";
-    static final String ID_ON_TEST = "id_on_test";
-    static final String HTML_FORMAT = "<html>" +
-            "      <head>" +
-            "            <style>" +
-            "html, body, table {" +
-            "   font-size: 24pt;" +
-            "}" +
-            "                  img {" +
-            "                       max-width: 100%%;" +
-            "                  }" +
-            "                  body {" +
-            "                        color: #666666;" +
-            "                  }" +
-            "                  table {" +
-            "                        margin: 10px 0;" +
-            "                        display: block;" +
-            "                        border: 1px solid #DBDBDB;" +
-            "                  }" +
-            "                  table img {" +
-            "                       max-width: none !important;" +
-            "                  }" +
-            "                  table td {" +
-            "                        vertical-align: top;" +
-            "                        padding: 10px;" +
-            "                        border-right: 1px solid #DBDBDB;" +
-            "                  }" +
-            "                  table td:last-child {" +
-            "                        border-right: none !important;" +
-            "                  }" +
-            "            </style>" +
-            "      </head>" +
-            "      <body>%s</body>" +
-            "</html>";
+    private static final char ENG_LETTER = 65;
+    private static final char UKR_LETTER = 1040;
+    private static final String FIRST_LETTER = "first_letter";
+    private static final String ID_ON_TEST = "id_on_test";
+    private static final String HTML = "text/html";
+    private static final String UTF8 = "utf-8";
+    private static final String HTML_FORMAT;
+
+    static {
+        Resources res = ZNOApplication.getInstance().getResources();
+        float scaledDensity = res.getDisplayMetrics().scaledDensity;
+        float textSizeInPX = res.getDimension(R.dimen.question_text_size);
+        int textSize = (int) (textSizeInPX / scaledDensity);
+        HTML_FORMAT = "<html><head>" +
+                "<link href=\"file:///android_asset/style/question.css\" " +
+                "rel=\"stylesheet\" type=\"text/css\">" +
+                "<style> html, body, table { font-size: " + textSize + "px; }" +
+                "</style></head><body>%s</body></html>";
+    }
 
     public interface OnAnswerSelectedListener {
         void onAnswerSelected(int id, String answer, boolean switchToNext);
@@ -611,7 +596,8 @@ public class QuestionFragment extends Fragment {
             });
             webText.setFocusable(false);
             webText.setFocusableInTouchMode(false);
-            webText.loadDataWithBaseURL(null, String.format(HTML_FORMAT, body) , "text/html", "utf-8", null);
+            String questionText = String.format(HTML_FORMAT, body);
+            webText.loadDataWithBaseURL(null, questionText, HTML, UTF8, null);
             return view;
         } else {
             TextView questionText = (TextView) inflater.inflate(R.layout.question_text, container, false);
