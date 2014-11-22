@@ -6,6 +6,7 @@
 
     <!-- Quote -->
     <dimen name="quote_text_size">24sp</dimen>
+    <dimen name="quote_padding">30dp</dimen>
 
     <!-- Button -->
     <dimen name="button_text_size">22sp</dimen>

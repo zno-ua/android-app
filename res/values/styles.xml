@@ -43,7 +43,7 @@
     <!-- Quote Style -->
     <style name="Quote">
         <item name="android:gravity">center</item>
-        <item name="android:padding">10dp</item>
+        <item name="android:padding">@dimen/quote_padding</item>
         <item name="android:textColor">@color/quote_color</item>
         <item name="android:textSize">@dimen/quote_text_size</item>
     </style>
@@ -89,6 +89,7 @@
 
     <!-- Scrollable Grid -->
     <style name="Scrollable.Grid">
+        <item name="android:background">@color/window_background_color</item>
         <item name="android:columnWidth">@dimen/grid_question_column_width</item>
         <item name="android:verticalSpacing">@dimen/grid_question_spacing</item>
         <item name="android:horizontalSpacing">@dimen/grid_question_spacing</item>
@@ -186,12 +187,16 @@
         <item name="android:layout_margin">@dimen/question_margin</item>
     </style>
 
+    <style name="QuestionContainer" parent="Scrollable">
+        <item name="android:paddingTop">@dimen/margin_none</item>
+    </style>
+
     <!-- Test Result -->
     <style name="TestResult" parent="QuestionHeader">
         <item name="android:layout_marginLeft">@dimen/scrollable_view_padding</item>
         <item name="android:layout_marginRight">@dimen/scrollable_view_padding</item>
         <item name="android:layout_marginTop">@dimen/scrollable_view_padding</item>
-        <item name="android:padding">@dimen/question_margin</item>
+        <item name="android:paddingBottom">@dimen/question_padding</item>
     </style>
 
     <style name="ResultLessonHeader">

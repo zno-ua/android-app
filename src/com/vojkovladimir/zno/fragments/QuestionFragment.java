@@ -17,7 +17,6 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -152,27 +151,35 @@ public class QuestionFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        View parent;
+        if (viewMode && idOnTest == 0) {
+            parent = inflater.inflate(R.layout.test_question_with_margin, container, false);
+        } else {
+            parent = inflater.inflate(R.layout.test_question, container, false);
+        }
         switch (type) {
             case Question.TYPE_1:
-                return createType1QuestionView(inflater, container);
+                createType1QuestionView(inflater, parent);
+                break;
             case Question.TYPE_2:
-                return createType2QuestionView(inflater, container);
+                createType2QuestionView(inflater, parent);
+            break;
             case Question.TYPE_3:
-                return createType3QuestionView(inflater, container);
+                createType3QuestionView(inflater, parent);
+            break;
             case Question.TYPE_4:
-                return createType4QuestionView(inflater, container);
+                createType4QuestionView(inflater, parent);
+            break;
             case Question.TYPE_5:
-                return createType5QuestionView(inflater, container);
-            default:
-                View v = inflater.inflate(R.layout.test_question, container, false);
-                return v;
+                createType5QuestionView(inflater, parent);
+            break;
         }
+
+        return parent;
     }
 
-    private View createType1QuestionView(LayoutInflater inflater, ViewGroup container) {
-        View v = inflater.inflate(R.layout.test_question, container, false);
-        LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+    private void createType1QuestionView(LayoutInflater inflater, View parent) {
+        LinearLayout questionContainer = (LinearLayout) parent.findViewById(R.id.test_question_container);
 
         if (!parentQuestion.isEmpty()) {
             questionContainer.addView(createParentQuestionText(inflater, questionContainer));
@@ -250,12 +257,10 @@ public class QuestionFragment extends Fragment {
             answerItems[Integer.valueOf(userAnswer) - 1].setSelected(true);
         }
 
-        return v;
     }
 
-    private View createType2QuestionView(LayoutInflater inflater, ViewGroup container) {
-        View v = inflater.inflate(R.layout.test_question, container, false);
-        LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+    private void createType2QuestionView(LayoutInflater inflater, View parent) {
+        LinearLayout questionContainer = (LinearLayout) parent.findViewById(R.id.test_question_container);
 
         if (balls == 0) {
             questionContainer.addView(createQuestionText(inflater, questionContainer));
@@ -263,12 +268,10 @@ public class QuestionFragment extends Fragment {
             questionContainer.addView(createStatementQuestionText(inflater, questionContainer));
         }
 
-        return v;
     }
 
-    private View createType3QuestionView(LayoutInflater inflater, ViewGroup container) {
-        View v = inflater.inflate(R.layout.test_question, container, false);
-        LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+    private void createType3QuestionView(LayoutInflater inflater, View parent) {
+        LinearLayout questionContainer = (LinearLayout) parent.findViewById(R.id.test_question_container);
 
         if (!parentQuestion.isEmpty()) {
             questionContainer.addView(createParentQuestionText(inflater, questionContainer));
@@ -380,12 +383,10 @@ public class QuestionFragment extends Fragment {
             answersContainer.addView(answerItems[i]);
         }
 
-        return v;
     }
 
-    private View createType4QuestionView(LayoutInflater inflater, ViewGroup container) {
-        View v = inflater.inflate(R.layout.test_question, container, false);
-        LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+    private void createType4QuestionView(LayoutInflater inflater, View parent) {
+        LinearLayout questionContainer = (LinearLayout) parent.findViewById(R.id.test_question_container);
 
         if (!parentQuestion.isEmpty()) {
             questionContainer.addView(createParentQuestionText(inflater, questionContainer));
@@ -470,13 +471,10 @@ public class QuestionFragment extends Fragment {
         }
         answersContainer.addView(answerItem);
 
-        return v;
     }
 
-    private View createType5QuestionView(LayoutInflater inflater,
-                                         ViewGroup container) {
-        View v = inflater.inflate(R.layout.test_question, container, false);
-        LinearLayout questionContainer = (LinearLayout) v.findViewById(R.id.test_question_container);
+    private void createType5QuestionView(LayoutInflater inflater, View parent) {
+        LinearLayout questionContainer = (LinearLayout) parent.findViewById(R.id.test_question_container);
 
         if (!parentQuestion.isEmpty()) {
             questionContainer.addView(createParentQuestionText(inflater, questionContainer));
@@ -559,7 +557,7 @@ public class QuestionFragment extends Fragment {
 
             answersContainer.addView(answerItem);
         }
-        return v;
+
     }
 
     private View createQuestionHeaderView(LayoutInflater inflater, ViewGroup container) {
@@ -568,8 +566,9 @@ public class QuestionFragment extends Fragment {
         TextView questionId = (TextView) v.findViewById(R.id.test_question_id);
         TextView questionTaskAll = (TextView) v.findViewById(R.id.test_question_task_all);
 
-        questionId.setText(res.getString(R.string.question) + " " + id);
-        questionTaskAll.setText(id + "/" + taskAll);
+        int num = idOnTest + 1;
+        questionId.setText(res.getString(R.string.question) + " " + num);
+        questionTaskAll.setText(num + "/" + taskAll);
 
         return v;
     }

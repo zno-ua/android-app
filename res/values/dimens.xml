@@ -6,6 +6,7 @@
 
     <!-- Quote -->
     <dimen name="quote_text_size">16sp</dimen>
+    <dimen name="quote_padding">16dp</dimen>
 
     <!-- Button -->
     <dimen name="button_text_size">16sp</dimen>
@@ -81,5 +82,6 @@
 
     <dimen name="record_ball_text_size">20sp</dimen>
     <dimen name="list_divider_height">10dp</dimen>
+    <dimen name="margin_none">0dp</dimen>
 
 </resources>
