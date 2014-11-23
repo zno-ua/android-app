@@ -42,6 +42,7 @@
     <string name="unfinished_test_alert_text">Є незавершений тест! Бажаєте його продовжити?</string>
     <string name="start_with_tracking_time">Розпочати тест з урахуванням часу?</string>
     <string name="unanswered_question_warning">Ви не відповіли на це запитання</string>
+    <string name="passed">Пройдено </string>
 
     <!-- Action -->
     <string name="action_questions_list">Список питань</string>
@@ -56,9 +57,6 @@
     <string name="test_passed_in">ТЕСТ ПРОЙДЕНО ЗА</string>
     <string name="sad">:-(</string>
     <string name="happy">:-)</string>
-    <string name="one_minute_rod">хвилину</string>
-    <string name="two_four_minutes_rod">хвилини</string>
-    <string name="minutes_rod">хвилин</string>
     <string name="share_template" formatted="false">Мій результат тестування з %s — %.1f балів.\nПройти цей тест:
         http://zno-ua.net/test/%s/%d?utm-source=android</string>
 
@@ -85,10 +83,21 @@
     <string name="empty_list">Немає результатів :(</string>
 
     <!-- Timer -->
-    <string name="timer_one_minute">Залишилась %d хвилина</string>
-    <string name="timer_two_four_minutes">Залишилось %d хвилини</string>
-    <string name="timer_minutes">Залишилось %d хвилин</string>
-    <string name="passed">Пройдено </string>
+    <string name="time_one_left">Залишилась %1$d %2$s</string>
+    <string name="time_two_four_left">Залишилось %1$d %2$s</string>
+    <string name="time_left">Залишилось %1$d %2$s</string>
+    <string name="time_is_up">Час вийшов</string>
+
+    <!-- Time -->
+    <string name="one_minute">хвилина</string>
+    <string name="one_minute_rod">хвилину</string>
+    <string name="two_four_minutes">хвилини</string>
+    <string name="minutes">хвилин</string>
+    <string name="one_second">секунда</string>
+    <string name="two_four_seconds">секунди</string>
+    <string name="seconds">секунд</string>
+
+
 
     <string-array name="months">
         <item>січня</item>

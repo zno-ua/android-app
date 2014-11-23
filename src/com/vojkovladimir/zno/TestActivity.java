@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vojkovladimir.zno.adapters.QuestionsAdapter;
 import com.vojkovladimir.zno.adapters.QuestionsGridAdapter;
@@ -66,6 +67,7 @@ public class TestActivity extends FragmentActivity
 
     boolean timerMode;
     long millisLeft;
+    long timerLastShowTime;
     MenuItem timerAction;
 
     Test test;
@@ -345,7 +347,7 @@ public class TestActivity extends FragmentActivity
         if (result.elapsedTime / 60000 > 0) {
             int minutes = (int) (result.elapsedTime / 60000);
             String time;
-            if (minutes >= 20 || (minutes >= 0 && minutes < 10)) {
+            if ((minutes < 10) || (minutes > 20 && minutes < 110) || minutes > 120) {
                 switch (minutes % 10) {
                     case 1:
                         time = getString(R.string.one_minute_rod);
@@ -353,13 +355,13 @@ public class TestActivity extends FragmentActivity
                     case 2:
                     case 3:
                     case 4:
-                        time = getString(R.string.two_four_minutes_rod);
+                        time = getString(R.string.two_four_minutes);
                         break;
                     default:
-                        time = getString(R.string.minutes_rod);
+                        time = getString(R.string.minutes);
                 }
             } else {
-                time = getString(R.string.minutes_rod);
+                time = getString(R.string.minutes);
             }
             time = String.format("%d %s", minutes, time);
             elapsedTime.setText(time);
@@ -406,24 +408,32 @@ public class TestActivity extends FragmentActivity
 
     @Override
     public void onTimeIsUp() {
-        millisLeft = 0;
+        Toast.makeText(this, R.string.time_is_up, Toast.LENGTH_SHORT).show();
         finishTest();
     }
 
     @Override
     public void onMinutePassed(long millisLeft) {
         int minutesLeft = (int) (millisLeft / 60000);
-        if (minutesLeft % 30 == 0
-                || (minutesLeft < 30 && minutesLeft % 10 == 0)
-                || (minutesLeft < 10 && minutesLeft % 5 == 0)) {
-            showHideTimer();
+
+        if (timerLastShowTime - millisLeft > 60000) {
+            if (minutesLeft % 30 == 0
+                    || (minutesLeft < 30 && minutesLeft % 10 == 0)
+                    || minutesLeft == 5
+                    || (minutesLeft <= 3)) {
+                showHideTimer();
+            }
         }
+
         if (minutesLeft == 10) {
             timerAction.setIcon(getResources().getDrawable(R.drawable.ic_action_time_low));
         }
+
+        this.millisLeft = millisLeft;
     }
 
     public void showHideTimer() {
+        timerLastShowTime = millisLeft;
         final Runnable hide = new Runnable() {
             @Override
             public void run() {

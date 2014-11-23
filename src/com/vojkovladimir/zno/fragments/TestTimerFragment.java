@@ -2,6 +2,7 @@ package com.vojkovladimir.zno.fragments;
 
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.vojkovladimir.zno.R;
+import com.vojkovladimir.zno.ZNOApplication;
 
 public class TestTimerFragment extends Fragment {
 
@@ -18,8 +20,34 @@ public class TestTimerFragment extends Fragment {
     public static final String MILLIS_LEFT = "millis_left";
     public static final int SHOW_TIME = 5000;
 
+    private static final String ONE_LEFT_FORMAT;
+    private static final String TWO_FOUR_LEFT_FORMAT;
+    private static final String LEFT_FORMAT;
+    private static final String ONE_MINUTE;
+    private static final String TWO_FOUR_MINUTES;
+    private static final String MINUTES;
+    private static final String ONE_SECOND;
+    private static final String TWO_FOUR_SECONDS;
+    private static final String SECONDS;
+    private static final String TIME_IS_UP;
+
+    static {
+        Resources resources = ZNOApplication.getInstance().getResources();
+        ONE_LEFT_FORMAT = resources.getString(R.string.time_one_left);
+        TWO_FOUR_LEFT_FORMAT = resources.getString(R.string.time_two_four_left);
+        LEFT_FORMAT = resources.getString(R.string.time_left);
+        ONE_MINUTE = resources.getString(R.string.one_minute);
+        TWO_FOUR_MINUTES = resources.getString(R.string.two_four_minutes);
+        MINUTES = resources.getString(R.string.minutes);
+        ONE_SECOND = resources.getString(R.string.one_second);
+        TWO_FOUR_SECONDS = resources.getString(R.string.two_four_seconds);
+        SECONDS = resources.getString(R.string.seconds);
+        TIME_IS_UP = resources.getString(R.string.time_is_up);
+    }
+
     public interface OnTimeChangedListener {
         void onTimeIsUp();
+
         void onMinutePassed(long millisLeft);
     }
 
@@ -55,23 +83,52 @@ public class TestTimerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         timerText = (TextView) inflater.inflate(R.layout.timer, container, false);
-        timerText.setText(getTimerText(millisLeft));
+        timerText.setText(getTimerText((int) (millisLeft / 60000), 0));
         return timerText;
     }
 
-    private String getTimerText(long millisLeft) {
-        int minutes = (int) (millisLeft / 60000);
-        if (minutes >= 20 || (minutes >= 0 && minutes < 10)) {
-            switch (minutes % 10) {
-                case 1:
-                    return String.format(getResources().getString(R.string.timer_one_minute), minutes);
-                case 2:
-                case 3:
-                case 4:
-                    return String.format(getResources().getString(R.string.timer_two_four_minutes), minutes);
+    private String getTimerText(int minutes, int seconds) {
+        String text;
+
+        if (minutes > 0) {
+            if ((minutes < 10) || (minutes > 20 && minutes < 110) || minutes > 120) {
+                switch (minutes % 10) {
+                    case 1:
+                        text = String.format(ONE_LEFT_FORMAT, minutes, ONE_MINUTE);
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                        text = String.format(TWO_FOUR_LEFT_FORMAT, minutes, TWO_FOUR_MINUTES);
+                        break;
+                    default:
+                        text = String.format(LEFT_FORMAT, minutes, MINUTES);
+                }
+            } else {
+                text = String.format(LEFT_FORMAT, minutes, MINUTES);
+            }
+        } else {
+            if (seconds == 0) {
+                text = TIME_IS_UP;
+            } else if (seconds >= 20 || (seconds > 0 && seconds < 10)) {
+                switch (seconds % 10) {
+                    case 1:
+                        text = String.format(ONE_LEFT_FORMAT, seconds, ONE_SECOND);
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                        text = String.format(TWO_FOUR_LEFT_FORMAT, seconds, TWO_FOUR_SECONDS);
+                        break;
+                    default:
+                        text = String.format(LEFT_FORMAT, seconds, SECONDS);
+                }
+            } else {
+                text = String.format(LEFT_FORMAT, seconds, SECONDS);
             }
         }
-        return String.format(getResources().getString(R.string.timer_minutes), minutes);
+
+        return text;
     }
 
     @Override
@@ -109,17 +166,26 @@ public class TestTimerFragment extends Fragment {
         @Override
         public void onTick(long millisInFuture) {
             millisLeft = millisInFuture;
-            if ((millisInFuture % 60000) / 1000 == 0) {
-                timerText.setText(getTimerText(millisInFuture));
+            int minutes = (int) (millisInFuture / 60000);
+            int seconds = (int) (millisInFuture % 60000 / 1000);
+
+            if (minutes == 0) {
+                timerText.setText(getTimerText(minutes, seconds));
+            }
+
+            if (minutes != 0 && seconds == 0) {
+                timerText.setText(getTimerText(minutes, seconds));
                 callBack.onMinutePassed(millisInFuture);
             }
-            if (millisInFuture / 60000 <= 10) {
+
+            if (minutes <= 10) {
                 timerText.setBackgroundColor(getResources().getColor(R.color.red));
             }
         }
 
         @Override
         public void onFinish() {
+            millisLeft = 0;
             callBack.onTimeIsUp();
         }
 
