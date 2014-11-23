@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.vojkovladimir.zno"
-    android:versionCode="1"
+    package="net.zno_ua.app"
     android:versionName="1.0">
 
     <uses-sdk
@@ -11,14 +10,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name="ZNOApplication"
+        android:name="net.zno_ua.app.ZNOApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/MainTheme">
 
         <activity
-            android:name=".MainActivity"
+            android:name="net.zno_ua.app.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
@@ -29,50 +28,50 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LessonsActivity"
+            android:name="net.zno_ua.app.LessonsActivity"
             android:label="@string/testing_activity_label">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vojkovladimir.zno.MainActivity" />
+                android:value="net.zno_ua.app.MainActivity" />
         </activity>
         <activity
-            android:name=".TestsActivity"
+            android:name="net.zno_ua.app.TestsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vojkovladimir.zno.LessonsActivity" />
+                android:value="net.zno_ua.app.LessonsActivity" />
         </activity>
 
         <activity
-            android:name=".RecordsActivity"
+            android:name="net.zno_ua.app.RecordsActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vojkovladimir.zno.MainActivity" />
+                android:value="net.zno_ua.app.MainActivity" />
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <action android:name="com.vojkovladimir.zno.VIEW_PASSED_TESTS" />
-                <action android:name="com.vojkovladimir.zno.VIEW_BEST_SCORES" />
+                <action android:name="net.zno_ua.app.VIEW_PASSED_TESTS" />
+                <action android:name="net.zno_ua.app.VIEW_BEST_SCORES" />
             </intent-filter>
         </activity>
 
         <activity
-            android:name=".TestActivity"
+            android:name="net.zno_ua.app.TestActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vojkovladimir.zno.TestsActivity" />
+                android:value="net.zno_ua.app.TestsActivity" />
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <action android:name="com.vojkovladimir.zno.VIEW_TEST" />
-                <action android:name="com.vojkovladimir.zno.PASS_TEST" />
-                <action android:name="com.vojkovladimir.zno.CONTINUE_PASSAGE_TEST" />
+                <action android:name="net.zno_ua.app.VIEW_TEST" />
+                <action android:name="net.zno_ua.app.PASS_TEST" />
+                <action android:name="net.zno_ua.app.CONTINUE_PASSAGE_TEST" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".ViewImageActivity"
+            android:name="net.zno_ua.app.ViewImageActivity"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
@@ -85,7 +84,7 @@
         </activity>
 
         <service
-            android:name=".service.ApiService"
+            android:name="net.zno_ua.app.service.ApiService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -95,7 +94,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name="com.vojkovladimir.zno.NetWatcher">
+        <receiver android:name="net.zno_ua.app.NetWatcher">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
