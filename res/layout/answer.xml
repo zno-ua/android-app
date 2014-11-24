@@ -8,8 +8,7 @@
     <include
         layout="@layout/answer_letter"
         android:layout_height="@dimen/letter_frame_size"
-        android:layout_width="@dimen/letter_frame_size"
-        android:layout_weight="0" />
+        android:layout_width="@dimen/letter_frame_size" />
 
     <TextView
         android:id="@+id/answer_text"

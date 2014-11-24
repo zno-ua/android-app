@@ -9,7 +9,7 @@ table {
   margin-top: 10px;
   border: 1px solid #DBDBDB;
   display: block;
-  width:100%;
+  width:99%;
   table-layout: fixed;
   word-wrap: break-word !important;
 }

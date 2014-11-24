@@ -6,7 +6,7 @@
 
     <!-- Quote -->
     <dimen name="quote_text_size">32sp</dimen>
-    <dimen name="list_divider_height">40dp</dimen>
+    <dimen name="quote_padding">32dp</dimen>
 
     <!-- Button -->
     <dimen name="button_text_size">28sp</dimen>
@@ -28,6 +28,9 @@
     <dimen name="test_download_image_separator_height">56dp</dimen>
 
     <!-- Question -->
+    <dimen name="question_padding">20dp</dimen>
+    <dimen name="question_padding_small">12dp</dimen>
+    <dimen name="question_margin">20dp</dimen>
     <dimen name="question_header_text_size">22sp</dimen>
     <dimen name="question_text_size">24sp</dimen>
     <dimen name="unanswered_question_text_size">26sp</dimen>
@@ -75,6 +78,6 @@
     <dimen name="list_header_text_size">24sp</dimen>
 
     <dimen name="record_ball_text_size">48sp</dimen>
-    <dimen name="quote_padding">30dp</dimen>
+    <dimen name="list_divider_height">20dp</dimen>
 
 </resources>
