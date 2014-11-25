@@ -46,8 +46,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             year++;
         }
 
-        String appName = getString(R.string.app_name);
-        String logoText = appName + " " + String.valueOf(year);
+        String zno = getString(R.string.zno);
+        String logoText = zno + " " + String.valueOf(year);
 
         int yearColor = getResources().getColor(R.color.blue_light);
         int appNameColor = getResources().getColor(R.color.quote_color);
@@ -56,8 +56,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         ForegroundColorSpan appNameColorSpan = new ForegroundColorSpan(appNameColor);
 
         SpannableString spannableString = new SpannableString(logoText);
-        spannableString.setSpan(yearColorSpan, 0, appName.length(), 0);
-        spannableString.setSpan(appNameColorSpan, appName.length() + 1, logoText.length(), 0);
+        spannableString.setSpan(yearColorSpan, 0, zno.length(), 0);
+        spannableString.setSpan(appNameColorSpan, zno.length() + 1, logoText.length(), 0);
 
         Typeface ptSansBold = Typeface.createFromAsset(getAssets(), "fonts/PT_Sans-Web-Bold.ttf");
 
@@ -79,7 +79,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onResume();
         if (app.hasSavedSession()) {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-            dialogBuilder.setMessage(getString(R.string.unfinished_test_alert_text));
+            dialogBuilder.setMessage(getString(R.string.dialog_unfinished_test_text));
             dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {

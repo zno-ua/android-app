@@ -1,48 +1,43 @@
 <resources>
 
-    <string name="app_name">ЗНО</string>
-    <string name="main_activity_label">Підготовка до ЗНО</string>
-    <string name="testing_activity_label">Тестування</string>
-    <string name="begin_testing_btn_text">Розпочати тестування</string>
-    <string name="last_passed_tests">Останні пройдені тести</string>
-    <string name="records">Рекорди</string>
-    <string name="settings_btn_text">Налаштування</string>
-    <string name="choose_lesson_view_text">ОБЕРІТЬ ПРЕДМЕТ:</string>
-    <string name="choose_test_view_text">ОБЕРІТЬ ТЕСТ:</string>
-    <string name="needed_to_load_text">необхідно завантажити</string>
-    <string name="session_text">сесія</string>
-    <string name="task_text">завдання</string>
-    <string name="tasks_text">завдань</string>
-    <string name="minutes_short">хв.</string>
+    <string name="zno">ЗНО</string>
     <string name="check_zno_full">Зовнішнє незалежне оцінювання</string>
     <string name="check_zno_lite">Офіційний тест ЗНО</string>
     <string name="exp_zno">Пробне тестування ЗНО</string>
-    <string name="for_">за</string>
-    <string name="year">рік</string>
-    <string name="min">хв</string>
-    <string name="sec">сек</string>
-    <string name="zno">ЗНО</string>
+
+    <!-- MainActivity -->
+    <string name="main_activity_label">Підготовка до ЗНО</string>
+    <string name="begin_testing_btn_text">Розпочати тестування</string>
+    <string name="last_passed_tests">Останні пройдені тести</string>
+    <string name="records">Рекорди</string>
+
+    <!-- LessonsActivity -->
+    <string name="testing_activity_label">Тестування</string>
+    <string name="choose_lesson_view_text">ОБЕРІТЬ ПРЕДМЕТ:</string>
     <string name="tests_one">тест</string>
     <string name="tests_two_four">тести</string>
     <string name="tests_over_five">тестів</string>
+
+    <!-- TestsActivity -->
+    <string name="choose_test_view_text">ОБЕРІТЬ ТЕСТ:</string>
+    <string name="session_text">сесія</string>
+    <string name="task_text">завдання</string>
+    <string name="tasks_text">завдань</string>
+    <string name="needed_to_load_text">необхідно завантажити</string>
+    <string name="for_">за</string>
+    <string name="year">рік</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_start_test_text">Розпочати тест з урахуванням часу?</string>
+    <string name="dialog_unfinished_test_text">Є незавершений тест! Бажаєте його продовжити?</string>
     <string name="dialog_load_test_text">Тест відсутній, завантажити?</string>
+    <string name="dialog_cancel_test_text">Ви виходите з тесту, тому відповіді не будуть збережені</string>
+    <string name="dialog_unanswered_questions_text">Ви відповіли не на всі запитання!</string>
+    <string name="dialog_finish_text">Бажаєте завершити?</string>
     <string name="dialog_positive_text">Так</string>
     <string name="dialog_negative_text">Ні</string>
-    <string name="skip_question_text">Пропустити запитання</string>
-    <string name="question">Запитання</string>
-    <string name="answer_three_correct">Введіть 3 цифри, які ви вважаєте вірними (в будь-якому порядку):</string>
-    <string name="answer_short">Введіть відповідь:</string>
-    <string name="parent_question_text_show">Натисніть для відображення тексту.</string>
-    <string name="choose_ball">Оберіть бал, на який розраховуєте:</string>
-    <string name="chosen_ball">Обраний бал — </string>
-    <string name="your_answer_text">Ваша відповідь:</string>
-    <string name="correct_answer_text">Вірна відповідь:</string>
-    <string name="your_combination_text">Ваша комбінація:</string>
-    <string name="correct_combination_text">Вірна комбінація:</string>
-    <string name="unfinished_test_alert_text">Є незавершений тест! Бажаєте його продовжити?</string>
-    <string name="start_with_tracking_time">Розпочати тест з урахуванням часу?</string>
-    <string name="unanswered_question_warning">Ви не відповіли на це запитання</string>
-    <string name="passed">Пройдено </string>
+    <string name="dialog_continue_text">Продовжити</string>
+    <string name="dialog_cancel_text">Відміна</string>
 
     <!-- Action -->
     <string name="action_questions_list">Список питань</string>
@@ -51,7 +46,6 @@
     <string name="action_share">Поділитися</string>
 
     <!--TestActivity-->
-    <string name="cancel_test_confirm">Завершити тестування без збереження відповідей?</string>
     <string name="rating_ball">РЕЙТИНГОВИЙ БАЛ</string>
     <string name="test_ball">ТЕСТОВИЙ БАЛ</string>
     <string name="test_passed_in">ТЕСТ ПРОЙДЕНО ЗА</string>
@@ -59,6 +53,37 @@
     <string name="happy">:-)</string>
     <string name="share_template">Мій результат тестування з %1$s — %2$.1f балів.\nПройти цей тест:
         http://zno-ua.net/test/%3$s/%4$d?utm-source=android</string>
+    <string name="question">Запитання</string>
+    <string name="answer_three_correct">Введіть 3 цифри, які ви вважаєте вірними (в будь-якому порядку):</string>
+    <string name="answer_short">Введіть відповідь:</string>
+    <string name="parent_question_text_show">Натисніть для відображення тексту</string>
+    <string name="choose_ball">Оберіть бал, на який розраховуєте:</string>
+    <string name="chosen_ball">Обраний бал — </string>
+    <string name="your_answer_text">Ваша відповідь:</string>
+    <string name="correct_answer_text">Вірна відповідь:</string>
+    <string name="your_combination_text">Ваша комбінація:</string>
+    <string name="correct_combination_text">Вірна комбінація:</string>
+    <string name="unanswered_question_warning">Ви не відповіли на це запитання</string>
+    <string name="statement_text_grid_item">П</string>
+
+    <!-- RecordsActivity -->
+    <string name="empty_list">Немає результатів :-(</string>
+    <string name="passed">Пройдено </string>
+    <string name="min">хв</string>
+    <string-array name="months">
+        <item>січня</item>
+        <item>лютого</item>
+        <item>березня</item>
+        <item>квітня</item>
+        <item>травня</item>
+        <item>червня</item>
+        <item>липня</item>
+        <item>серпня</item>
+        <item>вересня</item>
+        <item>жовтня</item>
+        <item>листопада</item>
+        <item>грудня</item>
+    </string-array>
 
     <!-- Updating Test DataBase Message -->
     <string name="updating_db">Оновлення тестів.</string>
@@ -77,11 +102,6 @@
     <string name="error_server_bad">Помилка серверу</string>
     <string name="error_unknown">Невідома помилка</string>
 
-    <string name="statement_text_grid_item">П</string>
-    <string name="want_to_finish">Бажаєте завершити?</string>
-    <string name="has_unanswered_questions">Ви відповіли не на всі запитання!</string>
-    <string name="empty_list">Немає результатів :(</string>
-
     <!-- Timer -->
     <string name="time_one_left">Залишилась %1$d %2$s</string>
     <string name="time_two_four_left">Залишилось %1$d %2$s</string>
@@ -97,23 +117,7 @@
     <string name="two_four_seconds">секунди</string>
     <string name="seconds">секунд</string>
 
-
-
-    <string-array name="months">
-        <item>січня</item>
-        <item>лютого</item>
-        <item>березня</item>
-        <item>квітня</item>
-        <item>травня</item>
-        <item>червня</item>
-        <item>липня</item>
-        <item>серпня</item>
-        <item>вересня</item>
-        <item>жовтня</item>
-        <item>листопада</item>
-        <item>грудня</item>
-    </string-array>
-
+    <!-- Quotes -->
     <string-array name="quotes">
         <!-- 2014 -->
         <item>Цитата з твору ЗНО-2014:&lt;br /&gt;Спочатку ти – людина, ти – особистість, а потім кістки і відро крові.</item>

@@ -39,7 +39,7 @@ public class RecordsAdapter extends BaseAdapter {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         FOR = context.getString(R.string.for_);
         YEAR = context.getString(R.string.year);
-        MIN = context.getString(R.string.minutes_short);
+        MIN = context.getString(R.string.min);
         SESSION = context.getString(R.string.session_text);
         MONTHS = context.getResources().getStringArray(R.array.months);
         HIGH_BALL_COLOR = context.getResources().getColor(R.color.dark_green);
@@ -98,7 +98,7 @@ public class RecordsAdapter extends BaseAdapter {
         String additionalInfo = PASSED + " " + day + " " + MONTHS[month];
         int minutes = (int) (record.elapsedTime / 60000);
         if (minutes != 0) {
-            additionalInfo += String.format(", " + FOR + " %d " + MIN, minutes);
+            additionalInfo += String.format(", " + FOR + " %d ." + MIN, minutes);
         }
 
         int ballType = (record.znoBall >= 190f) ? Record.GOOD_BALL :

@@ -524,20 +524,20 @@ public class TestActivity extends FragmentActivity
         switch (type) {
             case FINISH_ALERT:
                 if (test.hasUnAnsweredQuestions()) {
-                    String message = getString(R.string.has_unanswered_questions);
-                    message += "\n" + getString(R.string.want_to_finish);
+                    String message = getString(R.string.dialog_unanswered_questions_text);
+                    message += "\n" + getString(R.string.dialog_finish_text);
                     dialogBuilder.setMessage(message);
                     dialogBuilder.setNegativeButton(R.string.dialog_negative_text, resumeWithAsk);
                 } else {
-                    dialogBuilder.setMessage(R.string.want_to_finish);
+                    dialogBuilder.setMessage(R.string.dialog_finish_text);
                     dialogBuilder.setNegativeButton(R.string.dialog_negative_text, resume);
                 }
                 dialogBuilder.setPositiveButton(R.string.dialog_positive_text, finish);
                 break;
             case CANCEL_ALERT:
-                dialogBuilder.setMessage(R.string.cancel_test_confirm);
-                dialogBuilder.setPositiveButton(R.string.dialog_positive_text, cancel);
-                dialogBuilder.setNegativeButton(R.string.dialog_negative_text, null);
+                dialogBuilder.setMessage(R.string.dialog_cancel_test_text);
+                dialogBuilder.setPositiveButton(R.string.dialog_continue_text, cancel);
+                dialogBuilder.setNegativeButton(R.string.dialog_cancel_text, null);
                 break;
         }
         dialogBuilder.create().show();

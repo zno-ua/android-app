@@ -149,7 +149,7 @@ public class TestsActivity extends Activity implements TestDLCallBack, OnItemCli
 
     public void startTest(final int testId) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-        dialogBuilder.setMessage(getString(R.string.start_with_tracking_time));
+        dialogBuilder.setMessage(getString(R.string.dialog_start_test_text));
         dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
