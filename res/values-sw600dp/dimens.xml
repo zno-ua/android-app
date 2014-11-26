@@ -16,6 +16,7 @@
 
     <!-- Lesson -->
     <dimen name="lesson_image_height">96dp</dimen>
+    <dimen name="lesson_image_padding">6dp</dimen>
     <dimen name="lesson_padding">16dp</dimen>
     <dimen name="lesson_name_text_size">24sp</dimen>
     <dimen name="lesson_tests_counter_text_size">20sp</dimen>

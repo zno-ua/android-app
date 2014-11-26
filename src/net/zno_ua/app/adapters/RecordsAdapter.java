@@ -98,7 +98,7 @@ public class RecordsAdapter extends BaseAdapter {
         String additionalInfo = PASSED + " " + day + " " + MONTHS[month];
         int minutes = (int) (record.elapsedTime / 60000);
         if (minutes != 0) {
-            additionalInfo += String.format(", " + FOR + " %d ." + MIN, minutes);
+            additionalInfo += String.format(", " + FOR + " %d " + MIN + ".", minutes);
         }
 
         int ballType = (record.znoBall >= 190f) ? Record.GOOD_BALL :

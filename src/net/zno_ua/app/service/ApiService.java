@@ -16,6 +16,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
+
 import net.zno_ua.app.FileManager;
 import net.zno_ua.app.MainActivity;
 import net.zno_ua.app.R;
@@ -73,7 +74,7 @@ public class ApiService extends Service {
 
         void onSavingTest();
 
-        void onTestDownloaded();
+        void onTestDownloaded(int id);
 
         void onError(Exception e);
     }
@@ -168,7 +169,7 @@ public class ApiService extends Service {
         }
 
         @Override
-        public void onTestDownloaded() {
+        public void onTestDownloaded(int id) {
 
         }
 
@@ -219,7 +220,7 @@ public class ApiService extends Service {
 
                 callBack.onSavingTest();
                 db.updateTest(id, questions, balls);
-                callBack.onTestDownloaded();
+                callBack.onTestDownloaded(id);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();

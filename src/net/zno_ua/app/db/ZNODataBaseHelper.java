@@ -550,7 +550,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         String[] projection = {KEY_ID, KEY_LESSON_ID, KEY_NAME, KEY_TASK_ALL, KEY_TIME, KEY_YEAR, KEY_LOADED};
         String selection = KEY_LESSON_ID + "=" + id;
-        String ordering = KEY_YEAR + " DESC";
+        String ordering = KEY_YEAR + DESC;
         Cursor c = db.query(TABLE_TESTS, projection, selection, null, null, null, ordering);
 
         if (c.moveToFirst()) {
@@ -577,6 +577,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                 testInfo.time = c.getInt(timeIndex);
                 testInfo.year = c.getInt(yearIndex);
                 testInfo.loaded = c.getInt(loadedIndex) != 0;
+                testInfo.makeAdditionalInfo();
 
                 if (testInfo.loaded) {
                     tests.add(testInfo);

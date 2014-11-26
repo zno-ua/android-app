@@ -3,7 +3,7 @@
     <string name="zno">ЗНО</string>
     <string name="check_zno_full">Зовнішнє незалежне оцінювання</string>
     <string name="check_zno_lite">Офіційний тест ЗНО</string>
-    <string name="exp_zno">Пробне тестування ЗНО</string>
+    <string name="exp_zno">Пробне</string>
 
     <!-- MainActivity -->
     <string name="main_activity_label">Підготовка до ЗНО</string>
@@ -94,7 +94,7 @@
     <string name="progress_test_load">Завантаження тесту</string>
     <string name="progress_test_save">Збереження тесту</string>
     <string name="progress_test_load_images">Завантаження зображень</string>
-    <string name="test_load_complete">Тест Завантажено</string>
+    <string name="test_load_complete">Тест завантажено</string>
 
     <!-- Downloading Errors -->
     <string name="error_no_connection">Відсутнє з\'єднання з інтернетом</string>

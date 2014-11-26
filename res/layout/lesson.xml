@@ -8,6 +8,8 @@
     <ImageView
         android:id="@+id/lesson_image"
         android:layout_width="wrap_content"
+        android:layout_marginTop="@dimen/lesson_image_padding"
+        android:layout_marginBottom="@dimen/lesson_image_padding"
         android:layout_height="@dimen/lesson_image_height" />
 
     <LinearLayout

@@ -109,33 +109,25 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <!-- TextStyles -->
-    <style name="TextMarqueeLine">
-        <item name="android:ellipsize">marquee</item>
-        <item name="android:marqueeRepeatLimit">marquee_forever</item>
-        <item name="android:singleLine">true</item>
-    </style>
-
-
     <!-- Lesson -->
-    <style name="LessonName" parent="TextMarqueeLine">
+    <style name="LessonName">
         <item name="android:textColor">@color/list_item_text_color</item>
         <item name="android:textSize">@dimen/lesson_name_text_size</item>
     </style>
 
-    <style name="LessonTestsCounter" parent="TextMarqueeLine">
+    <style name="LessonTestsCounter">
         <item name="android:textColor">@color/sub_item_text_color</item>
         <item name="android:textSize">@dimen/lesson_tests_counter_text_size</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <!-- Test -->
-    <style name="TestName" parent="TextMarqueeLine">
+    <style name="TestName">
         <item name="android:textColor">@color/list_item_text_color</item>
         <item name="android:textSize">@dimen/test_name_text_size</item>
     </style>
 
-    <style name="TestProperties" parent="TextMarqueeLine">
+    <style name="TestProperties">
         <item name="android:textColor">@color/sub_item_text_color</item>
         <item name="android:textSize">@dimen/test_properties_text_size</item>
         <item name="android:textStyle">bold</item>

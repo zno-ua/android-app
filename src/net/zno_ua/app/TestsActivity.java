@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.android.volley.NoConnectionError;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
+
 import net.zno_ua.app.adapters.TestsAdapter;
 import net.zno_ua.app.db.ZNODataBaseHelper;
 import net.zno_ua.app.models.Lesson;
@@ -43,7 +44,6 @@ public class TestsActivity extends Activity implements TestDLCallBack, OnItemCli
     TestsAdapter testsAdapter;
 
     ProgressDialog dlProgress;
-    AlertDialog dlCancelAlert;
 
     ApiService apiService;
     boolean apiBound = false;
@@ -129,7 +129,7 @@ public class TestsActivity extends Activity implements TestDLCallBack, OnItemCli
                     switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
                             dlProgress = new ProgressDialog(context);
-                            dlProgress.setMessage(getResources().getString(R.string.progress_test_load));
+                            dlProgress.setMessage(getString(R.string.progress_test_load));
                             dlProgress.setCancelable(false);
                             dlProgress.show();
                             apiService.downLoadTest(test.id, TestsActivity.this);
@@ -142,9 +142,10 @@ public class TestsActivity extends Activity implements TestDLCallBack, OnItemCli
         }
     }
 
-    public void invalidate() {
+    public void invalidate(int id) {
         testsAdapter.setTestsList(db.getLessonTests(idLesson));
         testsListView.invalidateViews();
+        testsListView.setSelection(testsAdapter.getTestPosition(id));
     }
 
     public void startTest(final int testId) {
@@ -213,14 +214,11 @@ public class TestsActivity extends Activity implements TestDLCallBack, OnItemCli
     }
 
     @Override
-    public void onTestDownloaded() {
+    public void onTestDownloaded(final int id) {
         runOnUiThread(new Runnable() {
             public void run() {
                 dlProgress.dismiss();
-                if (dlCancelAlert != null) {
-                    dlCancelAlert.dismiss();
-                }
-                invalidate();
+                invalidate(id);
                 Toast.makeText(getApplicationContext(), R.string.test_load_complete, Toast.LENGTH_SHORT).show();
             }
         });
