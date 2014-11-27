@@ -21,8 +21,35 @@ import net.zno_ua.app.models.Record;
 import net.zno_ua.app.models.Test;
 import net.zno_ua.app.service.ApiService;
 
+import org.acra.ACRA;
+import org.acra.ReportField;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
+import org.acra.sender.HttpSender;
+
 import java.util.Locale;
 
+@ReportsCrashes(
+        formUri = "https://vojkovladimir.cloudant.com/" +
+                "acra-zno-ua-app/_design/acra-storage/_update/report",
+        reportType = HttpSender.Type.JSON,
+        httpMethod = HttpSender.Method.POST,
+        formUriBasicAuthLogin = "pectlystinnelyetantibles",
+        formUriBasicAuthPassword = "LSiLqvM1IIE6oWaBhSsCIcwM",
+        formKey = "",
+        customReportContent = {
+                ReportField.APP_VERSION_CODE,
+                ReportField.APP_VERSION_NAME,
+                ReportField.ANDROID_VERSION,
+                ReportField.PACKAGE_NAME,
+                ReportField.PHONE_MODEL,
+                ReportField.REPORT_ID,
+                ReportField.BUILD,
+                ReportField.STACK_TRACE,
+                ReportField.USER_CRASH_DATE
+        },
+        mode = ReportingInteractionMode.SILENT
+)
 public class ZNOApplication extends Application {
 
     public static final String TAG = ZNOApplication.class.getSimpleName();
@@ -40,6 +67,7 @@ public class ZNOApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+        if (!BuildConfig.DEBUG) ACRA.init(this);
     }
 
     public static synchronized ZNOApplication getInstance() {
