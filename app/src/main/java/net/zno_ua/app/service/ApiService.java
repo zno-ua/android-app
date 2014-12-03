@@ -125,8 +125,10 @@ public class ApiService extends Service {
             } catch (JSONException e) {
                 e.printStackTrace();
             } finally {
-                if (successful && notify) {
+                if (successful) {
                     app.setLastUpdate(System.currentTimeMillis());
+                }
+                if (successful && notify) {
                     ComponentName mainActivity =
                             new ComponentName(ApiService.this, MainActivity.class);
                     Intent main = Intent.makeMainActivity(mainActivity);
