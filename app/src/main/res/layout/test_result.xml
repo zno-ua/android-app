@@ -3,13 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    style="@style/TestResult">
+    style="@style/QuestionText">
 
     <TextView
         android:id="@+id/lesson_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Математика"
         style="@style/ResultLessonHeader" />
 
     <Space
@@ -19,7 +18,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_weight="1"
@@ -41,7 +41,6 @@
                 android:id="@+id/test_ball"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="45"
                 style="@style/ResultBallTime" />
 
         </LinearLayout>
@@ -74,7 +73,6 @@
                 android:id="@+id/rating_ball"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="156"
                 style="@style/ResultBallTime" />
 
         </LinearLayout>
@@ -111,7 +109,6 @@
                 android:id="@+id/elapsed_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="5 хвилин"
                 style="@style/ResultBallTime" />
 
         </LinearLayout>

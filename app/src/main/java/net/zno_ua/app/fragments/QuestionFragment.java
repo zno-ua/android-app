@@ -41,6 +41,7 @@ import net.zno_ua.app.TestActivity;
 import net.zno_ua.app.ViewImageActivity;
 import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.models.Question;
+import net.zno_ua.app.models.Record;
 import net.zno_ua.app.models.Test;
 
 import java.io.FileNotFoundException;
@@ -90,14 +91,20 @@ public class QuestionFragment extends Fragment {
     int type;
     int balls;
     char firstLetter;
+    Record results;
 
     boolean viewMode;
     OnAnswerSelectedListener callBack;
     FileManager fm;
     Resources res;
 
-    public static QuestionFragment newInstance(
-            boolean viewMode, int idOnTest, Question question, int taskAll, int lessonId) {
+    public static QuestionFragment newInstance(boolean viewMode, int idOnTest, Question question,
+                                               int taskAll, int lessonId) {
+        return QuestionFragment.newInstance(viewMode, idOnTest, question, taskAll, lessonId, null);
+    }
+
+    public static QuestionFragment newInstance(boolean viewMode, int idOnTest, Question question,
+                                               int taskAll, int lessonId, Record results) {
         QuestionFragment f = new QuestionFragment();
         f.viewMode = viewMode;
         f.idOnTest = idOnTest;
@@ -111,6 +118,7 @@ public class QuestionFragment extends Fragment {
         f.userAnswer = question.getUserAnswer();
         f.type = question.type;
         f.balls = question.balls;
+        f.results = results;
         return f;
     }
 
@@ -160,12 +168,12 @@ public class QuestionFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
-        View parent;
-        if (viewMode && idOnTest == 0) {
-            parent = inflater.inflate(R.layout.test_question_with_margin, container, false);
-        } else {
-            parent = inflater.inflate(R.layout.test_question, container, false);
+        View parent = inflater.inflate(R.layout.test_question, container, false);
+
+        if (results != null) {
+            createResultsView(inflater, parent);
         }
+
         switch (type) {
             case Question.TYPE_1:
                 createType1QuestionView(inflater, parent);
@@ -676,9 +684,9 @@ public class QuestionFragment extends Fragment {
 
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    String choosenBall =
+                    String chosenBall =
                             res.getString(R.string.chosen_ball) + " " + String.valueOf(progress);
-                    ballsText.setText(choosenBall);
+                    ballsText.setText(chosenBall);
                 }
             });
         }
@@ -757,6 +765,53 @@ public class QuestionFragment extends Fragment {
             inputManager.hideSoftInputFromWindow(
                     focusedView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
+    }
+
+    private void createResultsView(LayoutInflater inflater, View parent) {
+        LinearLayout container = (LinearLayout) parent.findViewById(R.id.test_question_container);
+        View resultsView = inflater.inflate(R.layout.test_result, container, false);
+
+        TextView lessonName = (TextView) resultsView.findViewById(R.id.lesson_name);
+        TextView testBall = (TextView) resultsView.findViewById(R.id.test_ball);
+        TextView ratingBall = (TextView) resultsView.findViewById(R.id.rating_ball);
+        TextView elapsedTime = (TextView) resultsView.findViewById(R.id.elapsed_time);
+
+        lessonName.setText(results.lessonName);
+        int ballType = (results.znoBall >= 190f) ? Record.GOOD_BALL :
+                (results.znoBall < 124f) ? Record.BAD_BALL : 0;
+
+        testBall.setText(ZNOApplication.buildBall(results.testBall, false, ballType));
+        ratingBall.setText(ZNOApplication.buildBall(results.znoBall, true, ballType));
+
+        if (results.elapsedTime / 60000 > 0) {
+            int minutes = (int) (results.elapsedTime / 60000);
+            String time;
+            if ((minutes < 10) || (minutes > 20 && minutes < 110) || minutes > 120) {
+                switch (minutes % 10) {
+                    case 1:
+                        time = getString(R.string.one_minute_rod);
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                        time = getString(R.string.two_four_minutes);
+                        break;
+                    default:
+                        time = getString(R.string.minutes);
+                }
+            } else {
+                time = getString(R.string.minutes);
+            }
+            time = String.format("%d %s", minutes, time);
+            elapsedTime.setText(time);
+        } else {
+            resultsView.findViewById(R.id.result_time_block_separator)
+                    .setVisibility(View.INVISIBLE);
+            resultsView.findViewById(R.id.result_time_block)
+                    .setVisibility(View.INVISIBLE);
+        }
+
+        container.addView(resultsView, 0);
     }
 
 }

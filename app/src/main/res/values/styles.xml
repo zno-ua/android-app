@@ -183,12 +183,10 @@
         <item name="android:paddingTop">@dimen/margin_none</item>
     </style>
 
-    <!-- Test Result -->
-    <style name="TestResult" parent="QuestionHeader">
-        <item name="android:layout_marginLeft">@dimen/scrollable_view_padding</item>
-        <item name="android:layout_marginRight">@dimen/scrollable_view_padding</item>
-        <item name="android:layout_marginTop">@dimen/scrollable_view_padding</item>
+    <!-- TestResults -->
+    <style name="TestResults" parent="QuestionHeader">
         <item name="android:paddingBottom">@dimen/question_padding</item>
+        <item name="android:layout_marginTop">@dimen/question_margin</item>
     </style>
 
     <style name="ResultLessonHeader">

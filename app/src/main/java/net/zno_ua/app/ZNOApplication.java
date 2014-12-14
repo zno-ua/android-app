@@ -55,6 +55,7 @@ public class ZNOApplication extends Application {
     public static final String TAG = ZNOApplication.class.getSimpleName();
     public static final String APP_SETTINGS = "settings";
     public static final String LAST_UPDATE = "last_update";
+    public static final String DEVICE_IOCEAN_X_7 = "3C3DC09C87BFF69EE07221D903FCAFA9";
 
     /// Interval of time after which will checking for updates. Now it is 24 hours.
     private static final long CHECK_FOR_UPDATES_INTERVAL = 86400000;

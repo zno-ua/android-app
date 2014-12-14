@@ -7,20 +7,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import net.zno_ua.app.adapters.QuestionsAdapter;
@@ -71,41 +67,16 @@ public class TestActivity extends FragmentActivity
     MenuItem timerAction;
 
     Test test;
-    Record result;
+    Record results;
     int userAnswersId;
     int currentPage;
 
     boolean questionsGridVisible;
     ViewPager mPager;
     PagerAdapter mPagerAdapter;
-    ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
-        @Override
-        public void onPageScrolled(int i, float v, int i2) {
-        }
-
-        @Override
-        public void onPageSelected(int i) {
-            if (viewMode) {
-                if (currentPage > 0 && i == 0) {
-                    contentList.addView(results, 0);
-                } else if (currentPage == 0 && i > 0) {
-                    contentList.removeView(results);
-                }
-
-            }
-            currentPage = i;
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int i) {
-
-        }
-    };
-    View results;
-    ViewGroup contentList;
     GridView questionsGrid;
 
-    FragmentManager manager;
+    android.app.FragmentManager manager;
     TestTimerFragment timerFragment;
     Handler handler;
 
@@ -121,47 +92,54 @@ public class TestActivity extends FragmentActivity
 
         app = ZNOApplication.getInstance();
         db = app.getZnoDataBaseHelper();
-        manager = getSupportFragmentManager();
+        manager = getFragmentManager();
 
         currentPage = 0;
 
         if (savedInstanceState == null) {
             Intent intent = getIntent();
             String action = intent.getAction();
-            if (action.equals(Action.PASS_TEST)) {
-                int testId = intent.getIntExtra(Test.TEST_ID, -1);
-                userAnswersId = -1;
-                test = db.getTest(testId);
-                timerMode = intent.getBooleanExtra(Extra.TIMER_MODE, false);
-                resumed = false;
-                viewMode = false;
-                timerMode = intent.getBooleanExtra(Extra.TIMER_MODE, false);
-                if (timerMode) {
-                    millisLeft = test.time * 60000;
-                }
-            } else if (action.equals(Action.CONTINUE_PASSAGE_TEST)) {
-                userAnswersId = intent.getIntExtra(Extra.USER_ANSWERS_ID, -1);
-                int testId = intent.getIntExtra(Test.TEST_ID, -1);
-                test = db.getTest(testId);
-                test.putAnswers(db.getUserAnswers(userAnswersId));
-                resumed = true;
-                viewMode = false;
-                timerMode = intent.hasExtra(TestTimerFragment.MILLIS_LEFT);
-                if (timerMode) {
-                    millisLeft = intent.getLongExtra(TestTimerFragment.MILLIS_LEFT, test.time * 60000);
-                    if (millisLeft == -1) {
+            switch (action) {
+                case Action.PASS_TEST: {
+                    int testId = intent.getIntExtra(Test.TEST_ID, -1);
+                    userAnswersId = -1;
+                    test = db.getTest(testId);
+                    timerMode = intent.getBooleanExtra(Extra.TIMER_MODE, false);
+                    resumed = false;
+                    viewMode = false;
+                    timerMode = intent.getBooleanExtra(Extra.TIMER_MODE, false);
+                    if (timerMode) {
                         millisLeft = test.time * 60000;
                     }
+                    break;
                 }
-                currentPage = intent.getIntExtra(Extra.QUESTION_NUMBER, 0);
-            } else if (action.equals(Action.VIEW_TEST)) {
-                int testId = intent.getIntExtra(Test.TEST_ID, -1);
-                userAnswersId = intent.getIntExtra(Extra.USER_ANSWERS_ID, -1);
-                test = db.getTest(testId);
-                test.putAnswers(db.getUserAnswers(userAnswersId));
-                viewMode = true;
-                resumed = intent.getBooleanExtra(Extra.RESUMED, false);
-                timerMode = false;
+                case Action.CONTINUE_PASSAGE_TEST: {
+                    userAnswersId = intent.getIntExtra(Extra.USER_ANSWERS_ID, -1);
+                    int testId = intent.getIntExtra(Test.TEST_ID, -1);
+                    test = db.getTest(testId);
+                    test.putAnswers(db.getUserAnswers(userAnswersId));
+                    resumed = true;
+                    viewMode = false;
+                    timerMode = intent.hasExtra(TestTimerFragment.MILLIS_LEFT);
+                    if (timerMode) {
+                        millisLeft = intent.getLongExtra(TestTimerFragment.MILLIS_LEFT, test.time * 60000);
+                        if (millisLeft == -1) {
+                            millisLeft = test.time * 60000;
+                        }
+                    }
+                    currentPage = intent.getIntExtra(Extra.QUESTION_NUMBER, 0);
+                    break;
+                }
+                case Action.VIEW_TEST: {
+                    int testId = intent.getIntExtra(Test.TEST_ID, -1);
+                    userAnswersId = intent.getIntExtra(Extra.USER_ANSWERS_ID, -1);
+                    test = db.getTest(testId);
+                    test.putAnswers(db.getUserAnswers(userAnswersId));
+                    viewMode = true;
+                    resumed = intent.getBooleanExtra(Extra.RESUMED, false);
+                    timerMode = false;
+                    break;
+                }
             }
             askToFinish = true;
         } else {
@@ -180,7 +158,8 @@ public class TestActivity extends FragmentActivity
             }
             askToFinish = savedInstanceState.getBoolean(Extra.ASK_TO_FINISH);
             if (timerMode) {
-                timerFragment = (TestTimerFragment) manager.getFragment(savedInstanceState, TestTimerFragment.TAG);
+                timerFragment = (TestTimerFragment) manager
+                        .getFragment(savedInstanceState, TestTimerFragment.TAG);
             }
         }
 
@@ -188,16 +167,16 @@ public class TestActivity extends FragmentActivity
             timerFragment = TestTimerFragment.newInstance(millisLeft);
         }
 
-        if (viewMode) {
-            result = db.getResult(userAnswersId);
-            createResultsView();
-        }
-
         mPager = (ViewPager) findViewById(R.id.test_question_pager);
-        mPagerAdapter = new QuestionsAdapter(this, getSupportFragmentManager(), test, viewMode);
+
+        if (viewMode) {
+            results = db.getResult(userAnswersId);
+            mPagerAdapter = new QuestionsAdapter(this, getSupportFragmentManager(), test, results);
+        } else {
+            mPagerAdapter = new QuestionsAdapter(this, getSupportFragmentManager(), test);
+        }
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(currentPage);
-        mPager.setOnPageChangeListener(onPageChangeListener);
         questionsGrid = (GridView) findViewById(R.id.test_questions);
         questionsGrid.setAdapter(new QuestionsGridAdapter(getApplicationContext(), test, viewMode));
         questionsGrid.setOnItemClickListener(new OnItemClickListener() {
@@ -304,7 +283,7 @@ public class TestActivity extends FragmentActivity
                 Lesson lesson = db.getLesson(test.lessonId);
                 String shareText =
                         String.format(Locale.US, shareTemplate,
-                                lesson.nameRod, result.znoBall, lesson.link, test.id);
+                                lesson.nameRod, results.znoBall, lesson.link, test.id);
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, shareText);
@@ -323,51 +302,6 @@ public class TestActivity extends FragmentActivity
             finish();
         } else {
             showAlert(CANCEL_ALERT);
-        }
-    }
-
-    private void createResultsView() {
-        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        contentList = (ViewGroup) findViewById(R.id.test_content_list);
-        results = inflater.inflate(R.layout.test_result, contentList, false);
-        contentList.addView(results, 0);
-
-        TextView lessonName = (TextView) results.findViewById(R.id.lesson_name);
-        TextView testBall = (TextView) results.findViewById(R.id.test_ball);
-        TextView ratingBall = (TextView) results.findViewById(R.id.rating_ball);
-        TextView elapsedTime = (TextView) results.findViewById(R.id.elapsed_time);
-
-        lessonName.setText(result.lessonName);
-        int ballType = (result.znoBall >= 190f) ? Record.GOOD_BALL :
-                (result.znoBall < 124f) ? Record.BAD_BALL : 0;
-
-        testBall.setText(ZNOApplication.buildBall(result.testBall, false, ballType));
-        ratingBall.setText(ZNOApplication.buildBall(result.znoBall, true, ballType));
-
-        if (result.elapsedTime / 60000 > 0) {
-            int minutes = (int) (result.elapsedTime / 60000);
-            String time;
-            if ((minutes < 10) || (minutes > 20 && minutes < 110) || minutes > 120) {
-                switch (minutes % 10) {
-                    case 1:
-                        time = getString(R.string.one_minute_rod);
-                        break;
-                    case 2:
-                    case 3:
-                    case 4:
-                        time = getString(R.string.two_four_minutes);
-                        break;
-                    default:
-                        time = getString(R.string.minutes);
-                }
-            } else {
-                time = getString(R.string.minutes);
-            }
-            time = String.format("%d %s", minutes, time);
-            elapsedTime.setText(time);
-        } else {
-            results.findViewById(R.id.result_time_block_separator).setVisibility(View.INVISIBLE);
-            results.findViewById(R.id.result_time_block).setVisibility(View.INVISIBLE);
         }
     }
 

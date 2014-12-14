@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,7 @@ import android.widget.TextView;
 import net.zno_ua.app.R;
 import net.zno_ua.app.ZNOApplication;
 
-public class TestTimerFragment extends Fragment {
+public class TestTimerFragment extends android.app.Fragment {
 
     public static final String TAG = "test_timer";
     public static final String MILLIS_LEFT = "millis_left";
