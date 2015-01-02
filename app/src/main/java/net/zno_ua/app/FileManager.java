@@ -22,48 +22,37 @@ public class FileManager {
         FILES_PATH = context.getFilesDir().getAbsolutePath();
     }
 
-    public boolean saveBitmap(String path, String name, Bitmap bitmap) {
-        boolean result = true;
+    public void saveBitmap(String path, String name, Bitmap bitmap) throws IOException {
         File dir = new File(path);
         if (!dir.exists()) {
             createFolder(path);
         }
 
         File file = new File(FILES_PATH + dir, name);
+        file.createNewFile();
+        Bitmap.CompressFormat format = null;
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
 
-        if (!file.exists()) {
-            Bitmap.CompressFormat format = null;
-            try {
-                file.createNewFile();
-                FileOutputStream fileOutputStream = new FileOutputStream(file);
-
-                if (name.contains("jpg")) {
-                    format = Bitmap.CompressFormat.JPEG;
-                } else if (name.contains("png")) {
-                    format = Bitmap.CompressFormat.PNG;
-                } else if (name.contains("gif")) {
-                    fileOutputStream.close();
-                    return false;
-                }
-
-                result = bitmap.compress(format, 100, fileOutputStream);
-                fileOutputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (name.contains("jpg")) {
+            format = Bitmap.CompressFormat.JPEG;
+        } else if (name.contains("png")) {
+            format = Bitmap.CompressFormat.PNG;
+        } else if (name.contains("gif")) {
+            fileOutputStream.close();
+            throw new IOException("Can't save image: wrong format.");
         }
 
-        return result;
+        boolean compressed = bitmap.compress(format, 100, fileOutputStream);
+        if (!compressed) {
+            throw new IOException("Can't save file: " + path + name);
+        }
+        fileOutputStream.close();
     }
 
     public Drawable openDrawable(String path) throws FileNotFoundException {
         File drawable = new File(FILES_PATH + path);
-        if (drawable.exists()) {
-            FileInputStream fis = new FileInputStream(drawable);
-            return new BitmapDrawable(context.getResources(), BitmapFactory.decodeStream(fis));
-        } else {
-            return null;
-        }
+        FileInputStream fis = new FileInputStream(drawable);
+        return new BitmapDrawable(context.getResources(), BitmapFactory.decodeStream(fis));
     }
 
     public void createFolder(String pathName) {

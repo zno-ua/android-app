@@ -12,10 +12,12 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -303,6 +305,30 @@ public class TestActivity extends FragmentActivity
         } else {
             showAlert(CANCEL_ALERT);
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        View view = getCurrentFocus();
+        boolean ret = super.dispatchTouchEvent(event);
+
+        if (view != null && view instanceof EditText) {
+            view = getCurrentFocus();
+            if (view != null) {
+                int scrCoordinates[] = new int[2];
+                view.getLocationOnScreen(scrCoordinates);
+
+                float x = event.getRawX() + view.getLeft() - scrCoordinates[0];
+                float y = event.getRawY() + view.getTop() - scrCoordinates[1];
+
+                if (event.getAction() == MotionEvent.ACTION_UP
+                        && (x < view.getLeft() || x >= view.getRight()
+                        || y < view.getTop() || y > view.getBottom()) ) {
+                    ZNOApplication.hideKeyboard(this);
+                }
+            }
+        }
+        return ret;
     }
 
     private void showQuestionsGrid() {

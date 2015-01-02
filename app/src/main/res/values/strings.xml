@@ -103,6 +103,7 @@
     <string name="error_timeout">Неможливо завантажити тест \nСпробуйте пізніше </string>
     <string name="error_server_bad">Помилка серверу</string>
     <string name="error_unknown">Невідома помилка</string>
+    <string name="error_cant_save_bitmap">Неможливо зберегти зображення</string>
 
     <!-- Timer -->
     <string name="time_one_left">Залишилась %1$d %2$s</string>

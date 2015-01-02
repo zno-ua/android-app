@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -232,6 +233,9 @@ public class ApiService extends Service {
             } catch (JSONException e) {
                 callBack.onError(e);
                 e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+                callBack.onError(e);
             }
         }
 

@@ -33,6 +33,8 @@ import net.zno_ua.app.service.ApiService;
 import net.zno_ua.app.service.ApiService.ApiBinder;
 import net.zno_ua.app.service.ApiService.TestDLCallBack;
 
+import java.io.IOException;
+
 public class TestsActivity extends Activity implements TestDLCallBack, OnItemClickListener {
 
     final Context context = this;
@@ -237,6 +239,8 @@ public class TestsActivity extends Activity implements TestDLCallBack, OnItemCli
                     msgId = R.string.error_timeout;
                 } else if (e instanceof ServerError) {
                     msgId = R.string.error_server_bad;
+                } else if (e instanceof IOException) {
+                    msgId = R.string.error_cant_save_bitmap;
                 } else {
                     msgId = R.string.error_unknown;
                 }

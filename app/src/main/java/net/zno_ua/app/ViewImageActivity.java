@@ -79,7 +79,7 @@ public class ViewImageActivity extends Activity implements OnClickListener,
 
             matrix.set(img.getImageMatrix());
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            finish();
         }
 
     }

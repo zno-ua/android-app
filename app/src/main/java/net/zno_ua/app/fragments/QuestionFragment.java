@@ -1,13 +1,11 @@
 package net.zno_ua.app.fragments;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.Html;
@@ -24,7 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
@@ -495,9 +492,8 @@ public class QuestionFragment extends Fragment {
                 @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if (actionId == EditorInfo.IME_ACTION_DONE
-                            || event.getAction() == KeyEvent.ACTION_DOWN
-                            && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                        hideKeyboard();
+                            || actionId == EditorInfo.IME_ACTION_NEXT) {
+                        ZNOApplication.hideKeyboard(getActivity());
                         if (userAnswer.length() == 3) {
                             callBack.onAnswerSelected(idOnTest, userAnswer, true);
                         }
@@ -578,18 +574,10 @@ public class QuestionFragment extends Fragment {
                 @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if (actionId == EditorInfo.IME_ACTION_DONE
-                            || event.getAction() == KeyEvent.ACTION_DOWN
-                            && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                        hideKeyboard();
+                            || actionId == EditorInfo.IME_ACTION_NEXT) {
+                        ZNOApplication.hideKeyboard(getActivity());
                         if (!userAnswer.isEmpty()) {
-                            new Handler().postDelayed(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    callBack.onAnswerSelected(idOnTest, userAnswer, true);
-                                }
-
-                            }, 200);
+                            callBack.onAnswerSelected(idOnTest, userAnswer, true);
                         }
                         return true;
                     }
@@ -756,16 +744,6 @@ public class QuestionFragment extends Fragment {
             return drawable;
         }
     };
-
-    private void hideKeyboard() {
-        InputMethodManager inputManager =
-                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        View focusedView = getActivity().getCurrentFocus();
-        if (focusedView != null) {
-            inputManager.hideSoftInputFromWindow(
-                    focusedView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-    }
 
     private void createResultsView(LayoutInflater inflater, View parent) {
         LinearLayout container = (LinearLayout) parent.findViewById(R.id.test_question_container);

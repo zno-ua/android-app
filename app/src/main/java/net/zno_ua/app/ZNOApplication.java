@@ -10,6 +10,8 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -202,6 +204,16 @@ public class ZNOApplication extends Application {
             builder.setSpan(new ForegroundColorSpan(lowScoreColor), 0, builder.length(), 0);
         }
         return builder;
+    }
+
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager inputManager =
+                (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        View focusedView = activity.getCurrentFocus();
+        if (focusedView != null) {
+            inputManager.hideSoftInputFromWindow(
+                    focusedView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
 }
