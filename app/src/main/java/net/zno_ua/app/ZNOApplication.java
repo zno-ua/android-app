@@ -126,7 +126,9 @@ public class ZNOApplication extends Application {
         long lastUpdate = getLastUpdate();
 
         if (currentDate - lastUpdate >= CHECK_FOR_UPDATES_INTERVAL) {
-            startService(new Intent(ApiService.ACTION_CHECK_FOR_UPDATES));
+            Intent checkForUpdates = new Intent(getApplicationContext(), ApiService.class);
+            checkForUpdates.setAction(ApiService.ACTION_CHECK_FOR_UPDATES);
+            startService(checkForUpdates);
         }
     }
 
