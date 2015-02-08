@@ -323,7 +323,7 @@ public class TestActivity extends FragmentActivity
 
                 if (event.getAction() == MotionEvent.ACTION_UP
                         && (x < view.getLeft() || x >= view.getRight()
-                        || y < view.getTop() || y > view.getBottom()) ) {
+                        || y < view.getTop() || y > view.getBottom())) {
                     ZNOApplication.hideKeyboard(this);
                 }
             }
@@ -504,8 +504,13 @@ public class TestActivity extends FragmentActivity
     }
 
     public void finishTest() {
+        String[] testBalls = db.getTestBalls(test.id);
         final int testBall = test.getTestBall();
-        final float znoBall = Float.parseFloat(db.getTestBalls(test.id)[testBall]);
+        final float znoBall = Float.parseFloat(
+                (testBall < testBalls.length) ?
+                        testBalls[testBall] :
+                        testBalls[testBalls.length - 1]
+        );
         long elapsedTime = 0;
         if (timerMode) {
             elapsedTime = test.time * 60000 - timerFragment.getMillisLeft();

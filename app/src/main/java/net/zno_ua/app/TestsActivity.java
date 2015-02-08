@@ -156,7 +156,8 @@ public class TestsActivity extends Activity implements TestDLCallBack, OnItemCli
         dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                final Intent passTest = new Intent(TestActivity.Action.PASS_TEST);
+                final Intent passTest = new Intent(TestsActivity.this, TestActivity.class);
+                passTest.setAction(TestActivity.Action.PASS_TEST);
                 passTest.putExtra(Test.TEST_ID, testId);
                 passTest.putExtra(TestActivity.Extra.TIMER_MODE, true);
                 startActivity(passTest);
@@ -165,7 +166,8 @@ public class TestsActivity extends Activity implements TestDLCallBack, OnItemCli
         dialogBuilder.setNegativeButton(R.string.dialog_negative_text, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                final Intent passTest = new Intent(TestActivity.Action.PASS_TEST);
+                final Intent passTest = new Intent(TestsActivity.this, TestActivity.class);
+                passTest.setAction(TestActivity.Action.PASS_TEST);
                 passTest.putExtra(Test.TEST_ID, testId);
                 passTest.putExtra(TestActivity.Extra.TIMER_MODE, false);
                 startActivity(passTest);

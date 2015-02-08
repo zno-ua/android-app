@@ -57,7 +57,8 @@ public class RecordsActivity extends Activity {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     PassedTest passedTest = (PassedTest) adapter.getItem(i);
-                    Intent viewTest = new Intent(TestActivity.Action.VIEW_TEST);
+                    Intent viewTest = new Intent(RecordsActivity.this, TestActivity.class);
+                    viewTest.setAction(TestActivity.Action.VIEW_TEST);
                     viewTest.putExtra(Test.TEST_ID, passedTest.testId);
                     viewTest.putExtra(TestActivity.Extra.USER_ANSWERS_ID, passedTest.id);
                     startActivity(viewTest);

@@ -110,11 +110,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 startActivity(lessons);
                 break;
             case R.id.records_btn:
-                Intent records = new Intent(RecordsActivity.Action.VIEW_BEST_SCORES);
+                Intent records = new Intent(this, RecordsActivity.class);
+                records.setAction(RecordsActivity.Action.VIEW_BEST_SCORES);
                 startActivity(records);
                 break;
             case R.id.last_passed_tests_btn:
-                Intent passedTests = new Intent(RecordsActivity.Action.VIEW_PASSED_TESTS);
+                Intent passedTests = new Intent(this, RecordsActivity.class);
+                passedTests.setAction(RecordsActivity.Action.VIEW_PASSED_TESTS);
                 startActivity(passedTests);
                 break;
         }

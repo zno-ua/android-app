@@ -168,7 +168,8 @@ public class ZNOApplication extends Application {
         int questionNumber = preferences.getInt(TestActivity.Extra.QUESTION_NUMBER, -1);
         int testId = preferences.getInt(Test.TEST_ID, -1);
 
-        Intent startedActivity = new Intent(TestActivity.Action.CONTINUE_PASSAGE_TEST);
+        Intent startedActivity = new Intent(parent, TestActivity.class);
+        startedActivity.setAction(TestActivity.Action.CONTINUE_PASSAGE_TEST);
         startedActivity.putExtra(Test.TEST_ID, testId);
         startedActivity.putExtra(TestActivity.Extra.USER_ANSWERS_ID, userAnswersId);
         startedActivity.putExtra(TestActivity.Extra.QUESTION_NUMBER, questionNumber);
