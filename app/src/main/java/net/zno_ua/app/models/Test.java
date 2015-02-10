@@ -38,7 +38,7 @@ public class Test extends TestInfo {
         if (savedAnswers != null) {
             try {
                 JSONArray answers = new JSONArray(savedAnswers);
-                for (int i = 0; i < answers.length(); i++) {
+                for (int i = 0; i < questions.size() && i < answers.length(); i++) {
                     questions.get(i).setUserAnswer(answers.getString(i));
                 }
             } catch (JSONException e) {

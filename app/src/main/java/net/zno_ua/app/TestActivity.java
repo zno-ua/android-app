@@ -410,25 +410,25 @@ public class TestActivity extends FragmentActivity
                 manager.beginTransaction()
                         .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
                         .show(timerFragment)
-                        .commit();
+                        .commitAllowingStateLoss();
                 handler.postDelayed(hide, TestTimerFragment.SHOW_TIME);
             } else if (timerFragment.isVisible()) {
                 handler.postDelayed(hide, TestTimerFragment.SHOW_TIME);
             } else {
                 manager.beginTransaction()
                         .hide(timerFragment)
-                        .commit();
+                        .commitAllowingStateLoss();
                 manager.beginTransaction()
                         .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
                         .show(timerFragment)
-                        .commit();
+                        .commitAllowingStateLoss();
                 handler.postDelayed(hide, TestTimerFragment.SHOW_TIME);
             }
         } else {
             manager.beginTransaction()
                     .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
                     .add(R.id.test_content_container, timerFragment, TestTimerFragment.TAG)
-                    .commit();
+                    .commitAllowingStateLoss();
             handler.postDelayed(hide, TestTimerFragment.SHOW_TIME);
         }
 
