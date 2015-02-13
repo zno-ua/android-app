@@ -279,6 +279,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             values.put(KEY_DATE, date);
             db.insert(TABLE_USER_RECORDS, null, values);
         }
+        c.close();
     }
 
     public int saveUserAnswers(int lessonId, int testId, String answers) {
@@ -317,6 +318,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             int testId = c.getInt(testIdIndex);
             updateRecords(db, lessonId, testId, znoBall, elapsedTime, date);
         }
+        c.close();
     }
 
     public void deleteUserAnswers(int id) {
@@ -328,12 +330,14 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         String[] projection = {KEY_ANSWERS};
         String selection = KEY_ID + "=" + id;
+        String answers = null;
         Cursor c = db.query(TABLE_USER_ANSWERS, projection, selection, null, null, null, null);
         if (c.moveToFirst()) {
-            return c.getString(c.getColumnIndex(KEY_ANSWERS));
-        } else {
-            return null;
+            answers = c.getString(c.getColumnIndex(KEY_ANSWERS));
         }
+
+        c.close();
+        return answers;
     }
 
     public Record getResult(int id) {
@@ -368,6 +372,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             result.znoBall = c.getFloat(5);
             result.testBall = c.getInt(6);
         }
+        c.close();
 
         return result;
     }
@@ -396,6 +401,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                     ids.add(id);
                 }
             }
+            c.close();
         }
 
         return ids;
@@ -465,6 +471,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             if (!c.moveToFirst()) {
                 insertTest(db, test);
             }
+            c.close();
         }
     }
 
@@ -473,11 +480,14 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         String[] projection = {KEY_BALLS};
         String selection = KEY_ID + "=" + id;
         Cursor c = db.query(TABLE_TESTS, projection, selection, null, null, null, null);
+
+        String[] balls = null;
         if (c.moveToFirst()) {
-            return c.getString(c.getColumnIndex(KEY_BALLS)).split("\r");
-        } else {
-            return null;
+            balls = c.getString(c.getColumnIndex(KEY_BALLS)).split("\r");
         }
+        c.close();
+
+        return balls;
     }
 
     public ArrayList<Lesson> getLessons() {
@@ -506,6 +516,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                 }
 
             } while (c.moveToNext());
+            c.close();
 
             if (worldHist != null) {
                 lessons.add(worldHist);
@@ -527,6 +538,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         lesson.name = c.getString(1);
         lesson.nameRod = c.getString(2);
         lesson.link = c.getString(3);
+        c.close();
 
         return lesson;
     }
@@ -536,11 +548,15 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
         String[] projection = {KEY_LESSON_ID};
         String selection = KEY_LESSON_ID + " = " + id;
         Cursor c = db.query(TABLE_TESTS, projection, selection, null, null, null, null);
+
+        int count = c.getCount();
         // Hide math 2014 test
         if (id == 4) {
-            return c.getCount() - 1;
+            count = c.getCount() - 1;
         }
-        return c.getCount();
+        c.close();
+
+        return count;
     }
 
     public ArrayList<TestInfo> getLessonTests(int id) {
@@ -585,6 +601,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                     notLoaded.add(testInfo);
                 }
             } while (c.moveToNext());
+            c.close();
         }
 
         tests.addAll(notLoaded);
@@ -652,6 +669,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
             testInfo.time = c.getInt(timeIndex);
             testInfo.year = c.getInt(yearIndex);
             testInfo.loaded = c.getInt(loadedIndex) != 0;
+            c.close();
 
             return new Test(testInfo, questions);
         }
@@ -709,6 +727,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
                 records.add(record);
             } while (cRecords.moveToNext());
+            cRecords.close();
         }
 
 
@@ -784,6 +803,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
 
                 passedTests.add(passedTest);
             } while (recRows.moveToNext());
+            recRows.close();
         }
 
         return passedTests;
