@@ -1,22 +1,20 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 22
     buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "net.zno_ua.app"
         minSdkVersion 14
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 6
         versionName "1.0.5"
     }
 }
 
 dependencies {
-    compile ('ch.acra:acra:4.5.0') {
-        exclude group: 'org.json'
-    }
-    compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'com.google.android.gms:play-services:7.3.0'
     compile 'com.mcxiaoke.volley:library:1.0.9'
+    compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1'
 }
