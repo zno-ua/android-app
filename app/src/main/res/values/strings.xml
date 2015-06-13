@@ -184,4 +184,7 @@
     <string name="test_banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="smart_banner_ad_unit_id">ca-app-pub-9629920327758375/6790595649</string>
 
+    <!-- New fields under development -->
+    <string name="zno_db">База даних тестів ЗНО</string>
+
 </resources>
