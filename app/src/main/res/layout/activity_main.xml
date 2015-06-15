@@ -1,68 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <TextView
-        android:id="@+id/app_logo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        style="@style/AppLogo" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <include layout="@layout/quote_divider" />
-
-    <TextView
-        android:id="@+id/quote"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/Quote" />
-
-    <include layout="@layout/quote_divider" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+    android:fitsSystemWindows="true"
+    tools:context="net.zno_ua.app.ui.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/begin_testing_btn"
-            android:layout_width="match_parent"
-            style="@style/Button"
-            android:layout_height="wrap_content"
-            android:text="@string/begin_testing_btn_text" />
+        <include
+            android:id="@+id/tool_bar"
+            layout="@layout/app_bar" />
 
-        <Button
-            android:id="@+id/last_passed_tests_btn"
+        <FrameLayout
+            android:id="@+id/main_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Button"
-            android:text="@string/last_passed_tests" />
-
-        <Button
-            android:id="@+id/records_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Button"
-            android:text="@string/records" />
-
+            android:layout_height="match_parent" />
     </LinearLayout>
 
-</LinearLayout>
+    <include
+        android:id="@+id/nav_drawer"
+        layout="@layout/nav_drawer" />
+
+</android.support.v4.widget.DrawerLayout>

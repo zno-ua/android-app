@@ -2,7 +2,6 @@
 <resources>
 
     <!-- Base App Colors-->
-    <color name="white">#fff</color>
     <color name="blue">#2e7ad8</color>
     <color name="blue_light">#5f86b6</color>
     <color name="red">#f00</color>
@@ -30,5 +29,29 @@
     <!-- SeekBar -->
     <color name="seek_bar_stroke_color">#4D666666</color>
     <color name="seek_bar_bg_color">#fafafa</color>
+
+    <!-- Material Design colors -->
+
+    <!-- Indigo -->
+    <color name="indigo_500">#3F51B5</color>
+    <color name="indigo_700">#303F9F</color>
+    <!-- Indigo -->
+
+    <!-- Pink -->
+    <color name="pink_500">#E91E63</color>
+    <!-- Pink -->
+
+    <!-- Grey -->
+    <color name="grey_230">#EAEAEA</color>
+    <!-- Grey -->
+
+    <!-- Black -->
+    <color name="black">#000000</color>
+    <!-- Black -->
+
+    <!-- White -->
+    <color name="white">#FFFFFF</color>
+    <color name="status_bar_inset_foreground">#4000</color>
+    <!-- White -->
 
 </resources>

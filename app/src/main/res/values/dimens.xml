@@ -84,5 +84,6 @@
     <dimen name="record_ball_text_size">20sp</dimen>
     <dimen name="list_divider_height">10dp</dimen>
     <dimen name="margin_none">0dp</dimen>
+    <dimen name="nav_drawer_width">280dp</dimen>
 
 </resources>

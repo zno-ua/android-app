@@ -17,7 +17,7 @@ import net.zno_ua.app.db.ZNODataBaseHelper;
 import java.util.Calendar;
 import java.util.Random;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivityOld extends Activity implements View.OnClickListener {
 
     ZNOApplication app;
     ZNODataBaseHelper db;
@@ -29,7 +29,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_old);
 
         app = ZNOApplication.getInstance();
         db = app.getZnoDataBaseHelper();
@@ -83,7 +83,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             dialogBuilder.setPositiveButton(R.string.dialog_positive_text, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    app.startSavedSession(MainActivity.this);
+                    app.startSavedSession(MainActivityOld.this);
                 }
             });
             dialogBuilder.setNegativeButton(R.string.dialog_negative_text, new DialogInterface.OnClickListener() {

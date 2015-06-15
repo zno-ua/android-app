@@ -16,7 +16,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".MainActivityOld"
             android:label="@string/zno"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
@@ -31,7 +31,7 @@
             android:label="@string/testing_activity_label">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.zno_ua.app.MainActivity" />
+                android:value=".MainActivityOld" />
         </activity>
         <activity
             android:name=".TestsActivity"
@@ -45,7 +45,7 @@
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.zno_ua.app.MainActivity" />
+                android:value=".MainActivityOld" />
 
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
@@ -71,7 +71,7 @@
         </activity>
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
         <activity
             android:name=".ViewImageActivity"
             android:noHistory="true"
@@ -104,12 +104,21 @@
 
         <!-- New fields under development -->
         <provider
-            android:name="net.zno_ua.app.provider.ZNOProvider"
+            android:name=".provider.ZNOProvider"
             android:authorities="net.zno_ua.app.provider.ZNOProvider"
             android:exported="false"
             android:label="@string/zno_db"
             android:syncable="true" />
 
+        <activity
+            android:name=".ui.MainActivity"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

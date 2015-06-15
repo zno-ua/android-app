@@ -257,7 +257,7 @@ public class TestActivity extends FragmentActivity
             case android.R.id.home:
                 if (viewMode) {
                     if (resumed) {
-                        Intent main = new Intent(this, MainActivity.class);
+                        Intent main = new Intent(this, MainActivityOld.class);
                         startActivity(main);
                     }
                     finish();

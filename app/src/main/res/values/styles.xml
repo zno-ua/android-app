@@ -250,4 +250,17 @@
         <item name="android:textSize">@dimen/timer_text_size</item>
     </style>
 
+    <!-- New fields under development -->
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar" />
+
+    <style name="AppTheme" parent="AppTheme.Base">
+        <item name="colorPrimary">@color/indigo_500</item>
+        <item name="colorPrimaryDark">@color/indigo_700</item>
+        <item name="colorAccent">@color/pink_500</item>
+        <item name="android:windowBackground">@color/grey_230</item>
+
+        <item name="toolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="toolbarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+    </style>
+
 </resources>

@@ -18,7 +18,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 
 import net.zno_ua.app.FileManager;
-import net.zno_ua.app.MainActivity;
+import net.zno_ua.app.MainActivityOld;
 import net.zno_ua.app.R;
 import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.db.ZNODataBaseHelper;
@@ -131,7 +131,7 @@ public class ApiService extends Service {
                 }
                 if (successful && notify) {
                     ComponentName mainActivity =
-                            new ComponentName(ApiService.this, MainActivity.class);
+                            new ComponentName(ApiService.this, MainActivityOld.class);
                     Intent main = Intent.makeMainActivity(mainActivity);
                     main.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     PendingIntent startApp =
