@@ -1,4 +1,4 @@
-package net.zno_ua.app.ui.util;
+package net.zno_ua.app.util;
 
 import android.app.Activity;
 import android.content.Context;
