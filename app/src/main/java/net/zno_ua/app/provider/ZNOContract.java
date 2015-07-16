@@ -152,6 +152,9 @@ public class ZNOContract {
     private static final String DOT = ".";
     private static final String VND = "/vnd.";
 
+    public static final String ASC = " ASC";
+    public static final String DESC = " DESC";
+
     public static class Subject implements SubjectColumns, BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_SUBJECT).build();
