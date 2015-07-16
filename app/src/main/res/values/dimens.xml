@@ -86,4 +86,7 @@
     <dimen name="margin_none">0dp</dimen>
     <dimen name="nav_drawer_width">280dp</dimen>
 
+    <!-- New fields under development -->
+    <dimen name="card_view_corner_radius">4dp</dimen>
+
 </resources>

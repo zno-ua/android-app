@@ -43,6 +43,9 @@
 
     <!-- Grey -->
     <color name="grey_230">#EAEAEA</color>
+    <color name="grey_800">#424242</color>
+    <color name="grey_900">#212121</color>
+    <!-- Grey -->
     <!-- Grey -->
 
     <!-- Black -->
@@ -54,4 +57,14 @@
     <color name="status_bar_inset_foreground">#4000</color>
     <!-- White -->
 
+    <!-- Subjects Colors -->
+    <color name="ukrainian">#2868C2</color>
+    <color name="history_ukr">#759bc0</color>
+    <color name="math">#044433</color>
+    <color name="biology">#0095c0</color>
+    <color name="geography">#a94d0c</color>
+    <color name="english">#144499</color>
+    <color name="physics">#0b4982</color>
+    <color name="chemistry">#3c5170</color>
+    <!-- Subjects Colors -->
 </resources>

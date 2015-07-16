@@ -1,18 +1,28 @@
 package net.zno_ua.app.ui;
 
+import android.app.Fragment;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import net.zno_ua.app.R;
 import net.zno_ua.app.util.UiUtils;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Calendar;
+
+public class MainActivity extends AppCompatActivity
+        implements SubjectsFragment.OnSubjectSelectedListener, NavigationView.OnNavigationItemSelectedListener {
 
     private Toolbar mToolBar;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -29,12 +39,13 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         initToolBar();
         initDrawerLayout();
+        initMainContent();
     }
 
-    @SuppressWarnings("ConstantConditions")
     private void initToolBar() {
         mToolBar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(mToolBar);
+        //noinspection ConstantConditions
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
@@ -44,10 +55,32 @@ public class MainActivity extends AppCompatActivity {
                 UiUtils.getThemeAttribute(this, R.attr.colorPrimaryDark).resourceId
         );
 
-        UiUtils.setDrawerLayoutWidth(this, mDrawerLayout.findViewById(R.id.nav_drawer));
+        NavigationView navigationView =
+                (NavigationView) mDrawerLayout.findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        ImageView backgroundImage = (ImageView) navigationView.findViewById(R.id.image);
+        Picasso.with(this).load(R.drawable.ic_zno)
+                .fit()
+                .centerCrop()
+                .into(backgroundImage);
+
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR) + ((calendar.get(Calendar.MONTH) >= 7) ? 0 : 1);
+
+        ((TextView) navigationView.findViewById(R.id.text))
+                .setText(String.format("%s %d", getString(R.string.zno), year));
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolBar, 0, 0);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    private void initMainContent() {
+        //noinspection ConstantConditions
+        getSupportActionBar().setTitle(R.string.testing);
+        Fragment fragment = SubjectsFragment.newInstance();
+        getFragmentManager().beginTransaction()
+                .add(R.id.main_content, fragment)
+                .commit();
     }
 
     @Override
@@ -78,5 +111,21 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.navigation_item_testing:
+                menuItem.setChecked(true);
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onSubjectSelected(long id) {
+
     }
 }

@@ -186,5 +186,6 @@
 
     <!-- New fields under development -->
     <string name="zno_db">База даних тестів ЗНО</string>
+    <string name="testing">Тестування</string>
 
 </resources>
