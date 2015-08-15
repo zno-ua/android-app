@@ -87,6 +87,10 @@
     <dimen name="nav_drawer_width">280dp</dimen>
 
     <!-- New fields under development -->
+    <dimen name="key_line_1">16dp</dimen>
     <dimen name="card_view_corner_radius">4dp</dimen>
+    <dimen name="single_line_item_tile_height">48dp</dimen>
+    <dimen name="two_line_item_tile_height">72dp</dimen>
+    <dimen name="action_icon_width">24dp</dimen>
 
 </resources>

@@ -735,7 +735,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
     }
 
     private int parseSession(String testName) {
-        String SESSION = ZNOApplication.getInstance().getResources().getString(R.string.session_text);
+        String SESSION = ZNOApplication.getInstance().getResources().getString(R.string.session);
         if (testName.contains("(I " + SESSION + ")")) {
             return 1;
         } else if (testName.contains("(II " + SESSION + ")")) {
@@ -753,7 +753,7 @@ public class ZNODataBaseHelper extends SQLiteOpenHelper {
                 KEY_ZNO_BALL};
         String selection;
         String ordering = KEY_DATE + DESC;
-        String SESSION = ZNOApplication.getInstance().getResources().getString(R.string.session_text);
+        String SESSION = ZNOApplication.getInstance().getResources().getString(R.string.session);
 
         recRows = db.query(TABLE_USER_ANSWERS, projection, null, null, null, null, ordering);
         if (recRows.moveToFirst()) {

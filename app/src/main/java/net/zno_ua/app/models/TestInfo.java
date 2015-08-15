@@ -41,10 +41,10 @@ public class TestInfo {
         String EXP_ZNO = resources.getString(R.string.exp_zno);
         String FOR_YEAR = resources.getString(R.string.for_);
         String YEAR = resources.getString(R.string.year);
-        String SESSION = resources.getString(R.string.session_text);
+        String SESSION = resources.getString(R.string.session);
         String TASK_TEXT = resources.getString(R.string.task_text);
         String TASKS_TEXT = resources.getString(R.string.tasks_text);
-        String NEEDED_TO_LOAD = resources.getString(R.string.needed_to_load_text);
+        String NEEDED_TO_LOAD = resources.getString(R.string.needed_to_download);
 
         if (name.contains(ZNO_FULL)
                 || name.contains(ZNO_LIGHT)) {

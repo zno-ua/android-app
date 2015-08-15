@@ -25,6 +25,7 @@ import net.zno_ua.app.R;
 import net.zno_ua.app.adapter.CursorRecyclerViewAdapter;
 import net.zno_ua.app.provider.ZNOContract;
 import net.zno_ua.app.ui.picasso.transformation.Rounded;
+import net.zno_ua.app.util.UiUtils;
 
 import static android.view.LayoutInflater.from;
 
@@ -113,33 +114,6 @@ public class SubjectsFragment extends Fragment implements LoaderManager.LoaderCa
 
     private class SubjectsAdapter extends CursorRecyclerViewAdapter<SubjectVH>
             implements View.OnClickListener {
-        final int[] SUBJECT_IMAGE_RES_ID = {
-                0,
-                R.drawable.ic_ukrainian,
-                R.drawable.ic_history_ukr,
-                R.drawable.ic_history_world,
-                R.drawable.ic_math,
-                R.drawable.ic_biology,
-                R.drawable.ic_geography,
-                R.drawable.ic_english,
-                R.drawable.ic_physics,
-                /*
-                * TODO: find new picture that will correspond to this resource type
-                * */
-                R.drawable.ic_chemistry
-        };
-        final int[] SUBJECT_COLOR_RES_ID = {
-                0,
-                R.color.ukrainian,
-                R.color.history_ukr,
-                R.color.black,
-                R.color.math,
-                R.color.biology,
-                R.color.geography,
-                R.color.english,
-                R.color.physics,
-                R.color.chemistry
-        };
         final Transformation roundedTransformation;
 
         public SubjectsAdapter(Context context, Cursor cursor) {
@@ -155,9 +129,11 @@ public class SubjectsFragment extends Fragment implements LoaderManager.LoaderCa
             int id = cursor.getInt(ID_COLUMN_INDEX);
 
             viewHolder.name.setText(cursor.getString(NAME_COLUMN_INDEX));
-            viewHolder.card.setCardBackgroundColor(getResources().getColor(SUBJECT_COLOR_RES_ID[id]));
+            viewHolder.card.setCardBackgroundColor(
+                    getResources().getColor(UiUtils.SUBJECT_COLOR_RES_ID[id])
+            );
 
-            int imageResID = SUBJECT_IMAGE_RES_ID[id];
+            int imageResID = UiUtils.SUBJECT_IMAGE_RES_ID[id];
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 viewHolder.image.setBackgroundResource(imageResID);

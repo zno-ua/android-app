@@ -1,6 +1,7 @@
 package net.zno_ua.app.ui;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -22,7 +23,8 @@ import net.zno_ua.app.util.UiUtils;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity
-        implements SubjectsFragment.OnSubjectSelectedListener, NavigationView.OnNavigationItemSelectedListener {
+        implements SubjectsFragment.OnSubjectSelectedListener,
+        NavigationView.OnNavigationItemSelectedListener {
 
     private Toolbar mToolBar;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -126,6 +128,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSubjectSelected(long id) {
-
+        Intent intent = new Intent(this, SubjectActivity.class);
+        intent.putExtra(SubjectActivity.EXTRA_SUBJECT_ID, id);
+        startActivity(intent);
     }
 }

@@ -42,6 +42,7 @@
     <!-- Pink -->
 
     <!-- Grey -->
+    <color name="grey_50">#FAFAFA</color>
     <color name="grey_230">#EAEAEA</color>
     <color name="grey_800">#424242</color>
     <color name="grey_900">#212121</color>
@@ -67,4 +68,6 @@
     <color name="physics">#0b4982</color>
     <color name="chemistry">#3c5170</color>
     <!-- Subjects Colors -->
+
+    <color name="list_item_tint_selection">#12000000</color>
 </resources>

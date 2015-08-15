@@ -179,6 +179,10 @@ public class ZNOContract {
             int NAME = 3;
             int NAME_GENITIVE = 4;
         }
+
+        public static Uri buildSubjectUri(long id) {
+            return CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
+        }
     }
 
     public static class Test implements TestColumns, BaseColumns, RESTColumns {
@@ -241,6 +245,8 @@ public class ZNOContract {
             int STATUS = 8;
             int RESULT = 9;
         }
+
+        public static final String SORT_ORDER = YEAR + DESC;
     }
 
     public static class Question implements QuestionColumns, BaseColumns {

@@ -40,7 +40,7 @@ public class RecordsAdapter extends BaseAdapter {
         FOR = context.getString(R.string.for_);
         YEAR = context.getString(R.string.year);
         MIN = context.getString(R.string.min);
-        SESSION = context.getString(R.string.session_text);
+        SESSION = context.getString(R.string.session);
         MONTHS = context.getResources().getStringArray(R.array.months);
         HIGH_BALL_COLOR = context.getResources().getColor(R.color.dark_green);
         PASSED = context.getString(R.string.passed);

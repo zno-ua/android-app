@@ -21,10 +21,8 @@
 
     <!-- TestsActivity -->
     <string name="choose_test_view_text">ОБЕРІТЬ ТЕСТ:</string>
-    <string name="session_text">сесія</string>
     <string name="task_text">завдання</string>
     <string name="tasks_text">завдань</string>
-    <string name="needed_to_load_text">необхідно завантажити</string>
     <string name="for_">за</string>
     <string name="year">рік</string>
 
@@ -187,5 +185,10 @@
     <!-- New fields under development -->
     <string name="zno_db">База даних тестів ЗНО</string>
     <string name="testing">Тестування</string>
+    <string name="official_test">Офіційний тест ЗНО</string>
+    <string name="experimental_test">Пробне тестування ЗНО</string>
+    <string name="session">сесія</string>
+    <string name="variant">варіант</string>
+    <string name="needed_to_download">необхідно завантажити</string>
 
 </resources>
