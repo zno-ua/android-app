@@ -11,7 +11,7 @@
         android:layout_width="@dimen/letter_frame_size" />
 
     <TextView
-        android:id="@+id/answer_text"
+        android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

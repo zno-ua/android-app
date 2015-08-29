@@ -12,7 +12,7 @@
         style="@style/AnswerText" />
 
     <EditText
-        android:id="@+id/answer_input"
+        android:id="@+id/short_answer_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="numberDecimal|numberSigned"

@@ -45,6 +45,7 @@ import java.io.FileNotFoundException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("deprecation")
 public class QuestionFragment extends Fragment {
 
     private static final char ENG_LETTER = 65;
@@ -222,8 +223,8 @@ public class QuestionFragment extends Fragment {
         for (int i = 0; i < answers.length; i++) {
             answerItems[i] = inflater.inflate(R.layout.answer, answersContainer, false);
 
-            answerItemLetter = (TextView) answerItems[i].findViewById(R.id.answer_letter);
-            answerItemText = (TextView) answerItems[i].findViewById(R.id.answer_text);
+            answerItemLetter = (TextView) answerItems[i].findViewById(R.id.letter);
+            answerItemText = (TextView) answerItems[i].findViewById(R.id.text);
 
             matcher = answerPattern.matcher(answers[i]);
 
@@ -330,7 +331,7 @@ public class QuestionFragment extends Fragment {
                 answerItemLetters[i][j] =
                         inflater.inflate(R.layout.answer_letter, answerLettersContainer, false);
                 answerItemLetter = (TextView) answerItemLetters[i][j]
-                        .findViewById(R.id.answer_letter);
+                        .findViewById(R.id.letter);
                 answerItemLetter.setText(String.valueOf((char) (firstLetter + j)));
 
                 final int letterNum = j;
@@ -544,7 +545,7 @@ public class QuestionFragment extends Fragment {
             answersContainer.addView(answerItem);
         } else {
             View answerItem = inflater.inflate(R.layout.answer_short, answersContainer, false);
-            EditText answerItemInput = (EditText) answerItem.findViewById(R.id.answer_input);
+            EditText answerItemInput = (EditText) answerItem.findViewById(R.id.short_answer_input);
 
             if (!userAnswer.isEmpty()) {
                 answerItemInput.setText(userAnswer);
@@ -647,13 +648,13 @@ public class QuestionFragment extends Fragment {
 
         if (viewMode) {
             questionText.setText(Html.fromHtml(question, imgGetter, null));
-            ballsText.setText(res.getString(R.string.chosen_ball) + " " + userAnswer);
+            ballsText.setText(res.getString(R.string.chosen_mark) + " " + userAnswer);
             ballsSeekBar.setVisibility(View.GONE);
         } else {
             questionText.setText(
-                    Html.fromHtml(question + res.getString(R.string.choose_ball), imgGetter, null));
+                    Html.fromHtml(question + res.getString(R.string.choose_mark), imgGetter, null));
             ballsText.setText(
-                    res.getString(R.string.chosen_ball) + " " + String.valueOf(balls / 2));
+                    res.getString(R.string.chosen_mark) + " " + String.valueOf(balls / 2));
             ballsSeekBar.setMax(balls);
             ballsSeekBar.setProgress(balls / 2);
             ballsSeekBar.setSecondaryProgress(0);
@@ -673,7 +674,7 @@ public class QuestionFragment extends Fragment {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     String chosenBall =
-                            res.getString(R.string.chosen_ball) + " " + String.valueOf(progress);
+                            res.getString(R.string.chosen_mark) + " " + String.valueOf(progress);
                     ballsText.setText(chosenBall);
                 }
             });

@@ -3,12 +3,12 @@ package net.zno_ua.app.ui;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -66,7 +66,7 @@ public class SubjectsFragment extends Fragment implements LoaderManager.LoaderCa
                 new GridLayoutManager(getActivity(), SPAN_COUNT, GridLayoutManager.VERTICAL, false)
         );
 
-        mAdapter = new SubjectsAdapter(getActivity(), null);
+        mAdapter = new SubjectsAdapter();
         mRecyclerView.setAdapter(mAdapter);
 
         return view;
@@ -75,7 +75,12 @@ public class SubjectsFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mSubjectSelectedListener = (OnSubjectSelectedListener) activity;
+        try {
+            mSubjectSelectedListener = (OnSubjectSelectedListener)  activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -116,8 +121,7 @@ public class SubjectsFragment extends Fragment implements LoaderManager.LoaderCa
             implements View.OnClickListener {
         final Transformation roundedTransformation;
 
-        public SubjectsAdapter(Context context, Cursor cursor) {
-            super(context, cursor);
+        public SubjectsAdapter() {
             roundedTransformation = new Rounded(
                     getResources().getDimensionPixelOffset(R.dimen.card_view_corner_radius),
                     Rounded.Corners.TOP
@@ -130,7 +134,7 @@ public class SubjectsFragment extends Fragment implements LoaderManager.LoaderCa
 
             viewHolder.name.setText(cursor.getString(NAME_COLUMN_INDEX));
             viewHolder.card.setCardBackgroundColor(
-                    getResources().getColor(UiUtils.SUBJECT_COLOR_RES_ID[id])
+                    ContextCompat.getColor(getActivity(), UiUtils.SUBJECT_COLOR_RES_ID[id])
             );
 
             int imageResID = UiUtils.SUBJECT_IMAGE_RES_ID[id];

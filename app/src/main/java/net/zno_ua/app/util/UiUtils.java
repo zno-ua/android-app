@@ -1,7 +1,10 @@
 package net.zno_ua.app.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.TypedValue;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import net.zno_ua.app.R;
 
@@ -43,5 +46,13 @@ public class UiUtils {
         TypedValue value = new TypedValue();
         context.getTheme().resolveAttribute(attr, value, true);
         return value;
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        View focusedView = activity.getCurrentFocus();
+        if (focusedView != null)
+            if (focusedView.getWindowToken() != null)
+                inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
 }

@@ -12,7 +12,7 @@
         android:src="@drawable/circle_gray_blue" />
 
     <TextView
-        android:id="@+id/answer_letter"
+        android:id="@+id/letter"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"

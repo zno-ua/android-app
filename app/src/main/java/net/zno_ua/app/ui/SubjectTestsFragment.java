@@ -3,14 +3,12 @@ package net.zno_ua.app.ui;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +16,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.zno_ua.app.R;
-import net.zno_ua.app.adapter.CursorRecyclerViewAdapter;
 import net.zno_ua.app.adapter.SectionCursorRecyclerViewAdapter;
-import net.zno_ua.app.provider.ZNOContract;
+
+import static net.zno_ua.app.provider.ZNOContract.Test;
 
 import java.util.HashMap;
 
@@ -30,20 +28,25 @@ import static java.lang.String.valueOf;
 public class SubjectTestsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String ARG_SUBJECT_ID = "subject_id";
 
-    private static final String SELECTION = ZNOContract.Test.SUBJECT_ID + " = ?";
+    private static final String SELECTION = Test.SUBJECT_ID + " = ?";
 
     private static final String[] PROJECTION = new String[]{
-            ZNOContract.Test._ID,
-            ZNOContract.Test.TYPE,
-            ZNOContract.Test.YEAR,
-            ZNOContract.Test.SESSION,
-            ZNOContract.Test.STATUS
+            Test._ID,
+            Test.TYPE,
+            Test.YEAR,
+            Test.SESSION,
+            Test.STATUS,
+            Test.RESULT,
+            Test.QUESTIONS_COUNT
     };
 
+    private static final int ID_COLUMN_ID = 0;
     private static final int TYPE_COLUMN_ID = 1;
     private static final int YEAR_COLUMN_ID = 2;
     private static final int SESSION_COLUMN_ID = 3;
     private static final int STATUS_COLUMN_ID = 4;
+    private static final int RESULT_COLUMN_ID = 5;
+    private static final int QUESTIONS_COUNT_COLUMN_ID = 6;
 
     private long mSubjectId;
 
@@ -90,7 +93,7 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-//            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnTestSelectedListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -106,11 +109,11 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(),
-                ZNOContract.Test.CONTENT_URI,
+                Test.CONTENT_URI,
                 PROJECTION,
                 SELECTION,
                 new String[]{valueOf(mSubjectId)},
-                ZNOContract.Test.SORT_ORDER);
+                Test.SORT_ORDER);
     }
 
     @Override
@@ -165,9 +168,12 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
                 case TYPE_ITEM:
                     itemView = from(getActivity())
                             .inflate(R.layout.test_list_item, parent, false);
-                    itemView.setOnClickListener(this);
+                    TestVH holder = new TestVH(itemView);
 
-                    return new TestVH(itemView);
+                    holder.itemView.setOnClickListener(this);
+                    holder.actionIcon.setOnClickListener(this);
+
+                    return holder;
                 case TYPE_SECTION:
                     itemView = from(getActivity())
                             .inflate(R.layout.test_year_section_item, parent, false);
@@ -175,11 +181,6 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
                 default:
                     throw new IllegalArgumentException("Invalid viewType " + viewType);
             }
-        }
-
-        @Override
-        public void onClick(View v) {
-
         }
 
         @Override
@@ -209,35 +210,52 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
             int type = cursor.getInt(TYPE_COLUMN_ID);
             int session = cursor.getInt(SESSION_COLUMN_ID);
             int status = cursor.getInt(STATUS_COLUMN_ID);
-            String infoText = "";
+            int result = cursor.getInt(RESULT_COLUMN_ID);
+            String description = "";
 
             switch (type) {
-                case ZNOContract.Test.OFFICIAL:
+                case Test.OFFICIAL:
                     viewHolder.primaryText.setText(R.string.official_test);
                     if (session == 1) {
-                        infoText += "I " + getString(R.string.session);
+                        description += "I " + getString(R.string.session);
                     } else if (session == 2) {
-                        infoText += "II " + getString(R.string.session);
+                        description += "II " + getString(R.string.session);
                     }
                     break;
-                case ZNOContract.Test.EXPERIMENTAL:
+                case Test.EXPERIMENTAL:
                     viewHolder.primaryText.setText(R.string.experimental_test);
                     if (session != 0) {
-                        infoText += session + " " + getString(R.string.variant);
+                        description += session + " " + getString(R.string.variant);
                     }
                     break;
             }
 
-            if (infoText.length() != 0) {
-                infoText += ", ";
-            }
-            switch (status) {
-                default:
-                    /* TODO: FLAG_NOT_LOADED */
-                    infoText += getString(R.string.needed_to_download);
+            if (description.length() != 0) {
+                description += ", ";
             }
 
-            viewHolder.secondaryText.setText(infoText);
+            if (status == Test.STATUS_IDLE) {
+                if (result == Test.NO_LOADED_DATA) {
+                    description += getString(R.string.needed_to_download);
+                    viewHolder.actionIcon.setImageResource(R.drawable.ic_file_download_black_24dp);
+                } else if (result == Test.TEST_LOADED) {
+                    viewHolder.actionIcon.setImageResource(R.drawable.ic_delete_black_24dp);
+                    int questionsCount = cursor.getInt(QUESTIONS_COUNT_COLUMN_ID);
+                    description += " " + questionsCount + " ";
+                    switch (questionsCount) {
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            description += getString(R.string.tasks);
+                            break;
+                        default:
+                            description += getString(R.string.tasks_genitive);
+                    }
+                }
+            }
+
+            viewHolder.secondaryText.setText(description);
 
             if (position == getItemCount() - 1) {
                 viewHolder.bottomShadow.setVisibility(View.VISIBLE);
@@ -250,6 +268,7 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
 
                 viewHolder.bottomShadow.setVisibility(View.GONE);
             }
+            viewHolder.actionIcon.setTag(position);
         }
 
         @Override
@@ -262,6 +281,27 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
             else
                 viewHolder.topShadow.setVisibility(View.VISIBLE);
         }
+
+        @Override
+        public void onClick(View v) {
+            int position = getItemPosition((v.getId() == R.id.action_icon) ?
+                    (int) v.getTag() : mRecyclerView.getChildLayoutPosition(v));
+            Cursor cursor = getCursor();
+            if (cursor.moveToPosition(position)) {
+                long id = cursor.getLong(ID_COLUMN_ID);
+                int status = cursor.getInt(STATUS_COLUMN_ID);
+                int result = cursor.getInt(RESULT_COLUMN_ID);
+
+                if (result == Test.TEST_LOADED) {
+                    if (v.getId() == R.id.action_icon)
+                        mListener.onStartDeletingTest(id);
+                    else
+                        mListener.onStartPassingTest(id);
+                } else if (result == Test.NO_LOADED_DATA && status == Test.STATUS_IDLE) {
+                    mListener.onStartDownloadingTest(id);
+                }
+            }
+        }
     }
 
     /**
@@ -271,7 +311,18 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
         /**
          * @param id unique id od the row of the test in the database.
          */
-        void onTestSelected(long id);
+        void onStartPassingTest(long id);
+
+        /**
+         * @param id unique id od the row of the test in the database.
+         */
+        void onStartDownloadingTest(long id);
+
+        /**
+         * @param id unique id od the row of the test in the database.
+         */
+        void onStartDeletingTest(long id);
+
     }
 
 }

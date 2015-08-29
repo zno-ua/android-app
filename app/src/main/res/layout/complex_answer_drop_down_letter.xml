@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/letter"
+    style="?android:attr/spinnerItemStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ellipsize="marquee"
+    android:singleLine="true"
+    android:text="A"
+    android:textAlignment="inherit"
+    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+    android:textColor="?attr/colorPrimary"
+    android:textSize="@dimen/abc_text_size_small_material"
+    android:textStyle="bold"
+    tools:ignore="UnusedAttribute" />

@@ -1,22 +1,22 @@
+*, html {
+    margin:0 !important;
+    padding:0 !important;  
+}
+body {
+  color: rgba(0, 0, 0, 222); //primary_text_default_material_light
+}
 img {
   max-width: 100%;
 }
-body {
-  color: #666666;
-  margin: 0 !important;
-}
 table {
-  margin-top: 10px;
-  border: 1px solid #DBDBDB;
+  margin-top: 10px !important;
   display: block;
-  width:99%;
+  width: 100%;
   table-layout: fixed;
   word-wrap: break-word !important;
 }
 table td {
-  border-right: 1px solid #DBDBDB;
   vertical-align: top;
-  padding: 5px;
 }
 table td img {
   max-width: 100% !important;

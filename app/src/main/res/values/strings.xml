@@ -21,8 +21,6 @@
 
     <!-- TestsActivity -->
     <string name="choose_test_view_text">ОБЕРІТЬ ТЕСТ:</string>
-    <string name="task_text">завдання</string>
-    <string name="tasks_text">завдань</string>
     <string name="for_">за</string>
     <string name="year">рік</string>
 
@@ -52,12 +50,11 @@
     <string name="happy">:-)</string>
     <string name="share_template">Мій результат тестування з %1$s — %2$.1f балів.\nПройти цей тест:
         http://zno-ua.net/test/%3$s/%4$d?utm-source=android</string>
-    <string name="question">Запитання</string>
     <string name="answer_three_correct">Введіть 3 цифри, які ви вважаєте вірними (в будь-якому порядку):</string>
     <string name="answer_short">Введіть відповідь:</string>
     <string name="parent_question_text_show">Натисніть для відображення тексту</string>
-    <string name="choose_ball">Оберіть бал, на який розраховуєте:</string>
-    <string name="chosen_ball">Обраний бал — </string>
+    <string name="choose_mark">Оберіть бал, на який розраховуєте:</string>
+    <string name="chosen_mark">Обраний бал — </string>
     <string name="your_answer_text">Ваша відповідь:</string>
     <string name="correct_answer_text">Вірна відповідь:</string>
     <string name="your_combination_text">Ваша комбінація:</string>
@@ -190,5 +187,27 @@
     <string name="session">сесія</string>
     <string name="variant">варіант</string>
     <string name="needed_to_download">необхідно завантажити</string>
+    <string name="download_test_question">Завантажити тест?</string>
+    <string name="download_test_description">Тест буде завантажено в пам`ять телефону.</string>
+    <string name="delete_test_question">Видалити тест?</string>
+    <string name="delete_test_description">Тест буде видалено з пам`яті телефону, після чого ви не зможете проходити його не завантаживши знову.</string>
+    <string name="cancel">відмінити</string>
+    <string name="download">завантажити</string>
+    <string name="delete">видалити</string>
+    <string name="start_test_question">Розпочати тестування?</string>
+    <string name="start_test_description">Буде розпочато тестування. Ви можете перевірити свої знання з урахуванням часу, або без.</string>
+    <string-array name="start_test_choices">
+        <item>з урахуванням часу</item>
+        <item>без урахування часу</item>
+    </string-array>
+    <string name="start">розпочати</string>
+    <string name="start_with_timer">розпочати з урахуванням часу</string>
+    <string name="tasks">завдання</string>
+    <string name="tasks_genitive">завдань</string>
+    <string name="read_text">Прочитати текс</string>
+    <string name="question">Запитання</string>
+    <string name="question_eng">Question</string>
+    <string name="close">закрити</string>
+    <string name="text_for_reading">Текст для читання</string>
 
 </resources>

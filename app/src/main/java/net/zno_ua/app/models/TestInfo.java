@@ -42,8 +42,8 @@ public class TestInfo {
         String FOR_YEAR = resources.getString(R.string.for_);
         String YEAR = resources.getString(R.string.year);
         String SESSION = resources.getString(R.string.session);
-        String TASK_TEXT = resources.getString(R.string.task_text);
-        String TASKS_TEXT = resources.getString(R.string.tasks_text);
+        String TASK_TEXT = resources.getString(R.string.tasks);
+        String TASKS_TEXT = resources.getString(R.string.tasks_genitive);
         String NEEDED_TO_LOAD = resources.getString(R.string.needed_to_download);
 
         if (name.contains(ZNO_FULL)

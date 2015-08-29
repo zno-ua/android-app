@@ -203,6 +203,13 @@ public class ZNOContract {
          */
         public static final int IMAGES_LOADED = 0x4;
 
+        public static final int TEST_LOADED = QUESTIONS_LOADED | MARKS_LOADED | IMAGES_LOADED;
+
+        /**
+         * STATUS value that indicates that this resource is in idle state.
+         * */
+        public static final int STATUS_IDLE = 0x0;
+
         /**
          * Official test type.
          */
@@ -278,5 +285,7 @@ public class ZNOContract {
                 ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_QUESTION;
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_QUESTION;
+
+        public static final String SORT_ORDER = POSITION_ON_TEST + ASC;
     }
 }

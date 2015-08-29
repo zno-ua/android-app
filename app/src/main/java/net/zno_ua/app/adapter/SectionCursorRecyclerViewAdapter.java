@@ -166,6 +166,10 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
         return super.getItemId(position);
     }
 
+    public int getItemPosition(int itemLayoutPosition) {
+        return mItemsAdapter.getItemPosition(itemLayoutPosition);
+    }
+
     @Override
     public int getItemViewType(int position) {
         return (mItemsAdapter.isItem(position)) ? TYPE_ITEM : TYPE_SECTION;
