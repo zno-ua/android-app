@@ -1,20 +1,21 @@
 package net.zno_ua.app.ui;
 
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +27,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -37,17 +39,40 @@ import net.zno_ua.app.util.UiUtils;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
+import static android.content.ContentUris.parseId;
 import static android.text.Html.fromHtml;
+import static android.text.TextUtils.isEmpty;
 import static android.view.LayoutInflater.from;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static net.zno_ua.app.provider.ZNOContract.Answer;
 import static net.zno_ua.app.provider.ZNOContract.Question;
+import static net.zno_ua.app.provider.ZNOContract.QuestionAndAnswer;
+import static net.zno_ua.app.provider.ZNOContract.Subject;
+import static net.zno_ua.app.provider.ZNOContract.Subject.buildSubjectUri;
+import static net.zno_ua.app.provider.ZNOContract.Test;
+import static net.zno_ua.app.provider.ZNOContract.Test.buildTestItemUri;
+import static net.zno_ua.app.provider.ZNOContract.Testing;
+import static net.zno_ua.app.provider.ZNOContract.Testing.buildTestingItemUri;
 
+/*
+* TODO: add view mode for all types of questions
+* */
 public class TestingActivity extends AppCompatActivity implements View.OnClickListener,
         LoaderManager.LoaderCallbacks<Cursor> {
-    public static final String EXTRA_TEST_ID = "net.zno_ua.app.ui.TEST_ID";
-    public static final String EXTRA_TIMER_MODE = "net.zno_ua.app.ui.TIMER_MODE";
+    public interface Action {
+        String VIEW_TEST = "net.zno_ua.app.VIEW_TEST";
+        String PASS_TEST = "net.zno_ua.app.PASS_TEST";
+        String CONTINUE_PASSAGE_TEST = "net.zno_ua.app.CONTINUE_PASSAGE_TEST";
+    }
+
+    public interface Extra {
+        String TEST_ID = "net.zno_ua.app.ui.TEST_ID";
+        String TESTING_ID = "net.zno_ua.app.ui.TESTING_ID";
+        String TIMER_MODE = "net.zno_ua.app.ui.TIMER_MODE";
+        String VIEW_MODE = "net.zno_ua.app.ui.VIEW_MODE";
+    }
 
     private static final String TABLE = "<table";
     private static final String HTML = "text/html";
@@ -55,18 +80,21 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
     private static final String SRC = "src=\"";
 
     private static final int QUESTIONS_LOADER = 0;
+    private static final int ANSWERS_LOADER = 1;
 
-    private static final String SELECTION = Question.TEST_ID + " = ?";
-
-    private static final String[] PROJECTION = new String[]{
+    private static final String[] QUESTIONS_PROJECTION = new String[]{
             Question._ID,
             Question.POSITION_ON_TEST,
             Question.TYPE,
             Question.TEXT,
             Question.ADDITIONAL_TEXT,
             Question.ANSWERS,
-            Question.MARK,
-            Question.CORRECT_ANSWER
+            Question.POINT
+    };
+
+    private static final String[] ANSWERS_PROJECTION = new String[]{
+            QuestionAndAnswer.ANSWER,
+            QuestionAndAnswer.CORRECT_ANSWER
     };
 
     private static final int POSITION_ON_TEST_COLUMN_ID = 1;
@@ -74,16 +102,24 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
     private static final int TEXT_COLUMN_ID = 3;
     private static final int ADDITIONAL_TEXT_COLUMN_ID = 4;
     private static final int ANSWERS_COLUMN_ID = 5;
-    private static final int MARK_COLUMN_ID = 6;
-    private static final int CORRECT_ANSWER_COLUMN_ID = 7;
+    private static final int POINT_COLUMN_ID = 6;
+    private static final int ID_ANSWER_COLUMN_ID = 1;
+
+    private static final int ANSWER_COLUMN_ID = 0;
+    private static final int CORRECT_ANSWER_COLUMN_ID = 1;
 
     private long testId;
+    private long testingId;
     private boolean viewMode;
+    private long time;
+    private volatile long elapsedTime;
     private boolean timerMode;
+    private Timer mTimer = null;
 
+    private Snackbar mTimerSnackbar;
     private CoordinatorLayout mCoordinatorLayout;
 
-    private QuestionsAdapter mAdapter;
+    private QuestionsAdapter mQuestionsAdapter;
     private Context mContext = this;
 
     private String htmlFormat;
@@ -94,11 +130,50 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_testing);
 
-        testId = getIntent().getLongExtra(EXTRA_TEST_ID, -1);
-        viewMode = false; /* TODO: getAction view / pass / continue_pass */
-        timerMode = getIntent().getBooleanExtra(EXTRA_TIMER_MODE, false);
-        /* DEBUG ONLY */
-        viewMode = timerMode;
+        if (savedInstanceState == null) {
+            testId = getIntent().getLongExtra(Extra.TEST_ID, -1);
+            timerMode = getIntent().getBooleanExtra(Extra.TIMER_MODE, false);
+            switch (getIntent().getAction()) {
+                case Action.PASS_TEST:
+                    ContentValues values = new ContentValues();
+                    values.put(Testing.TEST_ID, testId);
+                    values.put(Testing.STATUS, Testing.IN_PROGRESS);
+                    testingId = parseId(getContentResolver().insert(Testing.CONTENT_URI, values));
+                    break;
+                case Action.CONTINUE_PASSAGE_TEST:
+                    testingId = getIntent().getLongExtra(Extra.TESTING_ID, -1);
+                    viewMode = false;
+                    break;
+                case Action.VIEW_TEST:
+                    testingId = getIntent().getLongExtra(Extra.TESTING_ID, -1);
+                    viewMode = true;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Illegal action " + getIntent().getAction()
+                            + " for " + this.toString());
+            }
+        } else {
+            testId = savedInstanceState.getLong(Extra.TEST_ID);
+            testingId = savedInstanceState.getLong(Extra.TESTING_ID);
+            timerMode = savedInstanceState.getBoolean(Extra.TIMER_MODE);
+            viewMode = savedInstanceState.getBoolean(Extra.VIEW_MODE);
+        }
+
+        if (!viewMode && timerMode) {
+            Cursor cursor = getContentResolver()
+                    .query(buildTestItemUri(testId), new String[]{Test.TIME}, null, null, null);
+            if (cursor.moveToFirst() && cursor.getCount() == 1) {
+                time = 60000L * cursor.getLong(0);
+            }
+            cursor.close();
+
+            cursor = getContentResolver()
+                    .query(buildTestingItemUri(testingId), new String[]{Testing.ELAPSED_TIME}, null, null, null);
+            if (cursor.moveToFirst() && cursor.getCount() == 1) {
+                elapsedTime = cursor.isNull(0) ? 0 : cursor.getLong(0);
+            }
+            cursor.close();
+        }
 
         init();
         initWebViewData();
@@ -106,11 +181,16 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
 
     private void init() {
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
+        if (timerMode) {
+            mTimerSnackbar = Snackbar.make(mCoordinatorLayout,
+                    getTimerText((int) (time / 60000), 0),
+                    Snackbar.LENGTH_LONG);
+        }
         initToolbar();
         initQuestionsList();
         initFAB();
 
-        getLoaderManager().initLoader(QUESTIONS_LOADER, null, this);
+        getLoaderManager().initLoader(ANSWERS_LOADER, null, this);
     }
 
     private void initWebViewData() {
@@ -129,13 +209,29 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
         setSupportActionBar(appBar);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        initToolbarSubtitle();
+    }
+
+    private void initToolbarSubtitle() {
+        Cursor cursor = getContentResolver()
+                .query(buildTestItemUri(testId), new String[]{Test.SUBJECT_ID}, null, null, null);
+        cursor.moveToFirst();
+        long subjectId = cursor.getLong(0);
+        cursor.close();
+
+        cursor = getContentResolver()
+                .query(buildSubjectUri(subjectId), new String[]{Subject.NAME_GENITIVE}, null, null, null);
+        cursor.moveToFirst();
+        //noinspection ConstantConditions
+        getSupportActionBar().setSubtitle(getString(R.string.of) + " " + cursor.getString(0));
+        cursor.close();
     }
 
     private void initQuestionsList() {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.questions_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new QuestionsAdapter();
-        recyclerView.setAdapter(mAdapter);
+        mQuestionsAdapter = new QuestionsAdapter();
+        recyclerView.setAdapter(mQuestionsAdapter);
     }
 
     private void initFAB() {
@@ -143,8 +239,34 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putLong(Extra.TEST_ID, testId);
+        outState.putLong(Extra.TESTING_ID, testingId);
+        outState.putBoolean(Extra.TIMER_MODE, timerMode);
+        outState.putBoolean(Extra.VIEW_MODE, viewMode);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (timerMode)
+            startTimer();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (timerMode)
+            stopTimer();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_testing, menu);
+        if (timerMode)
+            menu.findItem(R.id.action_time).setVisible(true);
         return true;
     }
 
@@ -152,7 +274,10 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                showExitTestAlert();
+                return true;
+            case R.id.action_time:
+                mTimerSnackbar.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -160,32 +285,189 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
+    public void onBackPressed() {
+        showExitTestAlert();
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this,
-                Question.CONTENT_URI,
-                PROJECTION,
-                SELECTION,
-                new String[]{valueOf(testId)},
-                Question.SORT_ORDER);
+        switch (id) {
+            case QUESTIONS_LOADER:
+                return new CursorLoader(this,
+                        Question.CONTENT_URI,
+                        QUESTIONS_PROJECTION,
+                        Question.TEST_ID + " = ?",
+                        new String[]{valueOf(testId)},
+                        Question.SORT_ORDER);
+            case ANSWERS_LOADER:
+                return new CursorLoader(this,
+                        QuestionAndAnswer.CONTENT_URI,
+                        ANSWERS_PROJECTION,
+                        QuestionAndAnswer.TEST_ID + " = ?",
+                        new String[]{valueOf(testingId), valueOf(testId)},
+                        Question.SORT_ORDER);
+            default:
+                throw new IllegalArgumentException("Illegal Loader id " + id);
+        }
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mAdapter.swapCursor(data);
+        switch (loader.getId()) {
+            case QUESTIONS_LOADER:
+                data.moveToFirst();
+                mQuestionsAdapter.swapCursor(data);
+                break;
+            case ANSWERS_LOADER:
+                mQuestionsAdapter.swapAnswersCursor(data);
+                if (getLoaderManager().getLoader(QUESTIONS_LOADER) == null)
+                    getLoaderManager().initLoader(QUESTIONS_LOADER, null, this);
+                break;
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mAdapter.swapCursor(null);
+        mQuestionsAdapter.swapCursor(null);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab_done:
-                finish();
+                new MaterialDialog.Builder(this)
+                        .title(R.string.finish_test_question)
+                        .content(R.string.finish_test_description)
+                        .positiveText(R.string.finish)
+                        .negativeText(R.string.cancel)
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                finishTest();
+                            }
+                        })
+                        .show();
                 break;
         }
+    }
+
+    private void showExitTestAlert() {
+        new MaterialDialog.Builder(this)
+                .title(R.string.exit_test_question)
+                .content(R.string.exit_test_description)
+                .positiveText(R.string.exit)
+                .negativeText(R.string.cancel)
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        exitTest();
+                    }
+                })
+                .show();
+    }
+
+    private void exitTest() {
+        ContentValues values = new ContentValues();
+        values.put(Testing.ELAPSED_TIME, elapsedTime);
+        getContentResolver().delete(buildTestingItemUri(testingId), null, null);
+        getContentResolver()
+                .delete(Answer.CONTENT_URI, Testing._ID + " = ?", new String[]{valueOf(testingId)});
+        finish();
+    }
+
+    private void finishTest() {
+        if (viewMode)
+            mTimer.cancel();
+        ContentValues values = new ContentValues();
+        values.put(Testing.ELAPSED_TIME, elapsedTime);
+        values.put(Testing.DATE, System.currentTimeMillis());
+        values.put(Testing.STATUS, Testing.FINISHED);
+        /*
+        * TODO: calc test points
+        * */
+        getContentResolver().update(buildTestingItemUri(testingId), values, null, null);
+        finish();
+        /*
+        * TODO: start viewing results
+        * */
+    }
+
+    private void startTimer() {
+        if (mTimer == null)
+            mTimer = new Timer(time - elapsedTime);
+        mTimer.start();
+        mTimerSnackbar.show();
+    }
+
+    private void stopTimer() {
+        if (mTimer != null)
+            mTimer.cancel();
+        ContentValues values = new ContentValues();
+        values.put(Testing.ELAPSED_TIME, elapsedTime);
+        getContentResolver()
+                .update(buildTestingItemUri(testingId), values, null, null);
+    }
+
+    private String getTimerText(int minutes, int seconds) {
+        String text;
+
+        if (minutes > 0) {
+            if ((minutes < 10) || (minutes > 20 && minutes < 110) || minutes > 120) {
+                switch (minutes % 10) {
+                    case 1:
+                        text = format(getString(R.string.time_one_left),
+                                minutes,
+                                getString(R.string.one_minute)
+                        );
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                        text = format(getString(R.string.time_two_four_left),
+                                minutes,
+                                getString(R.string.two_four_minutes)
+                        );
+                        break;
+                    default:
+                        text = format(getString(R.string.time_left),
+                                minutes,
+                                getString(R.string.minutes)
+                        );
+                }
+            } else {
+                text = format(getString(R.string.time_left), minutes, getString(R.string.minutes));
+            }
+        } else {
+            if (seconds == 0) {
+                text = getString(R.string.time_is_up);
+            } else if (seconds >= 20 || (seconds > 0 && seconds < 10)) {
+                switch (seconds % 10) {
+                    case 1:
+                        text = format(getString(R.string.time_one_left),
+                                seconds,
+                                getString(R.string.one_second)
+                        );
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                        text = format(getString(R.string.time_two_four_left),
+                                seconds,
+                                getString(R.string.two_four_seconds)
+                        );
+                        break;
+                    default:
+                        text = format(getString(R.string.time_left),
+                                seconds,
+                                getString(R.string.seconds)
+                        );
+                }
+            } else {
+                text = format(getString(R.string.time_left), seconds, getString(R.string.seconds));
+            }
+        }
+
+        return text;
     }
 
     private abstract class QuestionBaseVH extends RecyclerView.ViewHolder {
@@ -249,31 +531,49 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
             answers = (RecyclerLinearLayout) itemView.findViewById(R.id.answers);
             answers.setAdapter(new AnswersAdapter(mContext, viewMode));
         }
+
+        public void setAdditionalText(final String additionalText) {
+            if (isEmpty(additionalText)) {
+                readTextButton.setVisibility(View.GONE);
+            } else {
+                readTextButton.setVisibility(View.VISIBLE);
+                readTextButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new MaterialDialog.Builder(mContext)
+                                .title(R.string.text_for_reading)
+                                .content(fromHtml(additionalText))
+                                .positiveText(R.string.close)
+                                .show();
+                    }
+                });
+            }
+        }
     }
 
     private class QuestionType2VH extends QuestionBaseVH {
 
-        DiscreteSeekBar markSeekBar;
-        TextView chosenMark;
+        DiscreteSeekBar pointSeekBar;
+        TextView chosenPoint;
 
         public QuestionType2VH(View itemView) {
             super(itemView);
-            markSeekBar = (DiscreteSeekBar) itemView.findViewById(R.id.mark_seek_bar);
-            chosenMark = (TextView) itemView.findViewById(R.id.chosen_mark);
+            pointSeekBar = (DiscreteSeekBar) itemView.findViewById(R.id.point_seek_bar);
+            chosenPoint = (TextView) itemView.findViewById(R.id.chosen_point);
             header.setVisibility(View.GONE);
         }
 
-        public void setChosenMark(int mark) {
-            markSeekBar.setProgress(mark);
-            setChosenMarkText(mark);
+        public void setChosenPoint(int point) {
+            pointSeekBar.setProgress(point);
+            setChosenPointText(point);
         }
 
-        public void setChosenMarkText(int mark) {
-            chosenMark.setText(fromHtml(getString(R.string.chosen_mark) + " <b>" + mark + "</b>"));
+        public void setChosenPointText(int point) {
+            chosenPoint.setText(fromHtml(getString(R.string.chosen_point) + " <b>" + point + "</b>"));
         }
 
-        public void setMaxMark(int maxMark) {
-            markSeekBar.setMax(maxMark);
+        public void setMaxPoint(int maxPoint) {
+            pointSeekBar.setMax(maxPoint);
         }
     }
 
@@ -294,12 +594,43 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
     private class QuestionsAdapter extends CursorRecyclerViewAdapter<QuestionBaseVH>
             implements View.OnFocusChangeListener {
 
+        private Cursor answersCursor = null;
+
         @Override
         public int getItemViewType(int position) {
             if (getCursor().moveToPosition(position))
                 return getCursor().getInt(TYPE_COLUMN_ID);
 
             return super.getItemViewType(position);
+        }
+
+        @Override
+        protected void moveCursorToPosition(int position) {
+            super.moveCursorToPosition(position);
+            moveAnswerCursorToPosition(position);
+        }
+
+        private void moveAnswerCursorToPosition(int position) {
+            if (answersCursor != null && !answersCursor.moveToPosition(position)) {
+                throw new IllegalStateException("couldn't move answers cursor to position " + position);
+            }
+        }
+
+        private long getAnswerId(int position) {
+            moveAnswerCursorToPosition(position);
+            return answersCursor.isNull(ID_ANSWER_COLUMN_ID) ? -1
+                    : answersCursor.getLong(ID_ANSWER_COLUMN_ID);
+        }
+
+        private String getAnswer(int position) {
+            moveAnswerCursorToPosition(position);
+            return answersCursor.isNull(ANSWER_COLUMN_ID) ? null
+                    : answersCursor.getString(ANSWER_COLUMN_ID);
+        }
+
+        private String getCorrectAnswer(int position) {
+            moveAnswerCursorToPosition(position);
+            return answersCursor.getString(CORRECT_ANSWER_COLUMN_ID);
         }
 
         @Override
@@ -347,7 +678,7 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
                     break;
                 case Question.TYPE_4:
                 case Question.TYPE_5:
-                    onBindQuestionType4_5ViewHolder((QuestionType4_5VH) viewHolder, cursor);
+                    onBindQuestionType4_5ViewHolder((QuestionType4_5VH) viewHolder);
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid viewHolderType " + viewType);
@@ -356,58 +687,41 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
             onBindQuestionBaseViewHolder(viewHolder, cursor);
         }
 
-        public void onBindQuestionType1_3ViewHolder(final QuestionType1_3VH viewHolder, Cursor cursor,
-                                                    final int viewType) {
+        public void onBindQuestionBaseViewHolder(QuestionBaseVH viewHolder, Cursor cursor) {
+            viewHolder.setNumber(cursor.getInt(POSITION_ON_TEST_COLUMN_ID) + 1, cursor.getCount());
+            String text = cursor.getString(TEXT_COLUMN_ID);
+            viewHolder.setText(text, text.contains(TABLE) /*TODO: change html detecting*/);
+        }
+
+        public void onBindQuestionType1_3ViewHolder(QuestionType1_3VH viewHolder, Cursor cursor,
+                                                    int viewType) {
+            final int position = viewHolder.getAdapterPosition();
             final String additionalText = cursor.getString(ADDITIONAL_TEXT_COLUMN_ID);
-            if (TextUtils.isEmpty(additionalText)) {
-                viewHolder.readTextButton.setVisibility(View.GONE);
-            } else {
-                viewHolder.readTextButton.setVisibility(View.VISIBLE);
-                viewHolder.readTextButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        new MaterialDialog.Builder(mContext)
-                                .title(R.string.text_for_reading)
-                                .content(fromHtml(additionalText))
-                                .positiveText(R.string.close)
-                                .show();
-                    }
-                });
-            }
-
-            final String answers = cursor.getString(ANSWERS_COLUMN_ID);
-            String correctAnswer = cursor.getString(CORRECT_ANSWER_COLUMN_ID);
-            final String oldUserAnswer = ""/* Get answer from DB */;
-
-            AnswersAdapter answersAdapter = (AnswersAdapter) viewHolder.answers.getAdapter();
-            answersAdapter.swapData(viewType, answers, correctAnswer, "0" /*user_answer*/);
+            viewHolder.setAdditionalText(additionalText);
+            final AnswersAdapter answersAdapter = (AnswersAdapter) viewHolder.answers.getAdapter();
+            answersAdapter.swapData(viewType,
+                    cursor.getString(ANSWERS_COLUMN_ID),
+                    getCorrectAnswer(position),
+                    getAnswer(position));
             answersAdapter.setOnAnswerSelectedListener(new AnswersAdapter.OnAnswerSelectedListener() {
                 @Override
-                public void onSimpleAnswerSelected(int letter) {
-                    saveUserAnswer(getItemId(viewHolder.getAdapterPosition()), "" + (letter + 1));
-                }
-
-                @Override
-                public void onComplexAnswerSelected(int number, int letter) {
-                    StringBuilder currentUserAnswer = new StringBuilder(oldUserAnswer.isEmpty() ?
-                            new String(new char[parseInt(answers.split("-")[0])]).replace("\0", "0")
-                            : oldUserAnswer
-                    );
-                    int index = currentUserAnswer.indexOf("" + letter);
-                    if (index != -1 || index != number) {
-                        currentUserAnswer.setCharAt(number, (char) ('0' + letter));
-                    }
-                    saveUserAnswer(getItemId(viewHolder.getAdapterPosition()), currentUserAnswer.toString());
+                public void onAnswerSelected(String answer) {
+                    saveUserAnswer(getItemId(position), answer);
                 }
             });
         }
 
         public void onBindQuestionType2ViewHolder(final QuestionType2VH viewHolder, Cursor cursor) {
-            viewHolder.markSeekBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
+            final int position = viewHolder.getAdapterPosition();
+            int maxPoint = cursor.getInt(POINT_COLUMN_ID);
+            String answer = getAnswer(position);
+            viewHolder.setMaxPoint(maxPoint);
+            viewHolder.setChosenPoint(answer == null ? maxPoint / 2 : parseInt(answer));
+            viewHolder.pointSeekBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
                 @Override
                 public void onProgressChanged(DiscreteSeekBar discreteSeekBar, int progress,
                                               boolean fromUser) {
-                    viewHolder.setChosenMarkText(progress);
+                    viewHolder.setChosenPointText(progress);
                 }
 
                 @Override
@@ -417,20 +731,16 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
 
                 @Override
                 public void onStopTrackingTouch(DiscreteSeekBar discreteSeekBar) {
-                    saveUserAnswer(getItemId(viewHolder.getAdapterPosition()),
-                            "" + discreteSeekBar.getProgress());
+                    saveUserAnswer(getItemId(position), valueOf(discreteSeekBar.getProgress()));
                 }
             });
-            viewHolder.setMaxMark(cursor.getInt(MARK_COLUMN_ID));
-//            if (has_user_input)
-//                  viewHolder.setChosenMarkText(user_input);
-//            else
-            viewHolder.setChosenMark(cursor.getInt(MARK_COLUMN_ID) / 2);
         }
 
-        public void onBindQuestionType4_5ViewHolder(final QuestionType4_5VH viewHolder, Cursor cursor) {
-//            if (has_user_answer)
-//            viewHolder.setUserAnswer(/*user_answer*/);
+        public void onBindQuestionType4_5ViewHolder(QuestionType4_5VH viewHolder) {
+            final int position = viewHolder.getAdapterPosition();
+            final String answer = getAnswer(position);
+            if (!isEmpty(answer))
+                viewHolder.setUserAnswer(answer);
             viewHolder.answerInput.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -439,27 +749,37 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                    saveUserAnswer(getItemId(position), s.toString());
                 }
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    saveUserAnswer(getItemId(viewHolder.getAdapterPosition()), s.toString());
+
                 }
             });
         }
 
-        public void onBindQuestionBaseViewHolder(QuestionBaseVH viewHolder, Cursor cursor) {
-            viewHolder.setNumber(cursor.getInt(POSITION_ON_TEST_COLUMN_ID) + 1, cursor.getCount());
-            String text = cursor.getString(TEXT_COLUMN_ID);
-            viewHolder.setText(text, text.contains(TABLE) /*TODO: change html detecting*/);
+        private Cursor swapAnswersCursor(Cursor cursor) {
+            if (cursor == answersCursor)
+                return null;
+            Cursor oldAnswersCursor = answersCursor;
+            answersCursor = cursor;
+
+            return oldAnswersCursor;
         }
 
-        private void saveUserAnswer(long id, String answer) {
-            /*
-            * TODO: save user answer to the DB
-            * */
-//            Toast.makeText(mContext, id + ", " + answer, Toast.LENGTH_SHORT).show();
+        private void saveUserAnswer(long questionId, String answer) {
+            ContentValues values = new ContentValues();
+            values.put(Answer.QUESTION_ID, questionId);
+            values.put(Answer.TESTING_ID, testingId);
+            values.put(Answer.ANSWER, answer);
+            int rowsUpdated = getContentResolver().update(Answer.CONTENT_URI,
+                    values,
+                    Answer.QUESTION_ID + " = ?" + " AND " + Answer.TESTING_ID + " = ?",
+                    new String[]{valueOf(questionId), valueOf(testingId)}
+            );
+            if (rowsUpdated == 0)
+                getContentResolver().insert(Answer.CONTENT_URI, values);
         }
 
         @Override
@@ -493,11 +813,13 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
         Spinner lettersSpinner;
         View divider;
 
-        public ComplexAnswerVH(View itemView) {
+        public ComplexAnswerVH(View itemView, SpinnerAdapter adapter) {
             super(itemView);
             number = (TextView) itemView.findViewById(R.id.number);
             lettersSpinner = (Spinner) itemView.findViewById(R.id.letters_spinner);
             divider = itemView.findViewById(R.id.divider);
+
+            lettersSpinner.setAdapter(adapter);
         }
     }
 
@@ -508,15 +830,14 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
         private static final int TYPE_SIMPLE = 0;
         private static final int TYPE_COMPLEX = 1;
 
+        private boolean viewMode;
         private int mAnswersType = -1;
         private int mAnswersCount = 0;
         private String[] mAnswers = {};
         private String mCorrectAnswer;
         private String mAnswer;
-        private Context mContext;
-        private boolean viewMode;
-
         private RecyclerLinearLayout mLayout = null;
+        private Context mContext;
 
         private OnAnswerSelectedListener mOnAnswerSelectedListener = null;
 
@@ -546,7 +867,7 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
                     break;
                 case TYPE_COMPLEX:
                     view = from(mContext).inflate(R.layout.complex_answer_item, parent, false);
-                    viewHolder = new ComplexAnswerVH(view);
+                    viewHolder = new ComplexAnswerVH(view, new AnswerLettersAdapter(mContext));
                     break;
                 default:
                     throw new IllegalArgumentException("Illegal viewType " + viewType);
@@ -578,36 +899,35 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
         private void onBindSimpleAnswerViewHolder(SimpleAnswerVH viewHolder, int position) {
             viewHolder.letter.setText(Character.toString((char) ('А' + position)) + ".");
             viewHolder.text.setText(fromHtml(mAnswers[position]));
-            int color = Color.BLACK;
+            /*int color = ContextCompat
+                    .getColor(mContext, R.color.primary_text_default_material_light)*/
+            ;
 
             if (viewMode) {
                 if (parseInt(mCorrectAnswer) - 1 == position)
-                    color = ContextCompat.getColor(mContext, R.color.green_700);
-                else if (parseInt(mAnswer) - 1 == position)
-                    color = ContextCompat.getColor(mContext, R.color.red_700);
-            } else {
-                if (position == parseInt(mAnswer))
-                    color = ContextCompat.getColor(mContext, R.color.indigo_500);
+                    viewHolder.setTextColor(ContextCompat.getColor(mContext, R.color.green_700));
+                else {
+                    if (parseInt(mAnswer) - 1 == position)
+                        viewHolder.setTextColor(ContextCompat.getColor(mContext, R.color.red_700));
+                }
             }
-
-            viewHolder.setTextColor(color);
         }
 
         private void onBindComplexAnswerViewHolder(ComplexAnswerVH viewHolder, final int position) {
             viewHolder.number.setText(fromHtml("<b>" + (position + 1) + ". \u2014 </b>"));
-            viewHolder.lettersSpinner.setAdapter(
-                    new AnswerLettersAdapter(mContext, parseInt(mAnswers[1]))
-            );
-            viewHolder.lettersSpinner.setSelection(0/*user_answer*/, false);
+            AnswerLettersAdapter adapter =
+                    (AnswerLettersAdapter) viewHolder.lettersSpinner.getAdapter();
+            adapter.setCount(parseInt(mAnswers[1]));
+            viewHolder.lettersSpinner.setSelection('0' - mAnswer.charAt(position), false);
             viewHolder.lettersSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int letter, long id) {
-                    mOnAnswerSelectedListener.onComplexAnswerSelected(position, letter + 1);
+                    selectComplexAnswer(position, letter, true);
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-                    mOnAnswerSelectedListener.onComplexAnswerSelected(position, 0);
+
                 }
             });
         }
@@ -617,13 +937,15 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
                 mAnswersType = TYPE_SIMPLE;
                 mAnswers = answers.split("\n");
                 mAnswersCount = mAnswers.length;
+                selectSimpleAnswer(answer == null ? -1 : (parseInt(answer) - 1), false);
             } else if (answersType == Question.TYPE_3) {
                 mAnswersType = TYPE_COMPLEX;
                 mAnswers = answers.split("-");
                 mAnswersCount = parseInt(mAnswers[0]);
+                mAnswer = answer == null ?
+                        new String(new char[mAnswersCount]).replace("\0", "0") : answer;
             }
             mCorrectAnswer = correctAnswer;
-            mAnswer = answer;
             notifyDataSetChanged();
         }
 
@@ -640,19 +962,51 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
         @Override
         public void onClick(View v) {
             if (mLayout != null && mOnAnswerSelectedListener != null) {
-                mOnAnswerSelectedListener
-                        .onSimpleAnswerSelected(mLayout.getChildAdapterPosition(v));
+                selectSimpleAnswer(mLayout.getChildAdapterPosition(v), true);
             }
         }
 
-        public void setOnAnswerSelectedListener(OnAnswerSelectedListener mAnswerSelectedListener) {
-            this.mOnAnswerSelectedListener = mAnswerSelectedListener;
+        private void selectSimpleAnswer(int newAnswerPosition, boolean fromUser) {
+            int selectedAnswerPosition = mAnswer == null ? -1 : parseInt(mAnswer) - 1;
+            RecyclerLinearLayout.ViewHolder viewHolder;
+            viewHolder = mLayout.getChildViewHolder(selectedAnswerPosition);
+            if (viewHolder != null) {
+                viewHolder.mItemView.setSelected(false);
+            }
+
+            viewHolder = mLayout.getChildViewHolder(newAnswerPosition);
+            if (viewHolder != null)
+                viewHolder.mItemView.setSelected(true);
+
+            mAnswer = "" + (newAnswerPosition + 1);
+            if (fromUser)
+                mOnAnswerSelectedListener.onAnswerSelected(mAnswer);
+        }
+
+        private void selectComplexAnswer(int number, int letter, boolean fromUser) {
+            StringBuilder currentUserAnswer = new StringBuilder(mAnswer);
+            int index = currentUserAnswer.indexOf(valueOf(letter));
+            if (index != -1 || index != number) {
+                currentUserAnswer.setCharAt(number, (char) ('0' + letter));
+                if (index != number && letter != 0) {
+                    ComplexAnswerVH viewHolder =
+                            (ComplexAnswerVH) mLayout.getChildViewHolder(index);
+                    if (viewHolder != null)
+                        viewHolder.lettersSpinner.setSelection(0);
+                }
+                mAnswer = currentUserAnswer.toString();
+                if (fromUser)
+                    mOnAnswerSelectedListener.onAnswerSelected(mAnswer);
+
+            }
+        }
+
+        public void setOnAnswerSelectedListener(OnAnswerSelectedListener onAnswerSelectedListener) {
+            mOnAnswerSelectedListener = onAnswerSelectedListener;
         }
 
         public interface OnAnswerSelectedListener {
-            void onSimpleAnswerSelected(int letter);
-
-            void onComplexAnswerSelected(int number, int letter);
+            void onAnswerSelected(String answer);
         }
     }
 
@@ -661,19 +1015,24 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
         int count;
         private Context mContext;
 
-        public AnswerLettersAdapter(Context context, int count) {
+        public AnswerLettersAdapter(Context context) {
             mContext = context;
+            count = 0;
+        }
+
+        public void setCount(int count) {
             this.count = count;
+            notifyDataSetChanged();
         }
 
         @Override
         public int getCount() {
-            return count;
+            return count + 1;
         }
 
         @Override
         public String getItem(int position) {
-            return (char) ('А' + position) + ".";
+            return position == 0 ? "" : (char) ('А' + position - 1) + ".";
         }
 
         @Override
@@ -691,6 +1050,46 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
             ((TextView) convertView.findViewById(R.id.letter)).setText(getItem(position));
 
             return convertView;
+        }
+    }
+
+    private class Timer extends CountDownTimer {
+
+        private static final long COUNT_DOWN_INTERVAL = 1000;
+
+        public Timer(long millisInFuture) {
+            super(millisInFuture, COUNT_DOWN_INTERVAL);
+        }
+
+        @Override
+        public void onTick(long millisInFuture) {
+            elapsedTime = time - millisInFuture;
+            int minutes = (int) (millisInFuture / 60000);
+            int seconds = (int) (millisInFuture % 60000 / 1000);
+
+            if (minutes == 0) {
+                mTimerSnackbar.setText(getTimerText(minutes, seconds));
+            }
+
+            if (minutes != 0 && seconds == 0) {
+                mTimerSnackbar.setText(getTimerText(minutes, seconds));
+                if (!mTimerSnackbar.isShown()) {
+                    if (minutes % 30 == 0 || (minutes < 30 && minutes % 10 == 0)
+                            || minutes == 5 || minutes <= 3) {
+                        mTimerSnackbar.show();
+                    }
+                }
+            }
+
+//            if (minutes <= 10) {
+//                timerText.setBackgroundColor(getResources().getColor(R.color.red));
+//            }
+        }
+
+        @Override
+        public void onFinish() {
+            elapsedTime = time;
+            finishTest();
         }
     }
 }

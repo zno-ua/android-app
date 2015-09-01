@@ -86,6 +86,13 @@ public class RecyclerLinearLayout extends LinearLayout {
         }
     }
 
+    public ViewHolder getChildViewHolder(int position) {
+        if (position < 0 || position >= mHolders.size())
+            return null;
+
+        return mHolders.get(position);
+    }
+
     public int getChildAdapterPosition(View v) {
         ViewHolder holder = (ViewHolder) v.getTag();
         if (holder != null)

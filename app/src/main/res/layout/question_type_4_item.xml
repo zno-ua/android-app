@@ -22,8 +22,7 @@
             android:id="@+id/header"
             layout="@layout/question_item_header" />
 
-        <include
-            layout="@layout/question_item_text" />
+        <include layout="@layout/question_item_text" />
 
         <Space
             android:layout_width="match_parent"
@@ -50,7 +49,7 @@
             android:layout_marginLeft="@dimen/card_padding"
             android:layout_marginRight="@dimen/card_padding"
             android:imeOptions="actionDone"
-            android:inputType="numberDecimal|numberSigned"
+            android:inputType="numberDecimal|numberSigned|textNoSuggestions"
             android:paddingLeft="@dimen/card_padding"
             android:paddingRight="@dimen/card_padding"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"

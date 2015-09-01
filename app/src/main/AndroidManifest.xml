@@ -126,6 +126,13 @@
             android:name=".ui.TestingActivity"
             android:theme="@style/AppTheme"
             android:label="@string/testing" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="net.zno_ua.app.VIEW_TEST" />
+                <action android:name="net.zno_ua.app.PASS_TEST" />
+                <action android:name="net.zno_ua.app.CONTINUE_PASSAGE_TEST" />
+            </intent-filter>
         </activity>
     </application>
 

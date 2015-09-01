@@ -20,7 +20,6 @@
     <color name="question_num_text_color">@color/chooser_text_color</color>
     <color name="question_underline_color">#b2b2b2</color>
     <color name="question_text_color">@color/quote_color</color>
-    <color name="answer_text_color">@color/question_text_color</color>
     <color name="action_bar_text_color">#99ffffff</color>
     <color name="view_image_bg_color">#A6000000</color>
     <color name="app_logo_shadow_color">#33000000</color>
@@ -84,8 +83,20 @@
     <!--  Blue  -->
 
     <!-- Indigo -->
+    <color name="indigo_50">#E8EAF6</color>
+    <color name="indigo_100">#C5CAE9</color>
+    <color name="indigo_200">#9FA8DA</color>
+    <color name="indigo_300">#7986CB</color>
+    <color name="indigo_400">#5C6BC0</color>
     <color name="indigo_500">#3F51B5</color>
+    <color name="indigo_600">#3949AB</color>
     <color name="indigo_700">#303F9F</color>
+    <color name="indigo_800">#283593</color>
+    <color name="indigo_900">#1A237E</color>
+    <color name="indigo_A100">#8C9EFF</color>
+    <color name="indigo_A200">#536DFE</color>
+    <color name="indigo_A400">#3D5AFE</color>
+    <color name="indigo_A700">#304FFE</color>
     <!-- Indigo -->
 
     <!-- Pink -->

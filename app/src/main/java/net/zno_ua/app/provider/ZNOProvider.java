@@ -11,8 +11,12 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import static net.zno_ua.app.provider.ZNOContract.Question;
+import static net.zno_ua.app.provider.ZNOContract.QuestionAndAnswer;
 import static net.zno_ua.app.provider.ZNOContract.Subject;
 import static net.zno_ua.app.provider.ZNOContract.Test;
+import static net.zno_ua.app.provider.ZNOContract.Answer;
+import static net.zno_ua.app.provider.ZNOContract.Testing;
+import static net.zno_ua.app.provider.ZNOContract.Point;
 import static net.zno_ua.app.provider.ZNODatabase.Tables;
 
 /**
@@ -33,6 +37,13 @@ public class ZNOProvider extends ContentProvider {
         int TEST_ID = 201;
         int QUESTION = 300;
         int QUESTION_ID = 301;
+        int QUESTION_AND_ANSWER = 302;
+        int ANSWER = 400;
+        int ANSWER_ID = 401;
+        int TESTING = 500;
+        int TESTING_ID = 501;
+        int POINT = 600;
+        int POINT_ID = 601;
     }
 
     /**
@@ -51,6 +62,16 @@ public class ZNOProvider extends ContentProvider {
 
         matcher.addURI(authority, "question" , URI_CODE.QUESTION);
         matcher.addURI(authority, "question/#" , URI_CODE.QUESTION_ID);
+        matcher.addURI(authority, "question_and_answer" , URI_CODE.QUESTION_AND_ANSWER);
+
+        matcher.addURI(authority, "answer" , URI_CODE.ANSWER);
+        matcher.addURI(authority, "answer/#" , URI_CODE.ANSWER_ID);
+
+        matcher.addURI(authority, "testing" , URI_CODE.TESTING);
+        matcher.addURI(authority, "testing/#" , URI_CODE.TESTING_ID);
+
+        matcher.addURI(authority, "point" , URI_CODE.POINT);
+        matcher.addURI(authority, "point/#" , URI_CODE.POINT_ID);
 
         return matcher;
     }
@@ -87,9 +108,33 @@ public class ZNOProvider extends ContentProvider {
             case URI_CODE.QUESTION:
                 queryBuilder.setTables(Tables.QUESTION);
                 break;
+            case URI_CODE.QUESTION_AND_ANSWER:
+                queryBuilder.setTables(Tables.QUESTION_JOIN_ANSWER);
+                break;
             case URI_CODE.QUESTION_ID:
                 queryBuilder.setTables(Tables.QUESTION);
                 queryBuilder.appendWhere(Question._ID + EQ + uri.getLastPathSegment());
+                break;
+            case URI_CODE.ANSWER:
+                queryBuilder.setTables(Tables.ANSWER);
+                break;
+            case URI_CODE.ANSWER_ID:
+                queryBuilder.setTables(Tables.ANSWER);
+                queryBuilder.appendWhere(Answer._ID + EQ + uri.getLastPathSegment());
+                break;
+            case URI_CODE.TESTING:
+                queryBuilder.setTables(Tables.TESTING);
+                break;
+            case URI_CODE.TESTING_ID:
+                queryBuilder.setTables(Tables.TESTING);
+                queryBuilder.appendWhere(Testing._ID + EQ + uri.getLastPathSegment());
+                break;
+            case URI_CODE.POINT:
+                queryBuilder.setTables(Tables.POINT);
+                break;
+            case URI_CODE.POINT_ID:
+                queryBuilder.setTables(Tables.POINT);
+                queryBuilder.appendWhere(Point._ID + EQ + uri.getLastPathSegment());
                 break;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
@@ -124,8 +169,22 @@ public class ZNOProvider extends ContentProvider {
                 return Test.CONTENT_ITEM_TYPE;
             case URI_CODE.QUESTION:
                 return Question.CONTENT_TYPE;
+            case URI_CODE.QUESTION_AND_ANSWER:
+                return QuestionAndAnswer.CONTENT_TYPE;
             case URI_CODE.QUESTION_ID:
                 return Question.CONTENT_ITEM_TYPE;
+            case URI_CODE.ANSWER:
+                return Answer.CONTENT_TYPE;
+            case URI_CODE.ANSWER_ID:
+                return Answer.CONTENT_ITEM_TYPE;
+            case URI_CODE.TESTING:
+                return Testing.CONTENT_TYPE;
+            case URI_CODE.TESTING_ID:
+                return Testing.CONTENT_ITEM_TYPE;
+            case URI_CODE.POINT:
+                return Point.CONTENT_TYPE;
+            case URI_CODE.POINT_ID:
+                return Point.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
         }
@@ -148,13 +207,22 @@ public class ZNOProvider extends ContentProvider {
             case URI_CODE.QUESTION:
                 table = Tables.QUESTION;
                 break;
+            case URI_CODE.ANSWER:
+                table = Tables.ANSWER;
+                break;
+            case URI_CODE.TESTING:
+                table = Tables.TESTING;
+                break;
+            case URI_CODE.POINT:
+                table = Tables.POINT;
+                break;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
         }
 
         id = db.insertOrThrow(table, null, values);
 
-        notifyChange(uri);
+        notifyChange(uri, match);
 
         return ContentUris.withAppendedId(uri, id);
     }
@@ -190,13 +258,34 @@ public class ZNOProvider extends ContentProvider {
                 table = Tables.SUBJECT;
                 where = Question._ID + EQ + uri.getLastPathSegment();
                 break;
+            case URI_CODE.ANSWER:
+                table = Tables.ANSWER;
+                break;
+            case URI_CODE.ANSWER_ID:
+                table = Tables.ANSWER;
+                where = Answer._ID + EQ + uri.getLastPathSegment();
+                break;
+            case URI_CODE.TESTING:
+                table = Tables.TESTING;
+                break;
+            case URI_CODE.TESTING_ID:
+                table = Tables.TESTING;
+                where = Testing._ID + EQ + uri.getLastPathSegment();
+                break;
+            case URI_CODE.POINT:
+                table = Tables.POINT;
+                break;
+            case URI_CODE.POINT_ID:
+                table = Tables.POINT;
+                where = Point._ID + EQ + uri.getLastPathSegment();
+                break;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
         }
 
         deleteCount = db.delete(table, appendSelection(where, selection), selectionArgs);
 
-        notifyChange(uri);
+        notifyChange(uri, match);
 
         return deleteCount;
     }
@@ -232,15 +321,45 @@ public class ZNOProvider extends ContentProvider {
                 table = Tables.SUBJECT;
                 where = Question._ID + EQ + uri.getLastPathSegment();
                 break;
+            case URI_CODE.ANSWER:
+                table = Tables.ANSWER;
+                break;
+            case URI_CODE.ANSWER_ID:
+                table = Tables.ANSWER;
+                where = Answer._ID + EQ + uri.getLastPathSegment();
+                break;
+            case URI_CODE.TESTING:
+                table = Tables.TESTING;
+                break;
+            case URI_CODE.TESTING_ID:
+                table = Tables.TESTING;
+                where = Testing._ID + EQ + uri.getLastPathSegment();
+                break;
+            case URI_CODE.POINT:
+                table = Tables.POINT;
+                break;
+            case URI_CODE.POINT_ID:
+                table = Tables.POINT;
+                where = Point._ID + EQ + uri.getLastPathSegment();
+                break;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
         }
 
         updateCount = db.update(table, values, appendSelection(where, selection), selectionArgs);
 
-        notifyChange(uri);
+        notifyChange(uri, match);
 
         return updateCount;
+    }
+
+    private void notifyChange(Uri uri, int match) {
+        switch (match) {
+            case URI_CODE.ANSWER:
+                notifyChange(QuestionAndAnswer.CONTENT_URI);
+                break;
+        }
+        notifyChange(uri);
     }
 
     private void notifyChange(Uri uri) {

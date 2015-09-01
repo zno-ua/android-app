@@ -51,7 +51,7 @@
             android:layout_marginLeft="@dimen/card_padding"
             android:layout_marginRight="@dimen/card_padding"
             android:imeOptions="actionDone"
-            android:inputType="number"
+            android:inputType="number|textNoSuggestions"
             android:maxLength="3"
             android:paddingLeft="@dimen/card_padding"
             android:paddingRight="@dimen/card_padding"

@@ -16,7 +16,7 @@
             android:singleLine="true"
             android:text="A."
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:textColor="@color/primary_text_default_material_light"
+            android:textColor="@color/answer_text_color"
             android:textSize="@dimen/abc_text_size_small_material"
             android:textStyle="bold" />
 
@@ -28,7 +28,7 @@
             android:layout_toRightOf="@id/letter"
             android:text="Answer"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/primary_text_default_material_light"
+            android:textColor="@color/answer_text_color"
             android:textSize="@dimen/abc_text_size_small_material" />
     </RelativeLayout>
 

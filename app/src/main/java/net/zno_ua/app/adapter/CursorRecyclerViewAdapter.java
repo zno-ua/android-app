@@ -18,6 +18,7 @@ package net.zno_ua.app.adapter;
 
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.provider.BaseColumns;
 import android.support.v7.widget.RecyclerView;
 
 import static java.lang.Math.max;
@@ -45,7 +46,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
     public CursorRecyclerViewAdapter(Cursor cursor) {
         mCursor = cursor;
         mDataValid = cursor != null;
-        mRowIdColumn = mDataValid ? mCursor.getColumnIndex("_id") : -1;
+        mRowIdColumn = mDataValid ? mCursor.getColumnIndex(BaseColumns._ID) : -1;
         mDataSetObserver = new NotifyingDataSetObserver();
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
@@ -69,6 +70,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         if (mDataValid && mCursor != null && mCursor.moveToPosition(position)) {
             return mCursor.getLong(mRowIdColumn);
         }
+
         return 0;
     }
 
@@ -81,13 +83,17 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
 
     @Override
     public void onBindViewHolder(VH viewHolder, int position) {
+        moveCursorToPosition(position);
+        onBindViewHolder(viewHolder, mCursor);
+    }
+
+    protected void moveCursorToPosition(int position) throws IllegalStateException {
         if (!mDataValid) {
             throw new IllegalStateException("this should only be called when the cursor is valid");
         }
         if (!mCursor.moveToPosition(position)) {
             throw new IllegalStateException("couldn't move cursor to position " + position);
         }
-        onBindViewHolder(viewHolder, mCursor);
     }
 
     /**

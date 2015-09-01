@@ -4,6 +4,8 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import static net.zno_ua.app.provider.ZNODatabase.Tables;
+
 /**
  * @author Vojko Vladimir
  */
@@ -121,10 +123,10 @@ public class ZNOContract {
          */
         String CORRECT_ANSWER = "correct_answer";
         /**
-         * The mark of the question if answer is correct.
+         * The point of the question if answer is correct.
          * <P>Type: TEXT</P>
          */
-        String MARK = "mark";
+        String POINT = "point";
         /**
          * The list of images (may be null).
          * <P>Type: TEXT</P>
@@ -137,6 +139,80 @@ public class ZNOContract {
         String IMAGES_RELATIVE_URL = "images_relative_url";
     }
 
+    public interface QuestionAndAnswerColumns extends QuestionColumns, AnswerColumns {
+        String _ID = Tables.QUESTION + DOT + BaseColumns._ID + AS + BaseColumns._ID;
+        String _ID_ANSWER = Tables.ANSWER + DOT + BaseColumns._ID + AS + Tables.ANSWER + BaseColumns._ID;
+    }
+
+    public interface TestingColumns {
+        /**
+         * The ID of the test of the question.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String TEST_ID = "test_id";
+        /**
+         * The date of the passing of the test.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String DATE = "date";
+        /**
+         * Time elapsed for passing the test.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String ELAPSED_TIME = "elapsed_time";
+        /**
+         * The point of the testing.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String TEST_POINT = "test_point";
+        /**
+         * The rating point of the test.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String RATING_POINT = "rating_point";
+        /**
+         * The status of the testing.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String STATUS = "status";
+    }
+
+    public interface AnswerColumns {
+        /**
+         * The ID of the question of the answer.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String QUESTION_ID = "question_id";
+        /**
+         * The ID of the testing of the answer.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String TESTING_ID = "testing_id";
+        /**
+         * Answer of the user.
+         * <P>Type: TEXT</P>
+         */
+        String ANSWER = "answer";
+    }
+
+    public interface PointColumns {
+        /**
+         * The ID of the test of the question.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String TEST_ID = "test_id";
+        /**
+         * The point of the test.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String TEST_POINT = "test_point";
+        /**
+         * The rating point of the test.
+         * <P>Type: INTEGER (long)</P>
+         */
+        String RATING_POINT = "rating_point";
+    }
+
     /*
     /**
      * Authority for the provider of the content of the {@link ZNODataBase}
@@ -145,13 +221,18 @@ public class ZNOContract {
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
-    private static final String PATH_SUBJECT = "subject";
-    private static final String PATH_TEST = "test";
-    private static final String PATH_QUESTION = "question";
+    private static final String PATH_SUBJECT = ZNODatabase.Tables.SUBJECT;
+    private static final String PATH_TEST = ZNODatabase.Tables.TEST;
+    private static final String PATH_QUESTION = ZNODatabase.Tables.QUESTION;
+    private static final String PATH_QUESTION_AND_ANSWER = "question_and_answer";
+    private static final String PATH_ANSWER = ZNODatabase.Tables.ANSWER;
+    private static final String PATH_TESTING = ZNODatabase.Tables.TESTING;
+    private static final String PATH_POINT = ZNODatabase.Tables.POINT;
 
     private static final String DOT = ".";
     private static final String VND = "/vnd.";
 
+    public static final String AS = " AS ";
     public static final String ASC = " ASC";
     public static final String DESC = " DESC";
 
@@ -195,19 +276,19 @@ public class ZNOContract {
          */
         public static final int QUESTIONS_LOADED = 0x1;
         /**
-         * RESULT bit value that indicates that marks are loaded
+         * RESULT bit value that indicates that points are loaded
          */
-        public static final int MARKS_LOADED = 0x2;
+        public static final int POINTS_LOADED = 0x2;
         /**
          * RESULT bit value that indicates that images are loaded
          */
         public static final int IMAGES_LOADED = 0x4;
 
-        public static final int TEST_LOADED = QUESTIONS_LOADED | MARKS_LOADED | IMAGES_LOADED;
+        public static final int TEST_LOADED = QUESTIONS_LOADED | POINTS_LOADED | IMAGES_LOADED;
 
         /**
          * STATUS value that indicates that this resource is in idle state.
-         * */
+         */
         public static final int STATUS_IDLE = 0x0;
 
         /**
@@ -253,6 +334,10 @@ public class ZNOContract {
             int RESULT = 9;
         }
 
+        public static Uri buildTestItemUri(long id) {
+            return buildItemUri(CONTENT_URI, id);
+        }
+
         public static final String SORT_ORDER = YEAR + DESC;
     }
 
@@ -287,5 +372,75 @@ public class ZNOContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_QUESTION;
 
         public static final String SORT_ORDER = POSITION_ON_TEST + ASC;
+    }
+
+    public static class QuestionAndAnswer implements QuestionAndAnswerColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_QUESTION_AND_ANSWER).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT
+                        + PATH_QUESTION_AND_ANSWER;
+    }
+
+    public static class Answer implements BaseColumns, AnswerColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_ANSWER).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_ANSWER;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_ANSWER;
+    }
+
+    public static class Testing implements BaseColumns, TestingColumns {
+        /**
+         * Status indicates that testing was finished.
+         */
+        public static final int FINISHED = 0x2;
+        /**
+         * Status indicates that testing is in progress.
+         */
+        public static final int IN_PROGRESS = 0x1;
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_TESTING).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_TESTING;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_TESTING;
+
+        public static final String[] PROJECTION = {
+                _ID,
+                TEST_ID,
+                ELAPSED_TIME
+        };
+
+        public interface COLUMN_ID {
+            int ID = 0;
+            int TEST_ID = 1;
+            int ELAPSED_TIME = 2;
+        }
+
+        public static Uri buildTestingItemUri(long id) {
+            return buildItemUri(CONTENT_URI, id);
+        }
+
+        public static final String SORT_ORDER = DATE + DESC;
+    }
+
+    public static class Point implements BaseColumns, PointColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_POINT).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_POINT;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_POINT;
+    }
+
+    private static Uri buildItemUri(Uri contentUri, Object item) {
+        return contentUri.buildUpon().appendPath(String.valueOf(item)).build();
     }
 }

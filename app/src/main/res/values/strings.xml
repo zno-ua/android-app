@@ -28,9 +28,7 @@
     <string name="dialog_start_test_text">Розпочати тест з урахуванням часу?</string>
     <string name="dialog_unfinished_test_text">Є незавершений тест! Бажаєте його продовжити?</string>
     <string name="dialog_load_test_text">Тест відсутній, завантажити?</string>
-    <string name="dialog_cancel_test_text">Ви виходите з тесту, тому відповіді не будуть збережені</string>
     <string name="dialog_unanswered_questions_text">Ви відповіли не на всі запитання!</string>
-    <string name="dialog_finish_text">Бажаєте завершити?</string>
     <string name="dialog_positive_text">Так</string>
     <string name="dialog_negative_text">Ні</string>
     <string name="dialog_continue_text">Продовжити</string>
@@ -39,7 +37,6 @@
     <!-- Action -->
     <string name="action_questions_list">Список питань</string>
     <string name="action_finish_testing">Завершити тестування</string>
-    <string name="action_time">Залишок часу</string>
     <string name="action_share">Поділитися</string>
 
     <!-- TestActivity -->
@@ -53,8 +50,6 @@
     <string name="answer_three_correct">Введіть 3 цифри, які ви вважаєте вірними (в будь-якому порядку):</string>
     <string name="answer_short">Введіть відповідь:</string>
     <string name="parent_question_text_show">Натисніть для відображення тексту</string>
-    <string name="choose_mark">Оберіть бал, на який розраховуєте:</string>
-    <string name="chosen_mark">Обраний бал — </string>
     <string name="your_answer_text">Ваша відповідь:</string>
     <string name="correct_answer_text">Вірна відповідь:</string>
     <string name="your_combination_text">Ваша комбінація:</string>
@@ -99,21 +94,6 @@
     <string name="error_server_bad">Помилка серверу</string>
     <string name="error_unknown">Невідома помилка</string>
     <string name="error_cant_save_bitmap">Неможливо зберегти зображення</string>
-
-    <!-- Timer -->
-    <string name="time_one_left">Залишилась %1$d %2$s</string>
-    <string name="time_two_four_left">Залишилось %1$d %2$s</string>
-    <string name="time_left">Залишилось %1$d %2$s</string>
-    <string name="time_is_up">Час вийшов</string>
-
-    <!-- Time -->
-    <string name="one_minute">хвилина</string>
-    <string name="one_minute_rod">хвилину</string>
-    <string name="two_four_minutes">хвилини</string>
-    <string name="minutes">хвилин</string>
-    <string name="one_second">секунда</string>
-    <string name="two_four_seconds">секунди</string>
-    <string name="seconds">секунд</string>
 
     <!-- Quotes -->
     <string-array name="quotes">
@@ -195,13 +175,11 @@
     <string name="download">завантажити</string>
     <string name="delete">видалити</string>
     <string name="start_test_question">Розпочати тестування?</string>
-    <string name="start_test_description">Буде розпочато тестування. Ви можете перевірити свої знання з урахуванням часу, або без.</string>
     <string-array name="start_test_choices">
         <item>з урахуванням часу</item>
         <item>без урахування часу</item>
     </string-array>
     <string name="start">розпочати</string>
-    <string name="start_with_timer">розпочати з урахуванням часу</string>
     <string name="tasks">завдання</string>
     <string name="tasks_genitive">завдань</string>
     <string name="read_text">Прочитати текс</string>
@@ -209,5 +187,29 @@
     <string name="question_eng">Question</string>
     <string name="close">закрити</string>
     <string name="text_for_reading">Текст для читання</string>
+    <string name="choose_point">Оберіть бал, на який розраховуєте:</string>
+    <string name="chosen_point">Обраний бал — </string>
+    <string name="time_one_left">Залишилась %1$d %2$s</string>
+    <string name="time_two_four_left">Залишилось %1$d %2$s</string>
+    <string name="time_left">Залишилось %1$d %2$s</string>
+    <string name="time_is_up">Час вийшов</string>
+    <string name="one_minute">хвилина</string>
+    <string name="one_minute_rod">хвилину</string>
+    <string name="two_four_minutes">хвилини</string>
+    <string name="minutes">хвилин</string>
+    <string name="one_second">секунда</string>
+    <string name="two_four_seconds">секунди</string>
+    <string name="seconds">секунд</string>
+    <string name="action_time">Залишок часу</string>
+    <string name="exit_test_question">Вийти з тесту?</string>
+    <string name="exit_test_description">Ви виходите з тесту, тому відповіді не будуть збережені.</string>
+    <string name="exit">вийти</string>
+    <string name="finish_test_question">Бажаєте завершити?</string>
+    <string name="finish_test_description">Тестування буде завершено і ви зможете подивитися його результати.</string>
+    <string name="finish">завершити</string>
+    <string name="of">з</string>
+    <string name="start_unfinished_test_question">Розпочати незавершиний тест?</string>
+    <string name="start_unfinished_test_description">Ви маєте незавершиний тест, ви можете прожовжити проходження тесту, або видалити його.</string>
+    <string name="continuee">продовжити</string>
 
 </resources>

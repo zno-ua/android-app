@@ -1,8 +1,12 @@
 package net.zno_ua.app.ui;
 
 import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,16 +19,27 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.squareup.picasso.Picasso;
 
 import net.zno_ua.app.R;
+import net.zno_ua.app.provider.ZNOContract;
 import net.zno_ua.app.util.UiUtils;
+
+import static java.lang.String.valueOf;
+import static net.zno_ua.app.provider.ZNOContract.Testing;
+import static net.zno_ua.app.provider.ZNOContract.Answer;
+import static net.zno_ua.app.provider.ZNOContract.Testing.COLUMN_ID;
+import static net.zno_ua.app.provider.ZNOContract.Testing.buildTestingItemUri;
+import static net.zno_ua.app.ui.TestingActivity.Action;
+import static net.zno_ua.app.ui.TestingActivity.Extra;
 
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity
         implements SubjectsFragment.OnSubjectSelectedListener,
-        NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private Toolbar mToolBar;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -36,6 +51,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         init();
+        getLoaderManager().initLoader(0, null, this);
     }
 
     private void init() {
@@ -131,5 +147,56 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, SubjectActivity.class);
         intent.putExtra(SubjectActivity.EXTRA_SUBJECT_ID, id);
         startActivity(intent);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this,
+                Testing.CONTENT_URI,
+                Testing.PROJECTION,
+                Testing.STATUS + " = ?",
+                new String[]{valueOf(Testing.IN_PROGRESS)},
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
+        if (data.moveToFirst()) {
+            new MaterialDialog.Builder(this)
+                    .title(R.string.start_unfinished_test_question)
+                    .content(R.string.start_unfinished_test_description)
+                    .positiveText(R.string.continuee)
+                    .negativeText(R.string.delete)
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            Intent i = new Intent(MainActivity.this, TestingActivity.class);
+                            i.setAction(Action.CONTINUE_PASSAGE_TEST);
+                            i.putExtra(Extra.TEST_ID, data.getLong(COLUMN_ID.TEST_ID));
+                            i.putExtra(Extra.TESTING_ID, data.getLong(COLUMN_ID.ID));
+                            i.putExtra(Extra.TIMER_MODE, !data.isNull(COLUMN_ID.ELAPSED_TIME));
+                            startActivity(i);
+                        }
+
+                        @Override
+                        public void onNegative(MaterialDialog dialog) {
+                            deleteTesting(data.getLong(COLUMN_ID.ID));
+                        }
+                    })
+                    .cancelable(false)
+                    .show();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    private void deleteTesting(long id) {
+        getContentResolver().delete(buildTestingItemUri(id), null, null);
+        getContentResolver().delete(Answer.CONTENT_URI, Answer.TESTING_ID + " = ?",
+                new String[]{valueOf(id)});
     }
 }
