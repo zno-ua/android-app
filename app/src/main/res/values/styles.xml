@@ -256,7 +256,7 @@
     <style name="AppTheme" parent="AppTheme.Base">
         <item name="colorPrimary">@color/indigo_500</item>
         <item name="colorPrimaryDark">@color/indigo_700</item>
-        <item name="colorAccent">@color/pink_500</item>
+        <item name="colorAccent">@color/pink_A200</item>
         <item name="android:windowBackground">@color/grey_50</item>
 
         <item name="toolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
@@ -269,6 +269,14 @@
 
         <item name="discreteSeekBarStyle">@style/Widget.DiscreteSeekBar</item>
     </style>
+
+    <style name="AppTheme.Translucent" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/Base.Animation.AppCompat.Dialog</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.TransparentStatus" parent="AppTheme" />
 
     <style name="AppCompat.Button.Flat.Common" parent="Base.TextAppearance.AppCompat.Button">
         <item name="android:background">@drawable/btn_flat_selector</item>
@@ -284,7 +292,8 @@
     </style>
 
     <style name="Widget.DiscreteSeekBar" parent="android:Widget">
-        <item name="dsb_indicatorTextAppearance">@style/Widget.DiscreteIndicatorTextAppearance
+        <item name="dsb_indicatorTextAppearance">
+            @style/Widget.DiscreteIndicatorTextAppearance
         </item>
         <item name="dsb_progressColor">?attr/colorAccent</item>
         <item name="dsb_trackColor">?attr/colorAccent</item>

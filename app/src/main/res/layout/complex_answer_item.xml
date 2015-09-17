@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:text="1. — "
+            android:textStyle="bold"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/primary_text_default_material_light"
             android:textSize="@dimen/abc_text_size_small_material" />
@@ -30,22 +30,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <View
+            <include
                 android:layout_width="wrap_content"
                 android:layout_height="1dp"
                 android:layout_alignLeft="@id/letters_spinner"
                 android:layout_alignRight="@id/letters_spinner"
                 android:layout_below="@id/letters_spinner"
                 android:layout_gravity="bottom"
-                android:background="@color/grey_230" />
+                layout="@layout/question_item_divider" />
         </RelativeLayout>
 
     </LinearLayout>
 
-    <View
-        android:id="@+id/divider"
+    <include
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_gravity="bottom"
-        android:background="@color/grey_230" />
+        layout="@layout/question_item_divider" />
 </FrameLayout>

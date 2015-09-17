@@ -22,6 +22,7 @@ import net.zno_ua.app.fragments.TestTimerFragment;
 import net.zno_ua.app.models.Record;
 import net.zno_ua.app.models.Test;
 import net.zno_ua.app.service.ApiService;
+import net.zno_ua.app.service.ZNOApiServiceHelper;
 
 import java.util.Locale;
 
@@ -43,6 +44,7 @@ public class ZNOApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+        ZNOApiServiceHelper.getInstance(this).restartPendingRequests();
     }
 
     public static synchronized ZNOApplication getInstance() {

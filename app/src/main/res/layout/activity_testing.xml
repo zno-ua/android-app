@@ -6,11 +6,15 @@
     android:layout_height="match_parent"
     tools:context="net.zno_ua.app.ui.TestingActivity">
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/questions_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:layout_height="wrap_content">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/app_bar"
@@ -22,18 +26,12 @@
             tools:ignore="UnusedAttribute" />
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/questions_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_done"
+        android:id="@+id/fab"
+        layout_anchorGravity="bottom|right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_margin="@dimen/fab_compat_margin"
-        android:src="@drawable/ic_done_black_24dp"
         android:tint="@color/white" />
 </android.support.design.widget.CoordinatorLayout>

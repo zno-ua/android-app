@@ -248,14 +248,14 @@ public class ZNOProvider extends ContentProvider {
                 table = Tables.TEST;
                 break;
             case URI_CODE.TEST_ID:
-                table = Tables.SUBJECT;
+                table = Tables.TEST;
                 where = Test._ID + EQ + uri.getLastPathSegment();
                 break;
             case URI_CODE.QUESTION:
                 table = Tables.QUESTION;
                 break;
             case URI_CODE.QUESTION_ID:
-                table = Tables.SUBJECT;
+                table = Tables.QUESTION;
                 where = Question._ID + EQ + uri.getLastPathSegment();
                 break;
             case URI_CODE.ANSWER:
@@ -311,14 +311,14 @@ public class ZNOProvider extends ContentProvider {
                 table = Tables.TEST;
                 break;
             case URI_CODE.TEST_ID:
-                table = Tables.SUBJECT;
+                table = Tables.TEST;
                 where = Test._ID + EQ + uri.getLastPathSegment();
                 break;
             case URI_CODE.QUESTION:
                 table = Tables.QUESTION;
                 break;
             case URI_CODE.QUESTION_ID:
-                table = Tables.SUBJECT;
+                table = Tables.QUESTION;
                 where = Question._ID + EQ + uri.getLastPathSegment();
                 break;
             case URI_CODE.ANSWER:

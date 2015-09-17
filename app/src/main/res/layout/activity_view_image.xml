@@ -1,15 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/view_image_bg_color">
+    android:background="#A6000000"
+    tools:context="net.zno_ua.app.ui.ViewImageActivity">
 
-    <ImageView
-        android:id="@+id/view_image_img"
+    <it.sephiroth.android.library.imagezoom.ImageViewTouch
+        android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:adjustViewBounds="true"
-        android:scaleType="matrix" />
+        android:background="@android:color/transparent" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="top"
+        android:theme="?attr/toolbarTheme"
+        app:popupTheme="?attr/toolbarPopupTheme" />
 
 </FrameLayout>

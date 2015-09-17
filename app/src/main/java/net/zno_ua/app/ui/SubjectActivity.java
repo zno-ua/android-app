@@ -1,9 +1,9 @@
 package net.zno_ua.app.ui;
 
 import android.app.Fragment;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -17,23 +17,20 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.squareup.picasso.Picasso;
 
 import net.zno_ua.app.R;
+import net.zno_ua.app.service.ZNOApiServiceHelper;
 import net.zno_ua.app.ui.widget.AspectRatioImageView;
 import net.zno_ua.app.util.UiUtils;
 
-import static android.content.ContentUris.parseId;
 import static net.zno_ua.app.provider.ZNOContract.Subject;
 import static net.zno_ua.app.provider.ZNOContract.Subject.buildSubjectUri;
-import static net.zno_ua.app.provider.ZNOContract.Testing;
 
 public class SubjectActivity extends AppCompatActivity
         implements SubjectTestsFragment.OnTestSelectedListener {
     public static final String EXTRA_SUBJECT_ID = "net.zno_ua.app.ui.SUBJECT_ID";
 
-    private static final int NAME_COLUMN_ID = 0;
-
     private long subjectId;
 
-    private CollapsingToolbarLayout mCollapsingToolbarLayout;
+    private ZNOApiServiceHelper mApiServiceHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +45,8 @@ public class SubjectActivity extends AppCompatActivity
     private void init() {
         initToolbar();
         initToolbarLayout();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            findViewById(R.id.status_bar_background).setVisibility(View.VISIBLE);
 
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -62,6 +61,7 @@ public class SubjectActivity extends AppCompatActivity
         getFragmentManager().beginTransaction()
                 .add(R.id.main_content, fragment)
                 .commit();
+        mApiServiceHelper = ZNOApiServiceHelper.getInstance(this);
     }
 
     private void initToolbar() {
@@ -70,8 +70,6 @@ public class SubjectActivity extends AppCompatActivity
     }
 
     private void initToolbarLayout() {
-        mCollapsingToolbarLayout =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_layout);
         AspectRatioImageView subjectImageView =
                 (AspectRatioImageView) findViewById(R.id.subject_image);
         Picasso.with(this)
@@ -91,7 +89,7 @@ public class SubjectActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                supportFinishAfterTransition();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -124,8 +122,23 @@ public class SubjectActivity extends AppCompatActivity
     @Override
     public void onStartDownloadingTest(final long id) {
         new MaterialDialog.Builder(this)
-                .title(R.string.download_test_question)
+                .title(R.string.download_test)
                 .content(R.string.download_test_description)
+                .positiveText(R.string.download)
+                .negativeText(R.string.cancel)
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        startDownloadingTest(id);
+                    }
+                }).show();
+    }
+
+    @Override
+    public void onReStartDownloadingTest(final long id) {
+        new MaterialDialog.Builder(this)
+                .title(R.string.download_test)
+                .content(R.string.restart_download_test_description)
                 .positiveText(R.string.download)
                 .negativeText(R.string.cancel)
                 .callback(new MaterialDialog.ButtonCallback() {
@@ -160,10 +173,10 @@ public class SubjectActivity extends AppCompatActivity
     }
 
     private void startDownloadingTest(long id) {
-        Toast.makeText(SubjectActivity.this, "Start downloading test " + id, Toast.LENGTH_SHORT).show();
+        mApiServiceHelper.getTest(id);
     }
 
     private void startDeletingTest(long id) {
-        Toast.makeText(SubjectActivity.this, "Start deleting test " + id, Toast.LENGTH_SHORT).show();
+        mApiServiceHelper.deleteTest(id);
     }
 }

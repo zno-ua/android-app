@@ -42,7 +42,7 @@ public class ViewImageActivity extends Activity implements OnClickListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_image);
+        setContentView(R.layout.activity_view_image_old);
         Intent intent = getIntent();
         Uri data = intent.getData();
 

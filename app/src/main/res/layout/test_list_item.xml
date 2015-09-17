@@ -9,23 +9,33 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/two_line_item_tile_height">
 
-        <ImageView
-            android:id="@+id/action_icon"
-            android:layout_width="@dimen/action_icon_width"
-            android:layout_height="@dimen/action_icon_width"
+        <FrameLayout
+            android:id="@+id/action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/key_line_1"
-            android:layout_marginRight="@dimen/key_line_1"
-            android:src="@drawable/ic_file_download_black_24dp"
-            android:tint="?attr/colorPrimary" />
+            android:layout_centerVertical="true">
+
+            <Space
+                android:layout_width="@dimen/key_line_1"
+                android:layout_height="match_parent" />
+
+            <ImageView
+                android:id="@+id/action_icon"
+                android:layout_width="@dimen/action_icon_width"
+                android:layout_height="@dimen/action_icon_width"
+                android:layout_margin="@dimen/key_line_1"
+                android:alpha="0.54"
+                android:tint="@color/black"
+                android:visibility="gone" />
+        </FrameLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/key_line_1"
-            android:layout_toLeftOf="@id/action_icon">
+            android:layout_toLeftOf="@id/action">
 
             <TextView
                 android:id="@+id/primary_text"
@@ -33,7 +43,6 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="Primary text"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="@color/primary_text_default_material_light"
                 android:textSize="@dimen/abc_text_size_medium_material" />
@@ -46,17 +55,16 @@
                 android:layout_below="@id/primary_text"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="secondary text"
                 android:textColor="@color/secondary_text_default_material_light"
                 android:textSize="@dimen/abc_text_size_small_material" />
         </RelativeLayout>
 
-        <View
+        <include
             android:id="@+id/divider"
+            layout="@layout/question_item_divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_alignParentBottom="true"
-            android:background="@color/grey_230" />
+            android:layout_alignParentBottom="true" />
 
     </RelativeLayout>
 

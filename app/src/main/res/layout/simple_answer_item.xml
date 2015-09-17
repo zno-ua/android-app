@@ -14,7 +14,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:text="A."
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/answer_text_color"
             android:textSize="@dimen/abc_text_size_small_material"
@@ -26,16 +25,15 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/card_padding"
             android:layout_toRightOf="@id/letter"
-            android:text="Answer"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/answer_text_color"
             android:textSize="@dimen/abc_text_size_small_material" />
     </RelativeLayout>
 
-    <View
-        android:id="@+id/divider"
+    <include
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_gravity="bottom"
-        android:background="@color/grey_230" />
+        layout="@layout/question_item_divider" />
+
 </FrameLayout>

@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/your_combination_text"
+        android:text="@string/user_combination"
         style="@style/AnswerText" />
 
     <TextView
@@ -20,7 +20,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/correct_combination_text"
+        android:text="@string/correct_combination"
         style="@style/AnswerText" />
 
     <TextView

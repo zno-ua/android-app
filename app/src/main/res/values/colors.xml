@@ -9,7 +9,7 @@
     <color name="dark_green">#669900</color>
     <color name="orange">#f88241</color>
 
-    <color name="window_background_color">#f2f2f2</color>
+    <color name="window_background_color">#fafafa</color>
     <color name="quote_color">#666666</color>
     <color name="quote_divider_color">#c1c1c1</color>
     <color name="chooser_text_color">#999999</color>
@@ -100,7 +100,7 @@
     <!-- Indigo -->
 
     <!-- Pink -->
-    <color name="pink_500">#E91E63</color>
+    <color name="pink_A200">#FF4081</color>
     <!-- Pink -->
 
     <!-- Grey -->
@@ -137,4 +137,7 @@
     <color name="flat_disabled_text">#40000000</color>
     <color name="flat_normal_text">#000000</color>
     <!-- Material Flat Buttons -->
+
+    <color name="translucent_status_bar">#32000000</color>
+    <color name="secondary_text_color">#b2b2b2</color>
 </resources>

@@ -47,14 +47,7 @@
     <string name="happy">:-)</string>
     <string name="share_template">Мій результат тестування з %1$s — %2$.1f балів.\nПройти цей тест:
         http://zno-ua.net/test/%3$s/%4$d?utm-source=android</string>
-    <string name="answer_three_correct">Введіть 3 цифри, які ви вважаєте вірними (в будь-якому порядку):</string>
-    <string name="answer_short">Введіть відповідь:</string>
     <string name="parent_question_text_show">Натисніть для відображення тексту</string>
-    <string name="your_answer_text">Ваша відповідь:</string>
-    <string name="correct_answer_text">Вірна відповідь:</string>
-    <string name="your_combination_text">Ваша комбінація:</string>
-    <string name="correct_combination_text">Вірна комбінація:</string>
-    <string name="unanswered_question_warning">Ви не відповіли на це запитання</string>
     <string name="statement_text_grid_item">П</string>
 
     <!-- RecordsActivity -->
@@ -162,13 +155,15 @@
     <!-- New fields under development -->
     <string name="zno_db">База даних тестів ЗНО</string>
     <string name="testing">Тестування</string>
+    <string name="testing_result">Результати тестування</string>
     <string name="official_test">Офіційний тест ЗНО</string>
     <string name="experimental_test">Пробне тестування ЗНО</string>
     <string name="session">сесія</string>
     <string name="variant">варіант</string>
     <string name="needed_to_download">необхідно завантажити</string>
-    <string name="download_test_question">Завантажити тест?</string>
+    <string name="download_test">Завантажити тест?</string>
     <string name="download_test_description">Тест буде завантажено в пам`ять телефону.</string>
+    <string name="restart_download_test_description">При завантаженні тесту виникла помилка, бажаєте спробувати знову?</string>
     <string name="delete_test_question">Видалити тест?</string>
     <string name="delete_test_description">Тест буде видалено з пам`яті телефону, після чого ви не зможете проходити його не завантаживши знову.</string>
     <string name="cancel">відмінити</string>
@@ -183,16 +178,19 @@
     <string name="tasks">завдання</string>
     <string name="tasks_genitive">завдань</string>
     <string name="read_text">Прочитати текс</string>
+    <string name="read_text_eng">read text</string>
     <string name="question">Запитання</string>
     <string name="question_eng">Question</string>
     <string name="close">закрити</string>
+    <string name="close_eng">close</string>
     <string name="text_for_reading">Текст для читання</string>
+    <string name="text_for_reading_eng">Text for reading</string>
     <string name="choose_point">Оберіть бал, на який розраховуєте:</string>
     <string name="chosen_point">Обраний бал — </string>
-    <string name="time_one_left">Залишилась %1$d %2$s</string>
-    <string name="time_two_four_left">Залишилось %1$d %2$s</string>
-    <string name="time_left">Залишилось %1$d %2$s</string>
-    <string name="time_is_up">Час вийшов</string>
+    <string name="time_one_left">Залишилась %1$d %2$s.</string>
+    <string name="time_two_four_left">Залишилось %1$d %2$s.</string>
+    <string name="time_left">Залишилось %1$d %2$s.</string>
+    <string name="time_is_up">Час вийшов.</string>
     <string name="one_minute">хвилина</string>
     <string name="one_minute_rod">хвилину</string>
     <string name="two_four_minutes">хвилини</string>
@@ -211,5 +209,25 @@
     <string name="start_unfinished_test_question">Розпочати незавершиний тест?</string>
     <string name="start_unfinished_test_description">Ви маєте незавершиний тест, ви можете прожовжити проходження тесту, або видалити його.</string>
     <string name="continuee">продовжити</string>
+    <string name="empty" />
+    <string name="level_basic">(Базовий)</string>
+    <string name="level_specialized">(Профільний)</string>
+    <string name="downloading">Завантажується…</string>
+    <string name="downloading_error">Помилка при завнатаженні.</string>
+    <string name="answer_three_correct">Введіть 3 цифри, які ви вважаєте вірними (в будь-якому порядку):</string>
+    <string name="answer_short">Введіть відповідь:</string>
+    <string name="user_answer">Ваша відповідь:</string>
+    <string name="correct_answer">Вірна відповідь:</string>
+    <string name="user_combination">Ваша комбінація:</string>
+    <string name="correct_combination">Вірна комбінація:</string>
+    <string name="unanswered_question_warning">Ви не відповіли на це запитання</string>
+    <string name="test_completed">Тест завершено</string>
+    <string name="ok">OK</string>
+    <string name="your_rating_point_format">Ваш рейтинговий бал складає %1$.1f.</string>
+    <string name="view_results_question">Подивитися результати?</string>
+    <string name="view_results_description">Ви зможете подивитися на які питання ви відповіли вірно, а на які ні.</string>
+    <string name="view">подивитися</string>
+    <string name="do_not_view">не дивитися</string>
+    <string name="deleting">Видаляеться…</string>
 
 </resources>

@@ -38,7 +38,7 @@
             android:layout_marginLeft="@dimen/card_padding"
             android:layout_marginRight="@dimen/card_padding"
             android:layout_marginTop="@dimen/card_padding"
-            android:text="@string/answer_three_correct"
+            android:text="@string/answer_short"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/primary_text_default_material_light"
             android:textSize="@dimen/abc_text_size_small_material" />
@@ -51,8 +51,7 @@
             android:layout_marginLeft="@dimen/card_padding"
             android:layout_marginRight="@dimen/card_padding"
             android:imeOptions="actionDone"
-            android:inputType="number|textNoSuggestions"
-            android:maxLength="3"
+            android:inputType="numberDecimal|numberSigned|textNoSuggestions"
             android:paddingLeft="@dimen/card_padding"
             android:paddingRight="@dimen/card_padding"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"

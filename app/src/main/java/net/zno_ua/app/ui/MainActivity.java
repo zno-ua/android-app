@@ -23,7 +23,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.squareup.picasso.Picasso;
 
 import net.zno_ua.app.R;
-import net.zno_ua.app.provider.ZNOContract;
 import net.zno_ua.app.util.UiUtils;
 
 import static java.lang.String.valueOf;
@@ -171,12 +170,7 @@ public class MainActivity extends AppCompatActivity
                     .callback(new MaterialDialog.ButtonCallback() {
                         @Override
                         public void onPositive(MaterialDialog dialog) {
-                            Intent i = new Intent(MainActivity.this, TestingActivity.class);
-                            i.setAction(Action.CONTINUE_PASSAGE_TEST);
-                            i.putExtra(Extra.TEST_ID, data.getLong(COLUMN_ID.TEST_ID));
-                            i.putExtra(Extra.TESTING_ID, data.getLong(COLUMN_ID.ID));
-                            i.putExtra(Extra.TIMER_MODE, !data.isNull(COLUMN_ID.ELAPSED_TIME));
-                            startActivity(i);
+                            continueTesting(data);
                         }
 
                         @Override
@@ -187,6 +181,16 @@ public class MainActivity extends AppCompatActivity
                     .cancelable(false)
                     .show();
         }
+    }
+
+    private void continueTesting(Cursor data) {
+        Intent intent = new Intent(MainActivity.this, TestingActivity.class);
+        intent.setAction(Action.CONTINUE_PASSAGE_TEST);
+        intent.putExtra(Extra.TEST_ID, data.getLong(COLUMN_ID.TEST_ID));
+        intent.putExtra(Extra.TESTING_ID, data.getLong(COLUMN_ID.ID));
+        intent.putExtra(Extra.TIMER_MODE, !data.isNull(COLUMN_ID.ELAPSED_TIME) &&
+                        data.getLong(COLUMN_ID.ELAPSED_TIME) != -1);
+        startActivity(intent);
     }
 
     @Override

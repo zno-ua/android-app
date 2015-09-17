@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="net.zno_ua.app.ui.MainActivity">
+    <item
+        android:id="@+id/action_close"
+        android:icon="@drawable/ic_close_white_24dp"
+        android:orderInCategory="100"
+        android:title="@string/close"
+        app:showAsAction="ifRoom" />
+</menu>

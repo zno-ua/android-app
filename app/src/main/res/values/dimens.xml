@@ -103,4 +103,6 @@
     <dimen name="btn_flat_margin">4dp</dimen>
     <!-- Material Flat Buttons -->
 
+    <dimen name="material_default_status_bar_height">24dp</dimen>
+
 </resources>

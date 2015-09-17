@@ -83,44 +83,52 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
             mDataValid = true;
         }
 
-        if (mDataValid)
-            changeItemsAdapter(new ItemsAdapter(createSections(mCursor), mCursor));
-        else
-            changeItemsAdapter(new ItemsAdapter(null, null));
-
-        return oldCursor;
-    }
-
-    private void changeItemsAdapter(ItemsAdapter newItemsAdapter) {
         ItemsAdapter oldItemsAdapter = mItemsAdapter;
-        mItemsAdapter = newItemsAdapter;
 
-        if (oldItemsAdapter.hasItems()) {
+        if (mDataValid)
+            mItemsAdapter = new ItemsAdapter(createSections(mCursor), mCursor);
+        else
+            mItemsAdapter = new ItemsAdapter(null, null);
+
+        if (oldItemsAdapter.getCount() == 0 && mItemsAdapter.getCount() != 0)
+            notifyItemRangeInserted(0, mItemsAdapter.getCount());
+        else if (oldItemsAdapter.getCount() != 0 && mItemsAdapter.getCount() == 0)
+            notifyItemRangeRemoved(0, oldItemsAdapter.getCount());
+        else if (oldCursor != null) {
             int min = min(oldItemsAdapter.getCount(), mItemsAdapter.getCount());
             int max = max(oldItemsAdapter.getCount(), mItemsAdapter.getCount());
 
             for (int i = 0; i < min; i++) {
-                if (oldItemsAdapter.isItem(i) == mItemsAdapter.isItem(i)) {
-                    notifyItemChanged(i);
-                } else {
-                    notifyItemRemoved(i);
-                    notifyItemInserted(i);
+                if (mItemsAdapter.isItem(i) && oldItemsAdapter.isItem(i)) {
+                    if (oldCursor.moveToPosition(oldItemsAdapter.getItemPosition(i))
+                            && mCursor.moveToPosition(mItemsAdapter.getItemPosition(i))) {
+                        if (!isCursorItemsEquals(oldCursor, mCursor))
+                            notifyItemChanged(i);
+                    } else if (!(mItemsAdapter.isItem(i) || oldItemsAdapter.isItem(i))) {
+                        if (!mItemsAdapter.getSection(i).equals(oldItemsAdapter.getSection(i)))
+                            notifyItemChanged(i);
+                    } else {
+                        notifyItemChanged(i);
+                    }
                 }
             }
 
-            boolean isGrown = oldItemsAdapter.getCount() < mItemsAdapter.getCount();
-
-            for (int i = min; i < max; i++) {
-                if (isGrown) {
-                    notifyItemInserted(i);
-                } else {
-                    notifyItemRemoved(i);
-                }
-            }
-
-        } else if (mItemsAdapter.hasItems()) {
-            notifyItemRangeInserted(0, mItemsAdapter.getCount());
+            notifyItemRangeInserted(min, max - min);
         }
+
+        return oldCursor;
+    }
+
+    private boolean isCursorItemsEquals(Cursor a, Cursor b) {
+        boolean isEquals = true;
+        for (int i = 0; i < min(a.getColumnCount(), b.getColumnCount()); i++) {
+            isEquals = a.getString(i).equals(b.getString(i));
+
+            if (!isEquals)
+                break;
+        }
+
+        return isEquals;
     }
 
     @Override

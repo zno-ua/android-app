@@ -1,9 +1,11 @@
 package net.zno_ua.app.ui;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
@@ -72,11 +74,12 @@ public class SubjectsFragment extends Fragment implements LoaderManager.LoaderCa
         return view;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mSubjectSelectedListener = (OnSubjectSelectedListener)  activity;
+            mSubjectSelectedListener = (OnSubjectSelectedListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -140,7 +143,11 @@ public class SubjectsFragment extends Fragment implements LoaderManager.LoaderCa
             int imageResID = UiUtils.SUBJECT_IMAGE_RES_ID[id];
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                viewHolder.image.setBackgroundResource(imageResID);
+                Picasso.with(getActivity())
+                        .load(imageResID)
+                        .fit()
+                        .centerCrop()
+                        .into(viewHolder.image);
             } else {
                 viewHolder.card.setPreventCornerOverlap(false);
 

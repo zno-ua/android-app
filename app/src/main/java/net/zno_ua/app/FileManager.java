@@ -14,84 +14,61 @@ import java.io.IOException;
 
 public class FileManager {
 
-    private final Context context;
+    private final Context mContext;
     private final String FILES_PATH;
 
     public FileManager(Context context) {
-        this.context = context;
+        mContext = context;
         FILES_PATH = context.getFilesDir().getAbsolutePath();
     }
 
-    public void saveBitmap(String path, String name, Bitmap bitmap) throws IOException {
-        File dir = new File(path);
-        if (!dir.exists()) {
-            createFolder(path);
-        }
+    public boolean saveBitmap(String path, String name, Bitmap bitmap) throws IOException {
+        boolean success;
+        File dir = new File(FILES_PATH + path);
+        success = dir.exists() || dir.mkdirs();
 
-        File file = new File(FILES_PATH + dir, name);
-        file.createNewFile();
-        Bitmap.CompressFormat format = null;
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        File file = new File(dir, name);
+        success |= file.exists() || file.createNewFile();
 
-        if (name.contains("jpg")) {
-            format = Bitmap.CompressFormat.JPEG;
-        } else if (name.contains("png")) {
-            format = Bitmap.CompressFormat.PNG;
-        } else if (name.contains("gif")) {
+        if (success) {
+            Bitmap.CompressFormat format;
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+            if (name.contains("jpg")) {
+                format = Bitmap.CompressFormat.JPEG;
+            } else if (name.contains("png")) {
+                format = Bitmap.CompressFormat.PNG;
+            } else {
+                fileOutputStream.close();
+                throw new IOException("Can't save image: wrong format.");
+            }
+
+            success = bitmap.compress(format, 100, fileOutputStream);
             fileOutputStream.close();
-            throw new IOException("Can't save image: wrong format.");
-        }
+        } else //noinspection ResultOfMethodCallIgnored
+            file.delete();
 
-        boolean compressed = bitmap.compress(format, 100, fileOutputStream);
-        if (!compressed) {
-            throw new IOException("Can't save file: " + path + name);
-        }
-        fileOutputStream.close();
+        return success;
     }
 
     public Drawable openDrawable(String path) throws FileNotFoundException {
-        File drawable = new File(FILES_PATH + path);
-        FileInputStream fis = new FileInputStream(drawable);
-        return new BitmapDrawable(context.getResources(), BitmapFactory.decodeStream(fis));
+        return new BitmapDrawable(mContext.getResources(), openBitmap(path));
     }
 
-    public void createFolder(String pathName) {
-        File folder;
-        String[] subFolders = pathName.split("/");
-
-        if (subFolders.length > 1) {
-            String fullPath = "";
-
-            for (String folderName : subFolders) {
-                fullPath += folderName;
-                folder = new File(FILES_PATH + fullPath);
-                if (!folder.exists()) {
-                    folder.mkdir();
-                }
-                fullPath += "/";
-            }
-        }
+    public Bitmap openBitmap(String path) throws FileNotFoundException {
+        return BitmapFactory.decodeFile(FILES_PATH + path);
     }
 
-    public void clearAllFiles() {
-        for (String fileName : context.fileList()) {
-            deleteFile(new File(FILES_PATH, fileName));
-        }
+    public boolean isFileExists(String path, String name) {
+        return new File(FILES_PATH + path, name).exists();
     }
 
-    private void deleteFile(File file) {
-        if (file.isDirectory()) {
-            if (file.listFiles() != null) {
-                for (File subFile : file.listFiles()) {
-                    deleteFile(subFile);
-                }
-            }
-        }
-        file.delete();
-    }
-
+    @Deprecated
     public boolean isFileExists(String fileName) {
         return new File(FILES_PATH, fileName).exists();
     }
 
+    public boolean deleteFile(String path, String name) {
+        return new File(FILES_PATH + path, name).delete();
+    }
 }

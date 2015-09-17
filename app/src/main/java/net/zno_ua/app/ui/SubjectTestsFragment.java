@@ -7,6 +7,7 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,12 +19,12 @@ import android.widget.TextView;
 import net.zno_ua.app.R;
 import net.zno_ua.app.adapter.SectionCursorRecyclerViewAdapter;
 
-import static net.zno_ua.app.provider.ZNOContract.Test;
-
 import java.util.HashMap;
 
+import static android.text.TextUtils.isEmpty;
 import static android.view.LayoutInflater.from;
 import static java.lang.String.valueOf;
+import static net.zno_ua.app.provider.ZNOContract.Test;
 
 public class SubjectTestsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String ARG_SUBJECT_ID = "subject_id";
@@ -32,21 +33,23 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
 
     private static final String[] PROJECTION = new String[]{
             Test._ID,
-            Test.TYPE,
             Test.YEAR,
+            Test.TYPE,
             Test.SESSION,
+            Test.LEVEL,
+            Test.QUESTIONS_COUNT,
             Test.STATUS,
             Test.RESULT,
-            Test.QUESTIONS_COUNT
     };
 
     private static final int ID_COLUMN_ID = 0;
-    private static final int TYPE_COLUMN_ID = 1;
-    private static final int YEAR_COLUMN_ID = 2;
+    private static final int YEAR_COLUMN_ID = 1;
+    private static final int TYPE_COLUMN_ID = 2;
     private static final int SESSION_COLUMN_ID = 3;
-    private static final int STATUS_COLUMN_ID = 4;
-    private static final int RESULT_COLUMN_ID = 5;
-    private static final int QUESTIONS_COUNT_COLUMN_ID = 6;
+    private static final int LEVEL_COLUMN_ID = 4;
+    private static final int QUESTIONS_COUNT_COLUMN_ID = 5;
+    private static final int STATUS_COLUMN_ID = 6;
+    private static final int RESULT_COLUMN_ID = 7;
 
     private long mSubjectId;
 
@@ -82,6 +85,7 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.tests_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mAdapter = new TestAdapter();
         mRecyclerView.setAdapter(mAdapter);
@@ -89,6 +93,7 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
         return view;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -129,6 +134,7 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
     private static class TestVH extends RecyclerView.ViewHolder {
         TextView primaryText;
         TextView secondaryText;
+        View action;
         ImageView actionIcon;
         View bottomShadow;
         View divider;
@@ -137,9 +143,28 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
             super(itemView);
             primaryText = (TextView) itemView.findViewById(R.id.primary_text);
             secondaryText = (TextView) itemView.findViewById(R.id.secondary_text);
+            action = itemView.findViewById(R.id.action);
             actionIcon = (ImageView) itemView.findViewById(R.id.action_icon);
             bottomShadow = itemView.findViewById(R.id.bottom_shadow);
             divider = itemView.findViewById(R.id.divider);
+        }
+
+        public void setActionIcon(int resId) {
+            actionIcon.setImageResource(resId);
+        }
+
+        public void setPrimaryText(String text) {
+            setText(primaryText, text);
+        }
+
+        public void setSecondaryText(String text) {
+            setText(secondaryText, text);
+        }
+
+        private static void setText(TextView textView, String text) {
+            if (!(text.equals(textView.getText()))) {
+                textView.setText(text);
+            }
         }
     }
 
@@ -171,7 +196,7 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
                     TestVH holder = new TestVH(itemView);
 
                     holder.itemView.setOnClickListener(this);
-                    holder.actionIcon.setOnClickListener(this);
+                    holder.action.setOnClickListener(this);
 
                     return holder;
                 case TYPE_SECTION:
@@ -207,55 +232,62 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
         public void onBindItemViewHolder(RecyclerView.ViewHolder holder, Cursor cursor,
                                          int position) {
             TestVH viewHolder = (TestVH) holder;
-            int type = cursor.getInt(TYPE_COLUMN_ID);
             int session = cursor.getInt(SESSION_COLUMN_ID);
-            int status = cursor.getInt(STATUS_COLUMN_ID);
             int result = cursor.getInt(RESULT_COLUMN_ID);
+            String primary = "";
             String description = "";
 
-            switch (type) {
-                case Test.OFFICIAL:
-                    viewHolder.primaryText.setText(R.string.official_test);
-                    if (session == 1) {
-                        description += "I " + getString(R.string.session);
-                    } else if (session == 2) {
-                        description += "II " + getString(R.string.session);
-                    }
+            switch (cursor.getInt(TYPE_COLUMN_ID)) {
+                case Test.TYPE_OFFICIAL:
+                    primary = getString(R.string.official_test);
+                    description = (session == 1 ? "I " : "II ")
+                            + getString(R.string.session);
                     break;
-                case Test.EXPERIMENTAL:
-                    viewHolder.primaryText.setText(R.string.experimental_test);
+                case Test.TYPE_EXPERIMENTAL:
+                    primary = getString(R.string.experimental_test);
                     if (session != 0) {
-                        description += session + " " + getString(R.string.variant);
+                        description = session + " " + getString(R.string.variant);
                     }
                     break;
             }
 
-            if (description.length() != 0) {
-                description += ", ";
+            switch (cursor.getInt(LEVEL_COLUMN_ID)) {
+                case Test.LEVEL_BASIC:
+                    primary += " " + getString(R.string.level_basic);
+                    break;
+                case Test.LEVEL_SPECIALIZED:
+                    primary += " " + getString(R.string.level_specialized);
+                    break;
             }
+
+            viewHolder.setPrimaryText(primary);
+
+            int status = cursor.getInt(STATUS_COLUMN_ID);
 
             if (status == Test.STATUS_IDLE) {
                 if (result == Test.NO_LOADED_DATA) {
+                    viewHolder.setActionIcon(R.drawable.ic_file_download_black_24dp);
+                    description += (isEmpty(description) ? "" : ", ");
                     description += getString(R.string.needed_to_download);
-                    viewHolder.actionIcon.setImageResource(R.drawable.ic_file_download_black_24dp);
                 } else if (result == Test.TEST_LOADED) {
-                    viewHolder.actionIcon.setImageResource(R.drawable.ic_delete_black_24dp);
-                    int questionsCount = cursor.getInt(QUESTIONS_COUNT_COLUMN_ID);
-                    description += " " + questionsCount + " ";
-                    switch (questionsCount) {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                            description += getString(R.string.tasks);
-                            break;
-                        default:
-                            description += getString(R.string.tasks_genitive);
-                    }
+                    viewHolder.setActionIcon(R.drawable.ic_delete_black_24dp);
+                    description += (isEmpty(description) ? "" : ", ");
+                    description += buildQuestionsCount(cursor.getInt(QUESTIONS_COUNT_COLUMN_ID));
+                } else {
+                    viewHolder.setActionIcon(R.drawable.ic_refresh_black_24dp);
+                    description = getString(R.string.downloading_error);
                 }
+
+                viewHolder.actionIcon.setVisibility(View.VISIBLE);
+            } else if (status == Test.STATUS_DELETING) {
+                viewHolder.actionIcon.setVisibility(View.GONE);
+                description = getString(R.string.deleting);
+            } else {
+                viewHolder.actionIcon.setVisibility(View.GONE);
+                description = getString(R.string.downloading);
             }
 
-            viewHolder.secondaryText.setText(description);
+            viewHolder.setSecondaryText(description);
 
             if (position == getItemCount() - 1) {
                 viewHolder.bottomShadow.setVisibility(View.VISIBLE);
@@ -268,7 +300,7 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
 
                 viewHolder.bottomShadow.setVisibility(View.GONE);
             }
-            viewHolder.actionIcon.setTag(position);
+            viewHolder.action.setTag(position);
         }
 
         @Override
@@ -282,9 +314,21 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
                 viewHolder.topShadow.setVisibility(View.VISIBLE);
         }
 
+        private String buildQuestionsCount(int questionsCount) {
+            switch (questionsCount % 10) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    return questionsCount + " " + getString(R.string.tasks);
+                default:
+                    return questionsCount + " " + getString(R.string.tasks_genitive);
+            }
+        }
+
         @Override
         public void onClick(View v) {
-            int position = getItemPosition((v.getId() == R.id.action_icon) ?
+            int position = getItemPosition((v.getId() == R.id.action) ?
                     (int) v.getTag() : mRecyclerView.getChildLayoutPosition(v));
             Cursor cursor = getCursor();
             if (cursor.moveToPosition(position)) {
@@ -292,13 +336,17 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
                 int status = cursor.getInt(STATUS_COLUMN_ID);
                 int result = cursor.getInt(RESULT_COLUMN_ID);
 
-                if (result == Test.TEST_LOADED) {
-                    if (v.getId() == R.id.action_icon)
-                        mListener.onStartDeletingTest(id);
-                    else
-                        mListener.onStartPassingTest(id);
-                } else if (result == Test.NO_LOADED_DATA && status == Test.STATUS_IDLE) {
-                    mListener.onStartDownloadingTest(id);
+                if (status == Test.STATUS_IDLE) {
+                    if (result == Test.TEST_LOADED) {
+                        if (v.getId() == R.id.action)
+                            mListener.onStartDeletingTest(id);
+                        else
+                            mListener.onStartPassingTest(id);
+                    } else if (result == Test.NO_LOADED_DATA) {
+                        mListener.onStartDownloadingTest(id);
+                    } else {
+                        mListener.onReStartDownloadingTest(id);
+                    }
                 }
             }
         }
@@ -317,6 +365,11 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
          * @param id unique id od the row of the test in the database.
          */
         void onStartDownloadingTest(long id);
+
+        /**
+         * @param id unique id od the row of the test in the database.
+         */
+        void onReStartDownloadingTest(long id);
 
         /**
          * @param id unique id od the row of the test in the database.

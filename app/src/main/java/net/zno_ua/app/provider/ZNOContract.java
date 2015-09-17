@@ -70,10 +70,15 @@ public class ZNOContract {
          */
         String TYPE = "type";
         /**
-         * Session if the official test or variant of the experimental test.
+         * Number of the session if the official test or variant of the experimental test.
          * <P>Type: INTEGER</P>
          */
         String SESSION = "session";
+        /**
+         * Level of the test session.
+         * <P>Type: INTEGER</P>
+         */
+        String LEVEL = "level";
         /**
          * The time allotted for passing the test.
          * <P>Type: INTEGER</P>
@@ -268,22 +273,24 @@ public class ZNOContract {
 
     public static class Test implements TestColumns, BaseColumns, RESTColumns {
         /**
-         * RESULT value that indicates that resources data didn't loaded
+         * RESULT value that indicates that resources data didn't loaded.
          */
         public static final int NO_LOADED_DATA = 0x0;
         /**
-         * RESULT bit value that indicates that questions are loaded
+         * RESULT bit value that indicates that questions are loaded.
          */
         public static final int QUESTIONS_LOADED = 0x1;
         /**
-         * RESULT bit value that indicates that points are loaded
+         * RESULT bit value that indicates that points are loaded.
          */
         public static final int POINTS_LOADED = 0x2;
         /**
-         * RESULT bit value that indicates that images are loaded
+         * RESULT bit value that indicates that images are loaded.
          */
         public static final int IMAGES_LOADED = 0x4;
-
+        /**
+         * RESULT value that indicates that resources data were loaded.
+         */
         public static final int TEST_LOADED = QUESTIONS_LOADED | POINTS_LOADED | IMAGES_LOADED;
 
         /**
@@ -292,13 +299,25 @@ public class ZNOContract {
         public static final int STATUS_IDLE = 0x0;
 
         /**
+         * STATUS value that indicates that processor downloading this resource.
+         */
+        public static final int STATUS_DOWNLOADING = 0x1;
+        /**
+         * STATUS value that indicates that processor deleting this resource.
+         */
+        public static final int STATUS_DELETING = 0x2;
+
+        /**
          * Official test type.
          */
-        public static final int OFFICIAL = 0x0;
+        public static final int TYPE_OFFICIAL = 0x0;
         /**
          * Experimental test type.
          */
-        public static final int EXPERIMENTAL = 0x1;
+        public static final int TYPE_EXPERIMENTAL = 0x1;
+
+        public static final int LEVEL_BASIC = 0x1;
+        public static final int LEVEL_SPECIALIZED = 0x2;
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_TEST).build();
@@ -308,37 +327,16 @@ public class ZNOContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_TEST;
 
-        public static final String[] PROJECTION = {
-                _ID,
-                SUBJECT_ID,
-                QUESTIONS_COUNT,
-                TYPE,
-                SESSION,
-                TIME,
-                YEAR,
-                LAST_UPDATE,
-                STATUS,
-                RESULT
-        };
-
-        public interface PROJECTION_ID {
-            int _ID = 0;
-            int SUBJECT_ID = 1;
-            int QUESTIONS_COUNT = 2;
-            int TYPE = 3;
-            int SESSION = 4;
-            int TIME = 5;
-            int YEAR = 6;
-            int LAST_UPDATE = 7;
-            int STATUS = 8;
-            int RESULT = 9;
-        }
-
         public static Uri buildTestItemUri(long id) {
             return buildItemUri(CONTENT_URI, id);
         }
 
-        public static final String SORT_ORDER = YEAR + DESC;
+        public static boolean testResult(int result, int mask) {
+            return (result & mask) == mask;
+        }
+
+        public static final String SORT_ORDER = YEAR + DESC + "," + TYPE + ASC
+                + "," + SESSION + ASC + "," + LEVEL + ASC;
     }
 
     public static class Question implements QuestionColumns, BaseColumns {
@@ -438,6 +436,8 @@ public class ZNOContract {
                 ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_POINT;
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_POINT;
+
+        public static final String SORT_ORDER = TEST_POINT + ASC;
     }
 
     private static Uri buildItemUri(Uri contentUri, Object item) {
