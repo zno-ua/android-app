@@ -1,5 +1,6 @@
 package net.zno_ua.app.ui;
 
+import android.annotation.SuppressLint;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -26,7 +27,6 @@ import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,7 +44,6 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import net.zno_ua.app.FileManager;
 import net.zno_ua.app.R;
 import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.adapter.CursorRecyclerViewAdapter;
@@ -164,9 +163,11 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
             testId = getIntent().getLongExtra(Extra.TEST_ID, -1);
             cursor = getContentResolver()
                     .query(buildTestItemUri(testId), new String[]{Test.SUBJECT_ID}, null, null, null);
-            cursor.moveToFirst();
-            subjectId = cursor.getLong(0);
-            cursor.close();
+            if (cursor != null) {
+                cursor.moveToFirst();
+                subjectId = cursor.getLong(0);
+                cursor.close();
+            }
             timerMode = getIntent().getBooleanExtra(Extra.TIMER_MODE, false);
             switch (getIntent().getAction()) {
                 case Action.PASS_TEST:
@@ -202,17 +203,21 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
         if (timerMode) {
             cursor = getContentResolver()
                     .query(buildTestItemUri(testId), new String[]{Test.TIME}, null, null, null);
-            if (cursor.moveToFirst() && cursor.getCount() == 1) {
-                time = 60000L * cursor.getLong(0);
+            if (cursor != null) {
+                if (cursor.moveToFirst() && cursor.getCount() == 1) {
+                    time = 60000L * cursor.getLong(0);
+                }
+                cursor.close();
             }
-            cursor.close();
 
             cursor = getContentResolver()
                     .query(buildTestingItemUri(testingId), new String[]{Testing.ELAPSED_TIME}, null, null, null);
-            if (cursor.moveToFirst() && cursor.getCount() == 1) {
-                elapsedTime = cursor.isNull(0) ? 0 : cursor.getLong(0);
+            if (cursor != null) {
+                if (cursor.moveToFirst() && cursor.getCount() == 1) {
+                    elapsedTime = cursor.isNull(0) ? 0 : cursor.getLong(0);
+                }
+                cursor.close();
             }
-            cursor.close();
         }
         mImageGetter = new ImageGetter(this);
 
@@ -254,10 +259,12 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
         Cursor cursor = getContentResolver().query(
                 buildSubjectUri(subjectId), new String[]{Subject.NAME_GENITIVE}, null, null, null
         );
-        cursor.moveToFirst();
-        //noinspection ConstantConditions
-        getSupportActionBar().setSubtitle(getString(R.string.of) + " " + cursor.getString(0));
-        cursor.close();
+        if (cursor != null) {
+            cursor.moveToFirst();
+            //noinspection ConstantConditions
+            getSupportActionBar().setSubtitle(getString(R.string.of) + " " + cursor.getString(0));
+            cursor.close();
+        }
     }
 
     private void initQuestionsList() {
@@ -489,15 +496,17 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
                         new String[]{valueOf(testId), valueOf(testPoint)},
                         Point.SORT_ORDER);
 
-        if (cursor.moveToFirst()) {
-            if (testPoint >= cursor.getCount())
-                cursor.moveToLast();
-            else
-                cursor.moveToPosition(testPoint);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                if (testPoint >= cursor.getCount())
+                    cursor.moveToLast();
+                else
+                    cursor.moveToPosition(testPoint);
 
-            point = cursor.getFloat(0);
+                point = cursor.getFloat(0);
+            }
+            cursor.close();
         }
-        cursor.close();
 
         return point;
     }
@@ -580,6 +589,7 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
             }
         }
 
+        @SuppressLint("SetTextI18n")
         public void setNumber(int number, int count) {
             number1.setText(QUESTION + " " + number);
             number2.setText(number + "/" + count);
@@ -1057,6 +1067,7 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
             divider = itemView.findViewById(R.id.divider);
         }
 
+        @SuppressLint("SetTextI18n")
         public void setAnswers(int number, char correctAnswer, char userAnswer) {
             if (userAnswer == '0') {
                 userAnswerText.setText("—");
@@ -1073,6 +1084,7 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
             setCorrectAnswer(number, -1);
         }
 
+        @SuppressLint("SetTextI18n")
         private void setCorrectAnswer(int number, int answer) {
             numberText.setText((number + 1) + ". — ");
             if (answer != -1) {
@@ -1163,6 +1175,7 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
             }
         }
 
+        @SuppressLint("SetTextI18n")
         private void onBindSimpleAnswerViewHolder(SimpleAnswerVH viewHolder, int position) {
             viewHolder.letter.setText(Character.toString((char) (firstLetter + position)) + ".");
             viewHolder.text.setText(fromHtml(mAnswers[position], mImageGetter, null));
