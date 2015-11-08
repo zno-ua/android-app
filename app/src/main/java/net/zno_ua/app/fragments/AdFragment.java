@@ -76,7 +76,6 @@ public class AdFragment extends Fragment {
             if (BuildConfig.DEBUG) {
                 AD_REQUEST = new AdRequest.Builder()
                         .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                        .addTestDevice(ZNOApplication.DEVICE_IOCEAN_X_7)
                         .build();
                 AD_UNIT_ID = getString(R.string.test_banner_ad_unit_id);
             } else {

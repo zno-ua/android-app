@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="net.zno_ua.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -10,91 +11,15 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/zno"
-        android:theme="@style/MainTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup">
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".MainActivityOld"
-            android:label="@string/zno"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".LessonsActivity"
-            android:label="@string/testing_activity_label">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivityOld" />
-        </activity>
-        <activity
-            android:name=".TestsActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.zno_ua.app.LessonsActivity" />
-        </activity>
-        <activity
-            android:name=".RecordsActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivityOld" />
-
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <action android:name="net.zno_ua.app.VIEW_PASSED_TESTS" />
-                <action android:name="net.zno_ua.app.VIEW_BEST_SCORES" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".TestActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.zno_ua.app.TestsActivity" />
-
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <action android:name="net.zno_ua.app.VIEW_TEST" />
-                <action android:name="net.zno_ua.app.PASS_TEST" />
-                <action android:name="net.zno_ua.app.CONTINUE_PASSAGE_TEST" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
-        <activity
-            android:name=".ViewImageActivity"
-            android:noHistory="true"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <action android:name="android.intent.action.VIEW" />
-
-                <data android:scheme="open.image" />
-            </intent-filter>
-        </activity>
-
-        <service
-            android:name=".service.ApiService"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <action android:name="api.CHECK_FOR_UPDATES" />
-            </intent-filter>
-        </service>
 
         <receiver android:name=".NetWatcher">
             <intent-filter>
@@ -124,8 +49,7 @@
             android:theme="@style/AppTheme.TransparentStatus" />
         <activity
             android:name=".ui.TestingActivity"
-            android:label="@string/empty"
-            android:theme="@style/AppTheme">
+            android:label="@string/empty">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
@@ -151,11 +75,12 @@
             android:theme="@style/AppTheme.Translucent">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <action android:name="android.intent.action.VIEW" />
+
                 <data android:scheme="image" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

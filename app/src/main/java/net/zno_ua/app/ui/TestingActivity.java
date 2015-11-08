@@ -876,8 +876,10 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
                     saveUserAnswer(getItemId(position), answer);
                 }
             });
-            if (viewMode) {
+            if (viewMode && viewType == Question.TYPE_1) {
                 viewHolder.setUnansweredWarning(answer == null);
+            } else {
+                viewHolder.setUnansweredWarning(false);
             }
         }
 
@@ -1183,7 +1185,7 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
             if (viewMode) {
                 if (parseInt(mCorrectAnswer) - 1 == position)
                     viewHolder.setTextColor(colorGreen700);
-                else if (parseInt(mAnswer) - 1 == position)
+                else if (mAnswer != null && parseInt(mAnswer) - 1 == position)
                     viewHolder.setTextColor(colorRed700);
                 else
                     viewHolder.setTextColor(ContextCompat.getColor(mContext, R.color.primary_text_default_material_light));
@@ -1218,15 +1220,17 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
                 mAnswersType = TYPE_SIMPLE;
                 mAnswers = answers.split("\n");
                 mAnswersCount = mAnswers.length;
+                mCorrectAnswer = correctAnswer;
+                notifyDataSetChanged();
                 selectSimpleAnswer(answer == null ? -1 : (parseInt(answer) - 1), false);
             } else if (answersType == Question.TYPE_3) {
                 mAnswersType = TYPE_COMPLEX;
                 mAnswers = answers.split("-");
                 mAnswersCount = parseInt(mAnswers[0]);
                 mAnswer = answer == null ? buildComplexAnswer(mAnswersCount) : answer;
+                mCorrectAnswer = correctAnswer;
+                notifyDataSetChanged();
             }
-            mCorrectAnswer = correctAnswer;
-            notifyDataSetChanged();
         }
 
         private String buildComplexAnswer(int answersCount) {
@@ -1259,8 +1263,9 @@ public class TestingActivity extends AppCompatActivity implements View.OnClickLi
             }
 
             viewHolder = mLayout.getChildViewHolder(newAnswerPosition);
-            if (viewHolder != null)
+            if (viewHolder != null) {
                 viewHolder.mItemView.setSelected(true);
+            }
 
             mAnswer = "" + (newAnswerPosition + 1);
             if (fromUser)

@@ -1,11 +1,9 @@
 package net.zno_ua.app.ui;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
@@ -46,10 +44,6 @@ public class SubjectsFragment extends Fragment implements LoaderManager.LoaderCa
     private OnSubjectSelectedListener mSubjectSelectedListener;
 
     public SubjectsFragment() {
-    }
-
-    public static SubjectsFragment newInstance() {
-        return new SubjectsFragment();
     }
 
     @Override

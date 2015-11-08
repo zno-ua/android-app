@@ -1,6 +1,5 @@
 package net.zno_ua.app.ui;
 
-import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -16,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,22 +25,21 @@ import com.squareup.picasso.Picasso;
 import net.zno_ua.app.R;
 import net.zno_ua.app.util.UiUtils;
 
+import java.util.Calendar;
+
 import static java.lang.String.valueOf;
-import static net.zno_ua.app.provider.ZNOContract.Testing;
 import static net.zno_ua.app.provider.ZNOContract.Answer;
+import static net.zno_ua.app.provider.ZNOContract.Testing;
 import static net.zno_ua.app.provider.ZNOContract.Testing.COLUMN_ID;
 import static net.zno_ua.app.provider.ZNOContract.Testing.buildTestingItemUri;
 import static net.zno_ua.app.ui.TestingActivity.Action;
 import static net.zno_ua.app.ui.TestingActivity.Extra;
-
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity
         implements SubjectsFragment.OnSubjectSelectedListener,
         NavigationView.OnNavigationItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private Toolbar mToolBar;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
 
@@ -49,55 +48,43 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        init();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setUpActionBar(toolbar);
+        setUpNavigationDrawerLayout(toolbar);
+
         getLoaderManager().initLoader(0, null, this);
     }
 
-    private void init() {
-        initToolBar();
-        initDrawerLayout();
-        initMainContent();
-    }
-
-    private void initToolBar() {
-        mToolBar = (Toolbar) findViewById(R.id.tool_bar);
-        setSupportActionBar(mToolBar);
+    private void setUpActionBar(Toolbar toolBar) {
+        setSupportActionBar(toolBar);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
-    private void initDrawerLayout() {
+    private void setUpNavigationDrawerLayout(Toolbar toolBar) {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(
                 UiUtils.getThemeAttribute(this, R.attr.colorPrimaryDark).resourceId
         );
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        NavigationView navigationView =
-                (NavigationView) mDrawerLayout.findViewById(R.id.navigation_view);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
-        ImageView backgroundImage = (ImageView) navigationView.findViewById(R.id.image);
+
+        View headerView = navigationView.inflateHeaderView(R.layout.drawer_header);
+
+        ImageView backgroundImage = (ImageView) headerView.findViewById(R.id.image);
         Picasso.with(this).load(R.drawable.ic_zno)
                 .fit()
                 .centerCrop()
                 .into(backgroundImage);
 
         Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR) + ((calendar.get(Calendar.MONTH) >= 7) ? 0 : 1);
+        int year = calendar.get(Calendar.YEAR) + ((calendar.get(Calendar.MONTH) < 7) ? 0 : 1);
 
-        ((TextView) navigationView.findViewById(R.id.text))
-                .setText(String.format("%s %d", getString(R.string.zno), year));
-
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolBar, 0, 0);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-    }
-
-    private void initMainContent() {
-        //noinspection ConstantConditions
-        getSupportActionBar().setTitle(R.string.testing);
-        Fragment fragment = SubjectsFragment.newInstance();
-        getFragmentManager().beginTransaction()
-                .add(R.id.main_content, fragment)
-                .commit();
+        TextView headerTitle = (TextView) headerView.findViewById(R.id.text);
+        headerTitle.setText(String.format("%s %d", getString(R.string.zno), year));
     }
 
     @Override
@@ -189,7 +176,7 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra(Extra.TEST_ID, data.getLong(COLUMN_ID.TEST_ID));
         intent.putExtra(Extra.TESTING_ID, data.getLong(COLUMN_ID.ID));
         intent.putExtra(Extra.TIMER_MODE, !data.isNull(COLUMN_ID.ELAPSED_TIME) &&
-                        data.getLong(COLUMN_ID.ELAPSED_TIME) != -1);
+                data.getLong(COLUMN_ID.ELAPSED_TIME) != -1);
         startActivity(intent);
     }
 
