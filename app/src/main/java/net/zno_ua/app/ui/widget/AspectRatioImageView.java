@@ -8,7 +8,9 @@ import android.widget.ImageView;
 
 import net.zno_ua.app.R;
 
-/** Maintains an aspect ratio based on either width or height. Disabled by default. */
+/**
+ * Maintains an aspect ratio based on either width or height. Disabled by default.
+ */
 public class AspectRatioImageView extends ImageView {
     // NOTE: These must be kept in sync with the AspectRatioImageView attributes in attrs.xml.
     public static final int MEASUREMENT_WIDTH = 0;
@@ -38,7 +40,8 @@ public class AspectRatioImageView extends ImageView {
         a.recycle();
     }
 
-    @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (!aspectRatioEnabled) return;
 
@@ -62,12 +65,16 @@ public class AspectRatioImageView extends ImageView {
         setMeasuredDimension(newWidth, newHeight);
     }
 
-    /** Get the aspect ratio for this image view. */
+    /**
+     * Get the aspect ratio for this image view.
+     */
     public float getAspectRatio() {
         return aspectRatio;
     }
 
-    /** Set the aspect ratio for this image view. This will update the view instantly. */
+    /**
+     * Set the aspect ratio for this image view. This will update the view instantly.
+     */
     public void setAspectRatio(float aspectRatio) {
         this.aspectRatio = aspectRatio;
         if (aspectRatioEnabled) {
@@ -75,18 +82,24 @@ public class AspectRatioImageView extends ImageView {
         }
     }
 
-    /** Get whether or not forcing the aspect ratio is enabled. */
+    /**
+     * Get whether or not forcing the aspect ratio is enabled.
+     */
     public boolean getAspectRatioEnabled() {
         return aspectRatioEnabled;
     }
 
-    /** set whether or not forcing the aspect ratio is enabled. This will re-layout the view. */
+    /**
+     * set whether or not forcing the aspect ratio is enabled. This will re-layout the view.
+     */
     public void setAspectRatioEnabled(boolean aspectRatioEnabled) {
         this.aspectRatioEnabled = aspectRatioEnabled;
         requestLayout();
     }
 
-    /** Get the dominant measurement for the aspect ratio. */
+    /**
+     * Get the dominant measurement for the aspect ratio.
+     */
     public int getDominantMeasurement() {
         return dominantMeasurement;
     }

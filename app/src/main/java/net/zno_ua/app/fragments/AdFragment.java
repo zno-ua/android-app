@@ -16,7 +16,6 @@ import com.google.android.gms.ads.AdView;
 
 import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.R;
-import net.zno_ua.app.ZNOApplication;
 
 public class AdFragment extends Fragment {
 

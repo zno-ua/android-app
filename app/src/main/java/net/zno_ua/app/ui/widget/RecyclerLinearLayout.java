@@ -5,11 +5,13 @@ import android.content.Context;
 import android.database.Observable;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * @author Vojko Vladimir
@@ -18,28 +20,39 @@ public class RecyclerLinearLayout extends LinearLayout {
 
     public static final int NO_POSITION = -1;
 
+    private SparseArray<Stack<ViewHolder>> mCachedViews;
     private ArrayList<ViewHolder> mHolders = new ArrayList<>();
     private Adapter<ViewHolder> mAdapter;
     private RecyclerLinearLayoutDataObserver mObserver = new RecyclerLinearLayoutDataObserver();
 
     public RecyclerLinearLayout(Context context) {
         super(context);
+        init();
     }
 
     public RecyclerLinearLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
     public RecyclerLinearLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public RecyclerLinearLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        init();
+    }
+
+    private void init() {
+        mCachedViews = new SparseArray<>();
     }
 
     public void setAdapter(Adapter<ViewHolder> adapter) {
+        if (mAdapter == adapter)
+            return;
         if (mAdapter != null) {
             mAdapter.onDetachedFromLayout(this);
             mAdapter.unregisterAdapterDataObserver(mObserver);
@@ -49,7 +62,22 @@ public class RecyclerLinearLayout extends LinearLayout {
             adapter.registerAdapterDataObserver(mObserver);
             adapter.onAttachedToLayout(this);
         }
+        prepareCashedViews();
         recycle();
+    }
+
+    private void prepareCashedViews() {
+        mCachedViews.clear();
+        if (mAdapter != null) {
+            Stack<ViewHolder> viewHolders;
+            for (int viewType : mAdapter.getItemViewTypes()) {
+                viewHolders = new Stack<>();
+                for (int j = 0; j < mAdapter.getCachedViewHoldersCapacity(); j++) {
+                    viewHolders.add(mAdapter.createViewHolder(this, viewType));
+                }
+                mCachedViews.put(viewType, viewHolders);
+            }
+        }
     }
 
     public Adapter<ViewHolder> getAdapter() {
@@ -57,33 +85,50 @@ public class RecyclerLinearLayout extends LinearLayout {
     }
 
     private void recycle() {
+        if (mAdapter == null) {
+            mHolders.clear();
+            removeAllViews();
+        }
         if (mHolders.size() != mAdapter.getItemCount()) {
             if (mHolders.size() < mAdapter.getItemCount()) {
                 for (int i = mHolders.size(); i < mAdapter.getItemCount(); i++) {
-                    mHolders.add(mAdapter.createViewHolder(this, mAdapter.getItemViewType(i)));
+                    mHolders.add(getViewHolder(mAdapter.getItemViewType(i)));
                     addView(mHolders.get(i).mItemView, i);
                 }
             }
 
             if (mHolders.size() > mAdapter.getItemCount()) {
                 for (int i = mHolders.size() - 1; i > mAdapter.getItemCount() - 1; i--) {
-                    mHolders.remove(i);
+                    cacheViewHolder(mHolders.remove(i));
                     removeViewAt(i);
                 }
             }
         }
 
+        int itemViewType;
         for (int i = 0; i < mAdapter.getItemCount(); i++) {
-            if (mHolders.get(i).mItemViewType != mAdapter.getItemViewType(i)) {
-                ViewHolder newViewHolder = mAdapter
-                        .createViewHolder(this, mAdapter.getItemViewType(i));
-                removeView(mHolders.get(i).mItemView);
-                mHolders.set(i, newViewHolder);
-                addView(newViewHolder.mItemView, i);
+            itemViewType = mAdapter.getItemViewType(i);
+            if (mHolders.get(i).mItemViewType != itemViewType) {
+                cacheViewHolder(mHolders.get(i));
+                removeViewAt(i);
+                mHolders.set(i, getViewHolder(itemViewType));
+                addView(mHolders.get(i).mItemView, i);
             }
 
             mAdapter.bindViewHolder(mHolders.get(i), i);
         }
+    }
+
+    private ViewHolder getViewHolder(int viewType) {
+        Stack<ViewHolder> holders = mCachedViews.get(viewType);
+        if (holders.size() > 0)
+            return holders.pop();
+
+        return mAdapter.createViewHolder(this, viewType);
+    }
+
+    private void cacheViewHolder(ViewHolder holder) {
+        mCachedViews.get(holder.getItemViewType()).push(holder);
     }
 
     public ViewHolder getChildViewHolder(int position) {
@@ -126,16 +171,22 @@ public class RecyclerLinearLayout extends LinearLayout {
     }
 
     public static abstract class ViewHolder {
-        public int mItemViewType;
+        int mItemViewType;
         public final View mItemView;
         int mPosition = NO_POSITION;
 
         public ViewHolder(View itemView) {
             mItemView = itemView;
         }
+
+        public int getItemViewType() {
+            return mItemViewType;
+        }
     }
 
     public static abstract class Adapter<VH extends RecyclerLinearLayout.ViewHolder> {
+
+        private static final int CACHED_VIEW_HOLDERS_CAPACITY = 0;
 
         private final AdapterDataObservable mObservable = new AdapterDataObservable();
 
@@ -179,6 +230,12 @@ public class RecyclerLinearLayout extends LinearLayout {
 
         protected void onDetachedFromLayout(RecyclerLinearLayout layout) {
             // noop
+        }
+
+        public abstract int[] getItemViewTypes();
+
+        private int getCachedViewHoldersCapacity() {
+            return CACHED_VIEW_HOLDERS_CAPACITY;
         }
     }
 }

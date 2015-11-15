@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/list_item_background">
@@ -27,13 +28,14 @@
             android:layout_toRightOf="@id/letter"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/answer_text_color"
-            android:textSize="@dimen/abc_text_size_small_material" />
+            android:textSize="@dimen/abc_text_size_small_material"
+            tools:ignore="RtlHardcoded" />
     </RelativeLayout>
 
     <include
+        layout="@layout/item_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_gravity="bottom"
-        layout="@layout/question_item_divider" />
+        android:layout_gravity="bottom" />
 
 </FrameLayout>

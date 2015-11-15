@@ -8,22 +8,23 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import static net.zno_ua.app.provider.ZNOContract.Answer;
+import static net.zno_ua.app.provider.ZNOContract.Point;
 import static net.zno_ua.app.provider.ZNOContract.Question;
 import static net.zno_ua.app.provider.ZNOContract.QuestionAndAnswer;
 import static net.zno_ua.app.provider.ZNOContract.Subject;
 import static net.zno_ua.app.provider.ZNOContract.Test;
-import static net.zno_ua.app.provider.ZNOContract.Answer;
 import static net.zno_ua.app.provider.ZNOContract.Testing;
-import static net.zno_ua.app.provider.ZNOContract.Point;
 import static net.zno_ua.app.provider.ZNODatabase.Tables;
 
 /**
  * @author Vojko Vladimir
  */
 public class ZNOProvider extends ContentProvider {
-    
+
     private static final String EQ = " = ";
 
     private ZNODatabase mDatabaseHelper;
@@ -54,24 +55,24 @@ public class ZNOProvider extends ContentProvider {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = ZNOContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority, "subject" , URI_CODE.SUBJECT);
-        matcher.addURI(authority, "subject/#" , URI_CODE.SUBJECT_ID);
+        matcher.addURI(authority, "subject", URI_CODE.SUBJECT);
+        matcher.addURI(authority, "subject/#", URI_CODE.SUBJECT_ID);
 
-        matcher.addURI(authority, "test" , URI_CODE.TEST);
-        matcher.addURI(authority, "test/#" , URI_CODE.TEST_ID);
+        matcher.addURI(authority, "test", URI_CODE.TEST);
+        matcher.addURI(authority, "test/#", URI_CODE.TEST_ID);
 
-        matcher.addURI(authority, "question" , URI_CODE.QUESTION);
-        matcher.addURI(authority, "question/#" , URI_CODE.QUESTION_ID);
-        matcher.addURI(authority, "question_and_answer" , URI_CODE.QUESTION_AND_ANSWER);
+        matcher.addURI(authority, "question", URI_CODE.QUESTION);
+        matcher.addURI(authority, "question/#", URI_CODE.QUESTION_ID);
+        matcher.addURI(authority, "question_and_answer", URI_CODE.QUESTION_AND_ANSWER);
 
-        matcher.addURI(authority, "answer" , URI_CODE.ANSWER);
-        matcher.addURI(authority, "answer/#" , URI_CODE.ANSWER_ID);
+        matcher.addURI(authority, "answer", URI_CODE.ANSWER);
+        matcher.addURI(authority, "answer/#", URI_CODE.ANSWER_ID);
 
-        matcher.addURI(authority, "testing" , URI_CODE.TESTING);
-        matcher.addURI(authority, "testing/#" , URI_CODE.TESTING_ID);
+        matcher.addURI(authority, "testing", URI_CODE.TESTING);
+        matcher.addURI(authority, "testing/#", URI_CODE.TESTING_ID);
 
-        matcher.addURI(authority, "point" , URI_CODE.POINT);
-        matcher.addURI(authority, "point/#" , URI_CODE.POINT_ID);
+        matcher.addURI(authority, "point", URI_CODE.POINT);
+        matcher.addURI(authority, "point/#", URI_CODE.POINT_ID);
 
         return matcher;
     }
@@ -83,7 +84,7 @@ public class ZNOProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs,
                         String sortOrder) {
         final SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
         final SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
@@ -149,13 +150,14 @@ public class ZNOProvider extends ContentProvider {
                 null,
                 sortOrder);
 
+        //noinspection ConstantConditions
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
         return cursor;
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
@@ -191,7 +193,7 @@ public class ZNOProvider extends ContentProvider {
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         final SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         String table;
@@ -228,7 +230,7 @@ public class ZNOProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
         int deleteCount;
         String table;
@@ -291,7 +293,8 @@ public class ZNOProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection,
+                      String[] selectionArgs) {
         final SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
         int updateCount;
         String table;
@@ -362,6 +365,7 @@ public class ZNOProvider extends ContentProvider {
         notifyChange(uri);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void notifyChange(Uri uri) {
         getContext().getContentResolver().notifyChange(uri, null, false);
     }

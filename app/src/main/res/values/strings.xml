@@ -109,15 +109,15 @@
     <string name="tasks">завдання</string>
     <string name="tasks_genitive">завдань</string>
     <string name="read_text">Прочитати текс</string>
-    <string name="read_text_eng">read text</string>
-    <string name="question">Запитання</string>
-    <string name="question_eng">Question</string>
+    <string name="read_text_en">read text</string>
+    <string name="question_format">Запитання %d</string>
+    <string name="question_en_format">Question %d</string>
     <string name="close">закрити</string>
-    <string name="close_eng">close</string>
+    <string name="close_en">close</string>
     <string name="text_for_reading">Текст для читання</string>
-    <string name="text_for_reading_eng">Text for reading</string>
+    <string name="text_for_reading_en">Text for reading</string>
     <string name="choose_point">Оберіть бал, на який розраховуєте:</string>
-    <string name="chosen_point">Обраний бал — </string>
+    <string name="chosen_point_format">Обраний бал — %1$s</string>
     <string name="time_one_left">Залишилась %1$d %2$s.</string>
     <string name="time_two_four_left">Залишилось %1$d %2$s.</string>
     <string name="time_left">Залишилось %1$d %2$s.</string>
@@ -160,5 +160,16 @@
     <string name="view">подивитися</string>
     <string name="do_not_view">не дивитися</string>
     <string name="deleting">Видаляеться…</string>
+    <string name="html_format">
+        <![CDATA[
+        <html>
+            <head>
+                <link href="file:///android_asset/style/question.css" rel="stylesheet" type="text/css">
+                <style> html, body, table { font-size: %1$dpx; } </style>
+            </head>
+            <body>%2$s</body>
+        </html>
+        ]]>
+    </string>
 
 </resources>

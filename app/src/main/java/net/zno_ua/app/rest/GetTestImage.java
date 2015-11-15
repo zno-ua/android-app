@@ -3,7 +3,6 @@ package net.zno_ua.app.rest;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.RequestFuture;

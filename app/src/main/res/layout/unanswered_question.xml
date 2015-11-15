@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/card_padding"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="@string/unanswered_question_warning"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@color/red_700"
+        android:textSize="@dimen/abc_text_size_small_material"
+        android:textStyle="bold" />
+
+    <include layout="@layout/item_divider" />
+
+</LinearLayout>

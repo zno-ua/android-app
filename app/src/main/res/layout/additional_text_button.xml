@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/read_text_button"
+    style="@style/AppCompat.Button.Flat.Common"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/read_text"
+    android:textColor="?attr/colorAccent" />

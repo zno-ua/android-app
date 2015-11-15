@@ -400,6 +400,10 @@ public class ZNOContract {
          * Status indicates that testing is in progress.
          */
         public static final int IN_PROGRESS = 0x1;
+        /**
+         * Elapsed time for testing without timer.
+         */
+        public static final long NO_TIME = -1;
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_TESTING).build();

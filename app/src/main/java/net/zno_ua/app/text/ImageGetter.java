@@ -1,66 +1,63 @@
 package net.zno_ua.app.text;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.text.Html;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import android.view.View;
 
-import net.zno_ua.app.FileManager;
 import net.zno_ua.app.R;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 
 /**
  * @author Vojko Vladimir
  */
 public class ImageGetter implements Html.ImageGetter {
 
-    public static final int UNDEFINED_WIDTH = -1;
-    private DisplayMetrics mDisplayMetrics;
-    private FileManager mFileManager;
-    private Drawable noImageDrawable;
-    private int maxWidth = UNDEFINED_WIDTH;
+    private static final int ERROR_DRAWABLE_RES_ID = R.drawable.emo_im_crying;
 
-    public ImageGetter(Context context) {
-        mDisplayMetrics = context.getResources().getDisplayMetrics();
-        mFileManager = new FileManager(context);
-        /*
-        * TODO: replace with correct image.
-        * */
-        noImageDrawable = ContextCompat.getDrawable(context, R.drawable.emo_im_crying);
+    private final View mContainer;
+    private final Context mContext;
+
+    public ImageGetter(View container) {
+        mContainer = container;
+        mContext = container.getContext();
     }
 
     @Override
     public Drawable getDrawable(String source) {
-        try {
-            Drawable drawable = mFileManager.openDrawable(source);
+        Resources res = mContext.getResources();
+        DisplayMetrics displayMetrics = res.getDisplayMetrics();
+        File image = new File(mContext.getFilesDir(), source);
 
-            int width = (int) (drawable.getIntrinsicWidth() * mDisplayMetrics.scaledDensity);
-            int height = (int) (drawable.getIntrinsicHeight() * mDisplayMetrics.scaledDensity);
+        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
 
-            if (maxWidth != UNDEFINED_WIDTH && width > maxWidth) {
-                float scale = (float) maxWidth / (float) width;
-                width = maxWidth;
-                height = (int) (height * scale);
-            }
+        if (bitmap == null)
+            return ResourcesCompat.getDrawable(res, ERROR_DRAWABLE_RES_ID, mContext.getTheme());
 
-            drawable.setBounds(0, 0, width, height);
+        Drawable drawable = new BitmapDrawable(res, bitmap);
 
-            return drawable;
-        } catch (FileNotFoundException e) {
-            Log.e("ImageGetter", "", e);
+        int width = (int) (drawable.getIntrinsicWidth() * displayMetrics.scaledDensity);
+        int height = (int) (drawable.getIntrinsicHeight() * displayMetrics.scaledDensity);
+
+        int reqWidth = mContainer.getWidth() == 0 ? (int) (displayMetrics.widthPixels * 0.7f)
+                : mContainer.getWidth();
+
+        if (width > reqWidth) {
+            float scale = (float) reqWidth / (float) width;
+            width = reqWidth;
+            height = (int) (height * scale);
         }
 
-        return noImageDrawable;
+        drawable.setBounds(0, 0, width, height);
+
+        return drawable;
     }
 
-    public void setMaxWidth(int maxWidth) {
-        this.maxWidth = maxWidth;
-    }
-
-    public boolean maxWidthIsNotSet() {
-        return maxWidth == ImageGetter.UNDEFINED_WIDTH;
-    }
 }

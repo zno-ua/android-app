@@ -41,7 +41,8 @@ public class Rounded implements Transformation {
         this.corners = corners;
     }
 
-    @Override public Bitmap transform(Bitmap source) {
+    @Override
+    public Bitmap transform(Bitmap source) {
         int w = source.getWidth();
         int h = source.getHeight();
         Bitmap output = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
@@ -78,7 +79,8 @@ public class Rounded implements Transformation {
         return output;
     }
 
-    @Override public String key() {
+    @Override
+    public String key() {
         return "rounded();";
     }
 }

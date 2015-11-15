@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ViewStub
+        android:id="@+id/unanswered_warning_stub"
+        android:layout="@layout/unanswered_question"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <net.zno_ua.app.ui.widget.RecyclerLinearLayout
+        android:id="@+id/answers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+</LinearLayout>

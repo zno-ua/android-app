@@ -5,14 +5,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.squareup.picasso.Picasso;
 
@@ -53,6 +53,7 @@ public class SubjectActivity extends AppCompatActivity
 
         Cursor cursor = getContentResolver()
                 .query(buildSubjectUri(subjectId), new String[]{Subject.NAME}, null, null, null);
+        //noinspection ConstantConditions
         cursor.moveToFirst();
         getSupportActionBar().setTitle(cursor.getString(0));
         cursor.close();
@@ -110,13 +111,13 @@ public class SubjectActivity extends AppCompatActivity
                 .items(R.array.start_test_choices)
                 .positiveText(R.string.start)
                 .negativeText(R.string.cancel)
-                .callback(new MaterialDialog.ButtonCallback() {
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        startPassingTest(id, dialog.getSelectedIndex() == 0);
+                    public void onClick(@NonNull MaterialDialog materialDialog,
+                                        @NonNull DialogAction dialogAction) {
+                        startPassingTest(id, materialDialog.getSelectedIndex() == 0);
                     }
-                })
-                .show();
+                }).show();
     }
 
     @Override
@@ -126,9 +127,10 @@ public class SubjectActivity extends AppCompatActivity
                 .content(R.string.download_test_description)
                 .positiveText(R.string.download)
                 .negativeText(R.string.cancel)
-                .callback(new MaterialDialog.ButtonCallback() {
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onPositive(MaterialDialog dialog) {
+                    public void onClick(@NonNull MaterialDialog materialDialog,
+                                        @NonNull DialogAction dialogAction) {
                         startDownloadingTest(id);
                     }
                 }).show();
@@ -141,9 +143,10 @@ public class SubjectActivity extends AppCompatActivity
                 .content(R.string.restart_download_test_description)
                 .positiveText(R.string.download)
                 .negativeText(R.string.cancel)
-                .callback(new MaterialDialog.ButtonCallback() {
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onPositive(MaterialDialog dialog) {
+                    public void onClick(@NonNull MaterialDialog materialDialog,
+                                        @NonNull DialogAction dialogAction) {
                         startDownloadingTest(id);
                     }
                 }).show();
@@ -156,9 +159,10 @@ public class SubjectActivity extends AppCompatActivity
                 .content(R.string.delete_test_description)
                 .positiveText(R.string.delete)
                 .negativeText(R.string.cancel)
-                .callback(new MaterialDialog.ButtonCallback() {
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onPositive(MaterialDialog dialog) {
+                    public void onClick(@NonNull MaterialDialog materialDialog,
+                                        @NonNull DialogAction dialogAction) {
                         startDeletingTest(id);
                     }
                 }).show();
