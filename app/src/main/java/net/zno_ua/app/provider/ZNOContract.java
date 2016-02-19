@@ -242,6 +242,8 @@ public class ZNOContract {
     public static final String DESC = " DESC";
 
     public static class Subject implements SubjectColumns, BaseColumns {
+        public static final long ENGLISH = 7;
+        public static final long UKRAINIAN = 1;
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_SUBJECT).build();
 
@@ -379,6 +381,7 @@ public class ZNOContract {
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT
                         + PATH_QUESTION_AND_ANSWER;
+        public static final String SORT_ORDER = POSITION_ON_TEST + ASC;
     }
 
     public static class Answer implements BaseColumns, AnswerColumns {

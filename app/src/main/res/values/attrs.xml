@@ -15,4 +15,8 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="CardView">
+        <attr name="cardSpacing" format="dimension|reference" />
+    </declare-styleable>
+
 </resources>

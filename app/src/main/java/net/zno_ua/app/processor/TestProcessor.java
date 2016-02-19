@@ -11,7 +11,7 @@ import net.zno_ua.app.rest.GetTestImage;
 import net.zno_ua.app.rest.GetTestInfo;
 import net.zno_ua.app.rest.GetTestPoints;
 import net.zno_ua.app.rest.GetTestQuestions;
-import net.zno_ua.app.ui.ViewImageActivity;
+import net.zno_ua.app.activity.ViewImageActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;

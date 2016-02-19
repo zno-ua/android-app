@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="net.zno_ua.app.ui.SubjectActivity">
+    tools:context=".activity.SubjectActivity">
 
     <FrameLayout
         android:id="@+id/main_content"
@@ -28,7 +28,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:statusBarScrim="?attr/colorPrimaryDark">
 
-            <net.zno_ua.app.ui.widget.AspectRatioImageView
+            <net.zno_ua.app.widget.AspectRatioImageView
                 android:id="@+id/subject_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

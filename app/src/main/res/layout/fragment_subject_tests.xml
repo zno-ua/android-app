@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="net.zno_ua.app.ui.SubjectTestsFragment">
+    tools:context=".fragment.SubjectTestsFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/tests_list"

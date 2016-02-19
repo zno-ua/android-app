@@ -250,8 +250,8 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
         public void onInvalidated() {
             super.onInvalidated();
             mDataValid = false;
-            notifyDataSetChanged();
             //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
+            notifyItemRangeRemoved(0, getItemCount());
         }
     }
 }

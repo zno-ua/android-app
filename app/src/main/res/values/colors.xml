@@ -39,6 +39,9 @@
     <color name="white">#FFFFFF</color>
     <!-- White -->
 
+    <color name="primary_text_color">#212121</color>
+    <color name="secondary_text_color">#727272</color>
+
     <!-- Material Design colors -->
 
     <!-- Subjects Colors -->
@@ -59,6 +62,5 @@
     <!-- Material Flat Buttons Colors -->
 
     <color name="translucent_status_bar">#32000000</color>
-    <color name="secondary_text_color">#b2b2b2</color>
     <color name="list_item_tint_selection">#12000000</color>
 </resources>

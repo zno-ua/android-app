@@ -130,6 +130,7 @@
     <string name="two_four_seconds">секунди</string>
     <string name="seconds">секунд</string>
     <string name="action_time">Залишок часу</string>
+    <string name="action_all_questions">Усі питання</string>
     <string name="exit_test_question">Вийти з тесту?</string>
     <string name="exit_test_description">Ви виходите з тесту, тому відповіді не будуть збережені.</string>
     <string name="exit">вийти</string>
@@ -151,7 +152,7 @@
     <string name="correct_answer">Вірна відповідь:</string>
     <string name="user_combination">Ваша комбінація:</string>
     <string name="correct_combination">Вірна комбінація:</string>
-    <string name="unanswered_question_warning">Ви не відповіли на це запитання</string>
+    <string name="unanswered_question_prompt">Ви не відповіли на це запитання</string>
     <string name="test_completed">Тест завершено</string>
     <string name="ok">OK</string>
     <string name="your_rating_point_format">Ваш рейтинговий бал складає %1$.1f.</string>
@@ -171,5 +172,7 @@
         </html>
         ]]>
     </string>
+    <string name="statement_question_number_en">W</string>
+    <string name="statement_question_number">П</string>
 
 </resources>

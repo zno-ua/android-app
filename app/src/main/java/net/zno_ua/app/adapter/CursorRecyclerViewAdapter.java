@@ -174,7 +174,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         public void onInvalidated() {
             super.onInvalidated();
             mDataValid = false;
-            notifyDataSetChanged();
+            notifyItemRangeRemoved(0, getItemCount());
             //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
         }
     }

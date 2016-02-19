@@ -17,6 +17,8 @@
         <item name="md_negative_color">@color/red_500</item>
 
         <item name="discreteSeekBarStyle">@style/Widget.DiscreteSeekBar</item>
+
+        <item name="cardSpacing">@dimen/key_line_8dp</item>
     </style>
 
     <style name="AppTheme.Translucent" parent="Theme.AppCompat.NoActionBar">

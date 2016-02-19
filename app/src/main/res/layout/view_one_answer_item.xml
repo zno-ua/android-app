@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cardView="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/key_line_8dp"
+    android:layout_marginRight="@dimen/key_line_8dp"
+    cardView:cardBackgroundColor="@color/white"
+    cardView:cardUseCompatPadding="false">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/list_item_background">
+
+        <TextView
+            android:id="@+id/letter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/key_line_1"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="@color/answer_text_color"
+            android:textSize="@dimen/abc_text_size_small_material"
+            android:textStyle="bold"
+            tools:text="A" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/letter"
+            android:paddingBottom="@dimen/key_line_1"
+            android:paddingRight="@dimen/key_line_1"
+            android:paddingTop="@dimen/key_line_1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/answer_text_color"
+            android:textSize="@dimen/abc_text_size_small_material"
+            tools:ignore="RtlHardcoded,RtlSymmetry"
+            tools:text="Answer" />
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

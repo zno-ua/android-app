@@ -12,7 +12,7 @@ import net.zno_ua.app.rest.RESTClient;
  */
 public class ZNOApiServiceHelper {
 
-    private static ZNOApiServiceHelper mInstance = null;
+    private static ZNOApiServiceHelper sInstance = null;
 
     private Context mContext;
 
@@ -42,11 +42,11 @@ public class ZNOApiServiceHelper {
         return new Intent(mContext, ZNOApiService.class);
     }
 
-    public static ZNOApiServiceHelper getInstance(Context context) {
-        if (mInstance == null) {
-            mInstance = new ZNOApiServiceHelper(context);
+    public static synchronized ZNOApiServiceHelper getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new ZNOApiServiceHelper(context);
         }
 
-        return mInstance;
+        return sInstance;
     }
 }

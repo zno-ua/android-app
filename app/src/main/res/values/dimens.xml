@@ -8,6 +8,7 @@
     <dimen name="action_icon_width">24dp</dimen>
     <dimen name="card_padding">14dp</dimen>
     <dimen name="fab_compat_margin">16dp</dimen>
+    <dimen name="fab_size">64dp</dimen>
 
     <!-- Material Flat Buttons -->
     <dimen name="btn_flat_corner_radius">1dp</dimen>
@@ -18,5 +19,7 @@
     <!-- Material Flat Buttons -->
 
     <dimen name="material_default_status_bar_height">24dp</dimen>
+    <dimen name="key_line_8dp">8dp</dimen>
+    <dimen name="fab_space_size">88dp</dimen>
 
 </resources>
