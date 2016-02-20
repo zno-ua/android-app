@@ -20,15 +20,12 @@ public class Utils {
             0,
             R.drawable.ic_ukrainian,
             R.drawable.ic_history_ukr,
-            R.drawable.ic_history_world,
+            0,
             R.drawable.ic_math,
             R.drawable.ic_biology,
             R.drawable.ic_geography,
             R.drawable.ic_english,
             R.drawable.ic_physics,
-                /*
-                * TODO: find new picture that will correspond to this resource type
-                * */
             R.drawable.ic_chemistry
     };
 
@@ -36,7 +33,7 @@ public class Utils {
             0,
             R.color.ukrainian,
             R.color.history_ukr,
-            R.color.black,
+            0,
             R.color.math,
             R.color.biology,
             R.color.geography,

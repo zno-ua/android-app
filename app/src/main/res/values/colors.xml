@@ -45,14 +45,14 @@
     <!-- Material Design colors -->
 
     <!-- Subjects Colors -->
-    <color name="ukrainian">#2868C2</color>
-    <color name="history_ukr">#759bc0</color>
-    <color name="math">#044433</color>
-    <color name="biology">#0095c0</color>
-    <color name="geography">#a94d0c</color>
-    <color name="english">#144499</color>
-    <color name="physics">#0b4982</color>
-    <color name="chemistry">#3c5170</color>
+    <color name="ukrainian">#dfa42f</color>
+    <color name="history_ukr">#5d4c32</color>
+    <color name="math">#011b1c</color>
+    <color name="biology">#2b714c</color>
+    <color name="geography">#093864</color>
+    <color name="english">#3b74ce</color>
+    <color name="physics">#46317c</color>
+    <color name="chemistry">#c70304</color>
     <!-- Subjects Colors -->
 
     <!-- Material Flat Buttons Colors -->
