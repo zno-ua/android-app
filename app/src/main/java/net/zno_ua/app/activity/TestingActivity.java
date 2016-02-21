@@ -274,7 +274,6 @@ public class TestingActivity extends AppCompatActivity
     @Override
     public void onViewPagerAttached(ViewPager viewPager) {
         mTabLayout.setupWithViewPager(viewPager);
-        mTabLayout.setVisibility(View.VISIBLE);
     }
 
     @Override

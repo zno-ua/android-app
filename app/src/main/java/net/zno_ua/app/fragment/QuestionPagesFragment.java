@@ -256,6 +256,7 @@ public class QuestionPagesFragment extends Fragment
                 } else {
                     onViewPagerAttached();
                 }
+                mPagerChangeListener.onViewPagerVisibilityChanged(mView == VIEW_CAROUSEL);
                 break;
             case LOADER_QUESTIONS_AND_ANSWERS:
                 mQuestionsGridAdapter.changeCursor(data);
