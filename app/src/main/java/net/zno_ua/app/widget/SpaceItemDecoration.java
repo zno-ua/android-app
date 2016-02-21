@@ -17,6 +17,7 @@ public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
     private static final int GRID_LAYOUT_MANAGER = 0x1;
     private static final int LINEAR_LAYOUT_MANAGER = 0x2;
     private final int mSpace;
+    private final int mHalfSpace;
     private boolean mShowFirstDivider = false;
     private boolean mShowLastDivider = false;
     private int mLastItemExtraSpace = NO_SPACE;
@@ -31,6 +32,7 @@ public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
     public SpaceItemDecoration(Context context) {
         final TypedArray a = context.obtainStyledAttributes(ATTRS);
         mSpace = a.getDimensionPixelOffset(0, 0);
+        mHalfSpace = mSpace / 2;
         a.recycle();
     }
 
@@ -42,6 +44,7 @@ public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
 
     public SpaceItemDecoration(int spaceInPx) {
         mSpace = spaceInPx;
+        mHalfSpace = mSpace / 2;
     }
 
     public SpaceItemDecoration(int spaceInPx, boolean showFirstDivider, boolean showLastDivider) {
@@ -52,6 +55,7 @@ public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
 
     public SpaceItemDecoration(Context ctx, @DimenRes int resId) {
         mSpace = ctx.getResources().getDimensionPixelSize(resId);
+        mHalfSpace = mSpace / 2;
     }
 
     public SpaceItemDecoration(Context ctx, @DimenRes int resId, boolean showFirstDivider,
@@ -95,21 +99,11 @@ public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
             }
             final int position = parent.getChildLayoutPosition(view);
             final int count = parent.getAdapter().getItemCount();
-            final int halfSpace = mSpace / 2;
-            final int mod = position % mSpanCount;
             if (mShowFirstDivider && position < mSpanCount || position >= mSpanCount) {
                 outRect.top = mSpace;
             }
-            if (mod == 0) {
-                outRect.left = mSpace;
-                outRect.right = halfSpace;
-            } else if (mod == mSpanCount - 1) {
-                outRect.left = halfSpace;
-                outRect.right = mSpace;
-            } else {
-                outRect.left = halfSpace;
-                outRect.right = halfSpace;
-            }
+            outRect.left = mHalfSpace;
+            outRect.right = mHalfSpace;
             if (mShowLastDivider && (count % mSpanCount == 0 && position >= count - mSpanCount
                     || position >= count - count % mSpanCount)) {
                 outRect.bottom = mLastItemExtraSpace == NO_SPACE ? mSpace : mLastItemExtraSpace;
