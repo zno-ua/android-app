@@ -69,4 +69,22 @@ public class Utils {
         return "file://" + context.getFilesDir().getPath();
     }
 
+    private static final String STRING_SEPARATOR = "$";
+
+    public static String convertArrayToString(String... array) {
+        String str = "";
+        for (int i = 0; i < array.length; i++) {
+            str = str + array[i];
+            // Do not append comma at the end of last element
+            if (i < array.length - 1) {
+                str = str + STRING_SEPARATOR;
+            }
+        }
+        return str;
+    }
+
+    public static String[] convertStringToArray(String string) {
+        return string.split(STRING_SEPARATOR);
+    }
+
 }

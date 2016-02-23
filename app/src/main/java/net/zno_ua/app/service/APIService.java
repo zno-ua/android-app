@@ -6,16 +6,14 @@ import android.database.Cursor;
 import android.os.IBinder;
 import android.util.SparseArray;
 
-import com.android.volley.Request;
-
+import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.processor.TestProcessor;
-import net.zno_ua.app.rest.RESTClient;
+import net.zno_ua.app.rest.APIClient;
+import net.zno_ua.app.rest.ServiceGenerator;
 
-import static com.android.volley.Request.Method;
 import static net.zno_ua.app.provider.ZNOContract.Test;
-import static net.zno_ua.app.rest.RESTClient.ResourceType;
 
-public class ZNOApiService extends Service {
+public class APIService extends Service {
 
     public interface Action {
         String RESTART_PENDING_REQUESTS = "net.zno_ua.app.RESTART_PENDING_REQUESTS";
@@ -27,10 +25,19 @@ public class ZNOApiService extends Service {
         String ID = "EXTRA_ID";
     }
 
-    private SparseArray<Command> mPendingCommands;
+    private final SparseArray<Command> mPendingCommands;
+    private APIClient mApiClient;
+    private TestProcessor mTestProcessor;
 
-    public ZNOApiService() {
+    public APIService() {
         mPendingCommands = new SparseArray<>();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mApiClient = ServiceGenerator.createService(APIClient.class, BuildConfig.API_KEY);
+        mTestProcessor = new TestProcessor(getApplicationContext(), mApiClient);
     }
 
     @Override
@@ -53,9 +60,9 @@ public class ZNOApiService extends Service {
         mPendingCommands.put(startId, command);
 
         switch (method) {
-            case Request.Method.GET:
+            case Method.GET:
                 switch (resourceType) {
-                    case RESTClient.ResourceType.TEST:
+                    case ResourceType.TEST:
                         getTest(id, startId);
                         return START_REDELIVER_INTENT;
                     default:
@@ -63,9 +70,9 @@ public class ZNOApiService extends Service {
                         throw new IllegalArgumentException("Illegal resource type " + resourceType
                                 + " for GET method.");
                 }
-            case Request.Method.DELETE:
+            case Method.DELETE:
                 switch (resourceType) {
-                    case RESTClient.ResourceType.TEST:
+                    case ResourceType.TEST:
                         deleteTest(id, startId);
                         return START_REDELIVER_INTENT;
                     default:
@@ -82,33 +89,32 @@ public class ZNOApiService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ZNOApiServiceHelper serviceHelper =
-                        ZNOApiServiceHelper.getInstance(getApplicationContext());
-                Cursor cursor = getContentResolver().query(Test.CONTENT_URI,
+                final Cursor cursor = getContentResolver().query(Test.CONTENT_URI,
                         new String[]{Test._ID, Test.STATUS},
                         Test.STATUS + " != " + Test.STATUS_IDLE,
                         null,
                         null);
-                if (cursor.moveToFirst()) {
-                    do {
-                        long id = cursor.getLong(0);
-                        int method = cursor.getInt(1) == Test.STATUS_DOWNLOADING ?
-                                Method.GET : Method.DELETE;
+                if (cursor != null) {
+                    if (cursor.moveToFirst()) {
+                        do {
+                            long id = cursor.getLong(0);
+                            int method = cursor.getInt(1) == Test.STATUS_DOWNLOADING ?
+                                    Method.GET : Method.DELETE;
 
-                        if (!isCommandPending(method, ResourceType.TEST, id)) {
-                            switch (method) {
-                                case Method.GET:
-                                    serviceHelper.getTest(id);
-                                    break;
-                                case Method.DELETE:
-                                    serviceHelper.deleteTest(id);
-                                    break;
+                            if (!isCommandPending(method, ResourceType.TEST, id)) {
+                                switch (method) {
+                                    case Method.GET:
+                                        APIServiceHelper.getTest(getBaseContext(), id);
+                                        break;
+                                    case Method.DELETE:
+                                        APIServiceHelper.deleteTest(getBaseContext(), id);
+                                        break;
+                                }
                             }
-                        }
-                    } while (cursor.moveToNext());
+                        } while (cursor.moveToNext());
+                    }
+                    cursor.close();
                 }
-
-                cursor.close();
                 stopSelf(startId);
             }
         }).start();
@@ -126,7 +132,7 @@ public class ZNOApiService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                new TestProcessor(getApplicationContext()).get(testId);
+                mTestProcessor.get(testId);
                 onStopCommand(startId);
             }
         }).start();
@@ -140,7 +146,7 @@ public class ZNOApiService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                new TestProcessor(getApplicationContext()).delete(testId);
+                mTestProcessor.delete(testId);
                 onStopCommand(startId);
             }
         }).start();
@@ -171,5 +177,14 @@ public class ZNOApiService extends Service {
         }
 
         return false;
+    }
+
+    public interface Method {
+        int GET = 0;
+        int DELETE = 1;
+    }
+
+    public interface ResourceType {
+        int TEST = 0x1;
     }
 }

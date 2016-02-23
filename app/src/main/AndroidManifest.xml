@@ -13,15 +13,7 @@
         android:label="@string/zno"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
 
-        <activity
-            android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
-
-        <!-- New fields under development -->
         <provider
             android:name=".provider.ZNOProvider"
             android:authorities="net.zno_ua.app.provider.ZNOProvider"
@@ -55,7 +47,7 @@
         </activity>
 
         <service
-            android:name=".service.ZNOApiService"
+            android:name=".service.APIService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

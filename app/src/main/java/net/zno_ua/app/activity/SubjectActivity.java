@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -18,7 +17,7 @@ import com.squareup.picasso.Picasso;
 
 import net.zno_ua.app.R;
 import net.zno_ua.app.fragment.SubjectTestsFragment;
-import net.zno_ua.app.service.ZNOApiServiceHelper;
+import net.zno_ua.app.service.APIServiceHelper;
 import net.zno_ua.app.util.Utils;
 import net.zno_ua.app.widget.AspectRatioImageView;
 
@@ -30,8 +29,6 @@ public class SubjectActivity extends AppCompatActivity
     public static final String EXTRA_SUBJECT_ID = "net.zno_ua.app.ui.SUBJECT_ID";
 
     private long subjectId;
-
-    private ZNOApiServiceHelper mApiServiceHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +63,6 @@ public class SubjectActivity extends AppCompatActivity
                     .replace(R.id.main_content, SubjectTestsFragment.newInstance(subjectId))
                     .commit();
         }
-        mApiServiceHelper = ZNOApiServiceHelper.getInstance(this);
     }
 
     private void initToolbar() {
@@ -175,10 +171,10 @@ public class SubjectActivity extends AppCompatActivity
     }
 
     private void startDownloadingTest(long id) {
-        mApiServiceHelper.getTest(id);
+        APIServiceHelper.getTest(this, id);
     }
 
     private void startDeletingTest(long id) {
-        mApiServiceHelper.deleteTest(id);
+        APIServiceHelper.deleteTest(this, id);
     }
 }
