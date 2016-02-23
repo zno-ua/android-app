@@ -183,6 +183,14 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
         return (mItemsAdapter.isItem(position)) ? TYPE_ITEM : TYPE_SECTION;
     }
 
+    public boolean isSection(int position) {
+        return !isItem(position);
+    }
+
+    public boolean isItem(int position) {
+        return mItemsAdapter.isItem(position);
+    }
+
     private class ItemsAdapter {
         private HashMap<Integer, Boolean> mItems;
         private HashMap<Integer, S> mSections;

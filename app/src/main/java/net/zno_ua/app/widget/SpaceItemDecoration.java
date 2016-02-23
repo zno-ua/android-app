@@ -87,6 +87,7 @@ public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
         if (mSpace == 0) {
             return;
         }
+
         if (mLayoutManager == UNDEFINED) {
             mLayoutManager = getLayoutManager(parent);
         }

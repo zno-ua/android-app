@@ -63,4 +63,5 @@
 
     <color name="translucent_status_bar">#32000000</color>
     <color name="list_item_tint_selection">#12000000</color>
+    <color name="divider">#1e000000</color>
 </resources>

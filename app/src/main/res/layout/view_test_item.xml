@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/list_item_background"
@@ -14,7 +15,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true">
+            android:layout_centerVertical="true"
+            tools:ignore="RtlHardcoded">
 
             <Space
                 android:layout_width="@dimen/key_line_1"
@@ -27,7 +29,8 @@
                 android:layout_margin="@dimen/key_line_1"
                 android:alpha="0.54"
                 android:tint="@color/black"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:ignore="ContentDescription" />
         </FrameLayout>
 
         <RelativeLayout
@@ -35,36 +38,39 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/key_line_1"
-            android:layout_toLeftOf="@id/action">
+            android:layout_toLeftOf="@id/action"
+            tools:ignore="RtlHardcoded">
 
             <TextView
-                android:id="@+id/primary_text"
+                android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="@color/primary_text_default_material_light"
-                android:textSize="@dimen/abc_text_size_medium_material" />
+                android:textSize="@dimen/abc_text_size_medium_material"
+                tools:text="Test title" />
 
             <TextView
-                android:id="@+id/secondary_text"
+                android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@id/primary_text"
-                android:layout_below="@id/primary_text"
+                android:layout_alignLeft="@id/title"
+                android:layout_below="@id/title"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textColor="@color/secondary_text_default_material_light"
-                android:textSize="@dimen/abc_text_size_small_material" />
+                android:textSize="@dimen/abc_text_size_small_material"
+                tools:text="Test description" />
         </RelativeLayout>
 
-        <include
-            android:id="@+id/divider"
-            layout="@layout/item_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignParentBottom="true" />
+        <!--<include-->
+            <!--android:id="@+id/divider"-->
+            <!--layout="@layout/item_divider"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:layout_alignParentBottom="true" />-->
 
     </RelativeLayout>
 
@@ -72,5 +78,6 @@
         android:id="@+id/bottom_shadow"
         android:layout_width="match_parent"
         android:layout_height="6dp"
-        android:background="@drawable/shadow_bottom" />
+        android:background="@drawable/shadow_bottom"
+        android:visibility="gone" />
 </LinearLayout>

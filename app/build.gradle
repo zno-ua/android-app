@@ -12,10 +12,6 @@ android {
         versionName "1.0.5"
     }
 
-    lintOptions {
-        disable ('PrivateResource')
-    }
-
     buildTypes {
         debug {
             applicationIdSuffix ".debug"

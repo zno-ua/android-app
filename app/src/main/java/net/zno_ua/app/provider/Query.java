@@ -74,6 +74,36 @@ public class Query {
         public static final String SORT_ORDER = ZNOContract.QuestionAndAnswer.SORT_ORDER;
     }
 
+    public static final class Test {
+        public static final Uri URI = ZNOContract.Test.CONTENT_URI;
+
+        public static final String[] PROJECTION = new String[]{
+                ZNOContract.Test._ID,
+                ZNOContract.Test.YEAR,
+                ZNOContract.Test.TYPE,
+                ZNOContract.Test.SESSION,
+                ZNOContract.Test.LEVEL,
+                ZNOContract.Test.QUESTIONS_COUNT,
+                ZNOContract.Test.STATUS,
+                ZNOContract.Test.RESULT,
+        };
+
+        public interface Column {
+            int _ID = 0;
+            int YEAR = 1;
+            int TYPE = 2;
+            int SESSION = 3;
+            int LEVEL = 4;
+            int QUESTIONS_COUNT = 5;
+            int STATUS = 6;
+            int RESULT = 7;
+        }
+
+        public static final String SELECTION = ZNOContract.Test.SUBJECT_ID + " = ?";
+
+        public static final String SORT_ORDER = ZNOContract.Test.SORT_ORDER;
+    }
+
     public static String[] selectionArgs(Object... args) {
         String[] combination = new String[args.length];
         for (int i = 0; i < args.length; i++) {
