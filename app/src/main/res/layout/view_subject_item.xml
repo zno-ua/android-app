@@ -10,7 +10,8 @@
     android:foreground="?android:attr/selectableItemBackground"
     card_view:cardCornerRadius="@dimen/card_view_corner_radius"
     card_view:cardElevation="2dp"
-    card_view:cardUseCompatPadding="false">
+    card_view:cardUseCompatPadding="false"
+    card_view:cardPreventCornerOverlap="@bool/card_prevent_content_overlap">
     <!-- TODO: Solve problem with foreground on SDK < 5.0 -->
 
     <LinearLayout

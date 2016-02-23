@@ -12,13 +12,18 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <include
-            android:id="@+id/tool_bar"
-            layout="@layout/app_bar" />
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/abc_action_bar_default_height_material"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/toolbarTheme"
+            app:popupTheme="?attr/toolbarPopupTheme"
+            tools:ignore="UnusedAttribute" />
 
-        <fragment
-            android:id="@+id/subjects"
-            class="net.zno_ua.app.fragment.SubjectsFragment"
+        <FrameLayout
+            android:id="@+id/main_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>

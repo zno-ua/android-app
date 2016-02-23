@@ -188,7 +188,7 @@ public class TestingActivity extends AppCompatActivity
         if (fragment == null) {
             fragment = new QuestionPagesFragment();
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.main_frame, fragment, QuestionPagesFragment.TAG)
+                    .add(R.id.main_content, fragment, QuestionPagesFragment.TAG)
                     .commit();
         }
     }
