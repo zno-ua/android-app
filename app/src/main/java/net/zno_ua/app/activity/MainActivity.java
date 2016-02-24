@@ -31,6 +31,7 @@ import com.squareup.picasso.Picasso;
 import net.zno_ua.app.R;
 import net.zno_ua.app.fragment.BaseFragment;
 import net.zno_ua.app.fragment.SubjectsFragment;
+import net.zno_ua.app.fragment.TestingResultFragment;
 import net.zno_ua.app.util.Utils;
 
 import java.util.Calendar;
@@ -142,6 +143,10 @@ public class MainActivity extends AppCompatActivity
                 onTestingSelected();
                 isChecked = true;
                 break;
+            case R.id.navigation_item_testing_results:
+                onTestingResultsSelected();
+                isChecked = true;
+                break;
         }
         setNavigationItemSelected(item, isChecked);
         mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -162,6 +167,13 @@ public class MainActivity extends AppCompatActivity
         final Fragment fragment = getMainContentFragment();
         if (!(fragment instanceof SubjectsFragment)) {
             replaceMainContent(SubjectsFragment.newInstance());
+        }
+    }
+
+    private void onTestingResultsSelected() {
+        final Fragment fragment = getMainContentFragment();
+        if (!(fragment instanceof TestingResultFragment)) {
+            replaceMainContent(TestingResultFragment.newInstance());
         }
     }
 

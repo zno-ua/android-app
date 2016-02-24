@@ -2,29 +2,43 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/two_line_item_tile_height"
+    android:layout_height="88dp"
     android:background="@drawable/list_item_background">
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:background="@drawable/circle_item_background"
-        android:minWidth="@dimen/key_line_1"
+        android:layout_marginLeft="@dimen/key_line_1"
+        android:layout_marginRight="@dimen/key_line_1"
         tools:ignore="RtlHardcoded">
 
+
+        <TextView
+            android:id="@+id/point"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            tools:text="200.0" />
+
         <ImageView
-            android:id="@+id/action_icon"
-            android:layout_width="@dimen/action_icon_width"
-            android:layout_height="@dimen/action_icon_width"
-            android:layout_margin="@dimen/key_line_1"
-            android:alpha="0.54"
-            android:tint="@color/black"
-            android:visibility="gone"
+            android:id="@+id/smile"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_alignBottom="@id/point"
+            android:layout_marginLeft="4dp"
+            android:layout_toRightOf="@id/point"
+            android:src="@drawable/ic_poll_black_24dp"
             tools:ignore="ContentDescription" />
-    </FrameLayout>
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -43,7 +57,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/primary_text_color"
             android:textSize="18sp"
-            tools:text="Test title" />
+            tools:text="2014 year" />
 
         <TextView
             android:id="@+id/description"
@@ -52,10 +66,11 @@
             android:layout_alignLeft="@id/title"
             android:layout_below="@id/title"
             android:ellipsize="end"
-            android:singleLine="true"
+            android:lines="2"
+            android:maxLines="2"
             android:textColor="@color/secondary_text_color"
             android:textSize="14sp"
-            tools:text="Test description" />
+            tools:text="Official test \nPassed at February 22th" />
     </RelativeLayout>
 
 </RelativeLayout>

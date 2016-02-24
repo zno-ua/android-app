@@ -39,8 +39,8 @@
     <color name="white">#FFFFFF</color>
     <!-- White -->
 
-    <color name="primary_text_color">#212121</color>
-    <color name="secondary_text_color">#727272</color>
+    <color name="primary_text_color">#de000000</color>
+    <color name="secondary_text_color">#8a000000</color>
 
     <!-- Material Design colors -->
 

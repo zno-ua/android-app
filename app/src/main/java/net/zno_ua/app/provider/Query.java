@@ -1,11 +1,13 @@
 package net.zno_ua.app.provider;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 
 /**
  * @author vojkovladimir.
  */
 public class Query {
+    private static final String ASC = " ASC";
 
     public static class Question {
         public static final Uri URI = ZNOContract.Question.CONTENT_URI;
@@ -102,6 +104,41 @@ public class Query {
         public static final String SELECTION = ZNOContract.Test.SUBJECT_ID + " = ?";
 
         public static final String SORT_ORDER = ZNOContract.Test.SORT_ORDER;
+    }
+
+    public static final class TestingResult {
+        public static final Uri URI = ZNOContract.TestingResult.CONTENT_URI;
+        public static final String[] PROJECTION = new String[]{
+                ZNOContract.TestingResult._ID,
+                ZNOContract.TestingResult.TEST_ID,
+                ZNOContract.TestingResult.SUBJECT_ID,
+                ZNOContract.TestingResult.TEST_STATUS,
+                ZNOContract.TestingResult.TEST_RESULT,
+                ZNOContract.TestingResult.TEST_TYPE,
+                ZNOContract.TestingResult.TEST_SESSION,
+                ZNOContract.TestingResult.TEST_LEVEL,
+                ZNOContract.TestingResult.TEST_YEAR,
+                ZNOContract.TestingResult.SUBJECT_NAME,
+                ZNOContract.TestingResult.DATE,
+                ZNOContract.TestingResult.ELAPSED_TIME,
+                ZNOContract.TestingResult.TEST_POINT,
+                ZNOContract.TestingResult.RATING_POINT,
+                ZNOContract.TestingResult.STATUS,
+        };
+
+        public interface Column {
+            int _ID = 0;
+            int YEAR = 8;
+            int SUBJECT_NAME = 9;
+            int DATE = 10;
+            int ELAPSED_TIME = 11;
+            int RATING_POINT = 13;
+        }
+
+        public static final String SELECTION = ZNOContract.TestingResult.STATUS + "="
+                + ZNOContract.Testing.FINISHED;
+        public static final String SORT_ORDER = ZNOContract.TestingResult.SUBJECT_NAME + ASC + ", "
+                + ZNOContract.TestingResult.RATING_POINT + ASC;
     }
 
     public static String[] selectionArgs(Object... args) {

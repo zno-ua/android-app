@@ -176,5 +176,8 @@
     <string name="statement_question_number">В</string>
     <string name="statement_en">Writing</string>
     <string name="statement">Висловлювання</string>
+    <string name="year_format">%d рік</string>
+    <string name="passed_date_format">Пройдено %1$d %2$s</string>
+    <string name="for_minutes_format">за %1$d хв</string>
 
 </resources>

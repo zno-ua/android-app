@@ -218,6 +218,24 @@ public class ZNOContract {
         String RATING_POINT = "rating_point";
     }
 
+    public interface TestingResultColumns {
+        String _ID = Tables.TESTING + DOT + BaseColumns._ID + AS + BaseColumns._ID;
+        String TEST_ID = Tables.TEST + DOT + BaseColumns._ID;
+        String SUBJECT_ID = Tables.TEST + DOT + TestColumns.SUBJECT_ID;
+        String TEST_STATUS = Tables.TEST + DOT + RESTColumns.STATUS;
+        String TEST_RESULT = Tables.TEST + DOT + RESTColumns.RESULT;
+        String TEST_TYPE = Tables.TEST + DOT + TestColumns.TYPE;
+        String TEST_SESSION = Tables.TEST + DOT + TestColumns.SESSION;
+        String TEST_LEVEL = Tables.TEST + DOT + TestColumns.LEVEL;
+        String TEST_YEAR = Tables.TEST + DOT + TestColumns.YEAR;
+        String SUBJECT_NAME = Tables.SUBJECT + DOT + SubjectColumns.NAME;
+        String DATE = Tables.TESTING + DOT + TestingColumns.DATE;
+        String ELAPSED_TIME = Tables.TESTING + DOT + TestingColumns.ELAPSED_TIME;
+        String TEST_POINT = Tables.TESTING + DOT + TestingColumns.TEST_POINT;
+        String RATING_POINT = Tables.TESTING + DOT + TestingColumns.RATING_POINT;
+        String STATUS = Tables.TESTING + DOT + TestingColumns.STATUS;
+    }
+
     /*
     /**
      * Authority for the provider of the content of the {@link ZNODataBase}
@@ -226,13 +244,14 @@ public class ZNOContract {
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
-    private static final String PATH_SUBJECT = ZNODatabase.Tables.SUBJECT;
-    private static final String PATH_TEST = ZNODatabase.Tables.TEST;
-    private static final String PATH_QUESTION = ZNODatabase.Tables.QUESTION;
-    private static final String PATH_QUESTION_AND_ANSWER = "question_and_answer";
-    private static final String PATH_ANSWER = ZNODatabase.Tables.ANSWER;
-    private static final String PATH_TESTING = ZNODatabase.Tables.TESTING;
-    private static final String PATH_POINT = ZNODatabase.Tables.POINT;
+    static final String PATH_SUBJECT = ZNODatabase.Tables.SUBJECT;
+    static final String PATH_TEST = ZNODatabase.Tables.TEST;
+    static final String PATH_QUESTION = ZNODatabase.Tables.QUESTION;
+    static final String PATH_QUESTION_AND_ANSWER = "question_and_answer";
+    static final String PATH_ANSWER = ZNODatabase.Tables.ANSWER;
+    static final String PATH_TESTING = ZNODatabase.Tables.TESTING;
+    static final String PATH_POINT = ZNODatabase.Tables.POINT;
+    static final String PATH_TESTING_RESULT = "testing_result";
 
     private static final String DOT = ".";
     private static final String VND = "/vnd.";
@@ -445,6 +464,16 @@ public class ZNOContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_POINT;
 
         public static final String SORT_ORDER = TEST_POINT + ASC;
+    }
+
+    public static class TestingResult implements TestingResultColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_TESTING_RESULT).build();
+
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + VND + CONTENT_AUTHORITY + DOT + PATH_TESTING_RESULT;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + VND + CONTENT_AUTHORITY + DOT + PATH_TESTING_RESULT;
     }
 
     private static Uri buildItemUri(Uri contentUri, Object item) {

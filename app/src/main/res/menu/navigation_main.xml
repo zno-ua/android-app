@@ -7,6 +7,12 @@
             android:checked="true"
             android:icon="@drawable/ic_school_black_24dp"
             android:title="@string/testing" />
+
+        <item
+            android:id="@+id/navigation_item_testing_results"
+            android:checked="true"
+            android:icon="@drawable/ic_poll_black_24dp"
+            android:title="@string/testing_result" />
     </group>
 
 </menu>
