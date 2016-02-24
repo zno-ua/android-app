@@ -8,8 +8,11 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+
+import static okhttp3.logging.HttpLoggingInterceptor.Level;
 
 /**
  * @author vojkovladimir.
@@ -21,6 +24,11 @@ public class ServiceGenerator {
 
     static {
         sHttpClient = new OkHttpClient.Builder();
+        if (BuildConfig.DEBUG) {
+            final HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(Level.BASIC);
+            sHttpClient.addInterceptor(logging);
+        }
         sBuilder = new Retrofit.Builder()
                 .baseUrl(BuildConfig.SERVER_URL + "api/v" + BuildConfig.API_VERSION + "/")
                 .addConverterFactory(JacksonConverterFactory.create());

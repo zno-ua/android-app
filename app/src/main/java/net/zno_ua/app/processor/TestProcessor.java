@@ -153,7 +153,7 @@ public class TestProcessor {
                 imageResponse = mApiClient.getImage(relativeUrl, name).execute();
                 if (imageResponse.isSuccess()) {
                     inputStream = imageResponse.body().byteStream();
-                    imagesLoaded &= mFileManager.saveBitmap(localPath, name, inputStream);
+                    imagesLoaded &= mFileManager.saveFile(localPath, name, inputStream);
                 }
             }
         }

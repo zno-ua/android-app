@@ -3,54 +3,44 @@ package net.zno_ua.app;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.WorkerThread;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 public class FileManager {
 
-    private final Context mContext;
     private final String FILES_PATH;
 
     public FileManager(Context context) {
-        mContext = context;
         FILES_PATH = context.getFilesDir().getAbsolutePath();
     }
 
-    public boolean saveBitmap(String path, String name, InputStream bitmapInputStream)
+    @WorkerThread
+    public boolean saveFile(String path, String name, InputStream fileInputStream)
             throws IOException {
-        return saveBitmap(path, name, BitmapFactory.decodeStream(bitmapInputStream));
-    }
-
-    public boolean saveBitmap(String path, String name, Bitmap bitmap) throws IOException {
-        boolean success;
+        boolean isFileSaved = false;
         final File dir = new File(FILES_PATH + path);
-        success = dir.exists() || dir.mkdirs();
-
         final File file = new File(dir, name);
-        success |= file.exists() || file.createNewFile();
+        final boolean isFileCreated = dir.exists() || dir.mkdirs() || file.exists()
+                || file.createNewFile();
 
-        FileOutputStream fileOutputStream = null;
+        OutputStream fileOutputStream = null;
         try {
-            if (success) {
+            if (isFileCreated) {
                 fileOutputStream = new FileOutputStream(file);
-                final Bitmap.CompressFormat format;
 
-                if (name.contains("jpg")) {
-                    format = Bitmap.CompressFormat.JPEG;
-                } else if (name.contains("png")) {
-                    format = Bitmap.CompressFormat.PNG;
-                } else {
-                    fileOutputStream.close();
-                    throw new IOException("Can't save image: wrong format.");
+                byte[] buffer = new byte[8 * 1024];
+                int bytesRead;
+                while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                    fileOutputStream.write(buffer, 0, bytesRead);
                 }
-
-                success = bitmap.compress(format, 100, fileOutputStream);
                 fileOutputStream.flush();
-                fileOutputStream.close();
+                isFileSaved = true;
             } else {
                 //noinspection ResultOfMethodCallIgnored
                 file.delete();
@@ -59,11 +49,15 @@ public class FileManager {
             if (fileOutputStream != null) {
                 fileOutputStream.close();
             }
+            if (fileInputStream != null) {
+                fileInputStream.close();
+            }
         }
 
-        return success;
+        return isFileSaved;
     }
 
+    @WorkerThread
     public Bitmap openBitmap(String path) throws FileNotFoundException {
         return BitmapFactory.decodeFile(FILES_PATH + path);
     }
