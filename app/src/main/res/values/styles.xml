@@ -19,6 +19,8 @@
         <item name="discreteSeekBarStyle">@style/Widget.DiscreteSeekBar</item>
 
         <item name="cardSpacing">@dimen/key_line_8dp</item>
+
+        <item name="android:listDivider">@drawable/line_divider</item>
     </style>
 
     <style name="AppTheme.Translucent" parent="Theme.AppCompat.NoActionBar">

@@ -27,16 +27,13 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
 
     private ItemsAdapter mItemsAdapter;
 
-    public SectionCursorRecyclerViewAdapter(HashMap<Integer, S> sections, Cursor cursor) {
-        mCursor = cursor;
-        mDataValid = cursor != null;
-        mRowIDColumn = mDataValid ? mCursor.getColumnIndex(ROW_ID_COLUMN_NAME) : -1;
+    public SectionCursorRecyclerViewAdapter() {
+        mCursor = null;
+        mDataValid = false;
+        mRowIDColumn = -1;
         mDataSetObserver = new NotifyingDataSetObserver();
-        if (mCursor != null) {
-            mCursor.registerDataSetObserver(mDataSetObserver);
-        }
-
-        mItemsAdapter = new ItemsAdapter(sections, mCursor);
+        mItemsAdapter = new ItemsAdapter(null, null);
+        setHasStableIds(true);
     }
 
     public Cursor getCursor() {
@@ -131,11 +128,6 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
         return isEquals;
     }
 
-    @Override
-    public void setHasStableIds(boolean hasStableIds) {
-        super.setHasStableIds(true);
-    }
-
     protected abstract HashMap<Integer, S> createSections(Cursor cursor);
 
     @Override
@@ -191,6 +183,9 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
         return mItemsAdapter.isItem(position);
     }
 
+    /*
+    * TODO: optimize adapter.
+    * */
     private class ItemsAdapter {
         private HashMap<Integer, Boolean> mItems;
         private HashMap<Integer, S> mSections;

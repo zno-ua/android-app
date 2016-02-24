@@ -24,7 +24,6 @@ public class TestsAdapter extends SectionCursorRecyclerViewAdapter<String>
     private final LayoutInflater mLayoutInflater;
 
     public TestsAdapter(Context context, @NonNull TestItemVewHolder.OnTestItemClickListener listener) {
-        super(null, null);
         mLayoutInflater = LayoutInflater.from(context);
         mOnTestItemClickListener = listener;
     }

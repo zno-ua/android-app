@@ -2,6 +2,7 @@ package net.zno_ua.app.view;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,6 @@ import net.zno_ua.app.R;
 import net.zno_ua.app.provider.ZNOContract;
 
 import static android.text.TextUtils.isEmpty;
-
 import static net.zno_ua.app.provider.Query.Test.Column;
 
 public class TestItemVewHolder extends CursorViewHolder implements View.OnClickListener {
@@ -20,8 +20,6 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
     private final TextView mTvDescription;
     private final View mActionView;
     private final ImageView mIvActionIcon;
-    private final View bottomShadow;
-    //    private final View divider;
     private final String mExperimentalTest;
     private final String mOfficialTest;
     private final String mSession;
@@ -37,8 +35,6 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
         mTvDescription = (TextView) itemView.findViewById(R.id.description);
         mActionView = itemView.findViewById(R.id.action);
         mIvActionIcon = (ImageView) itemView.findViewById(R.id.action_icon);
-        bottomShadow = itemView.findViewById(R.id.bottom_shadow);
-//        divider = itemView.findViewById(R.id.divider);
         mOfficialTest = itemView.getContext().getString(R.string.official_test);
         mExperimentalTest = itemView.getContext().getString(R.string.experimental_test);
         mSession = itemView.getContext().getString(R.string.session);
@@ -86,7 +82,7 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
             final int actionResId;
             if (result == ZNOContract.Test.NO_LOADED_DATA) {
                 actionResId = R.drawable.ic_file_download_black_24dp;
-                description += (isEmpty(description) ? "" : ", ");
+                description += TextUtils.isEmpty(description) ? "" : ", ";
                 description += itemView.getContext().getString(R.string.needed_to_download);
             } else if (result == ZNOContract.Test.TEST_LOADED) {
                 actionResId = R.drawable.ic_delete_black_24dp;
@@ -107,18 +103,6 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
         }
 
         mTvDescription.setText(description);
-
-//        if (position == getItemCount() - 1) {
-//            bottomShadow.setVisibility(View.VISIBLE);
-//            divider.setVisibility(View.GONE);
-//        } else {
-//            if (getItemViewType(position + 1) == TYPE_ITEM)
-//                divider.setVisibility(View.VISIBLE);
-//            else
-//                divider.setVisibility(View.GONE);
-//
-//            bottomShadow.setVisibility(View.GONE);
-//        }
     }
 
     private String buildQuestionsCount(int questionsCount) {

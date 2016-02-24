@@ -20,6 +20,7 @@ import net.zno_ua.app.provider.ZNOContract;
 import net.zno_ua.app.util.Utils;
 import net.zno_ua.app.view.TestItemVewHolder;
 import net.zno_ua.app.widget.DividerItemDecoration;
+import net.zno_ua.app.widget.SelectableItemDecoration;
 
 import static net.zno_ua.app.provider.Query.Test;
 import static net.zno_ua.app.provider.Query.selectionArgs;
@@ -71,7 +72,7 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final DividerItemDecoration itemDecoration = new DividerItemDecoration(getActivity(), R.drawable.line_divider);
+        final SelectableItemDecoration itemDecoration = new DividerItemDecoration(getActivity());
         itemDecoration.setDecoratorSelector(mAdapter);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -117,7 +118,7 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onTestItemClicked(int position, long id, boolean isAction) {
         final Cursor cursor = mAdapter.getCursor();
-        if (cursor.moveToPosition(position)) {
+        if (cursor.moveToPosition(mAdapter.getItemPosition(position))) {
             final int status = cursor.getInt(Test.Column.STATUS);
             final int result = cursor.getInt(Test.Column.RESULT);
             if (status == ZNOContract.Test.STATUS_IDLE) {
