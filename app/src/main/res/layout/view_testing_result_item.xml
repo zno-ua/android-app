@@ -29,13 +29,12 @@
             tools:text="200.0" />
 
         <ImageView
-            android:id="@+id/smile"
+            android:id="@+id/sentiment"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:layout_alignBottom="@id/point"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="4dp"
             android:layout_toRightOf="@id/point"
-            android:src="@drawable/ic_poll_black_24dp"
             tools:ignore="ContentDescription" />
 
     </RelativeLayout>
@@ -57,7 +56,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/primary_text_color"
             android:textSize="18sp"
-            tools:text="2014 year" />
+            tools:text="Офіційний тест ЗНО (Базовий)" />
 
         <TextView
             android:id="@+id/description"
@@ -70,7 +69,7 @@
             android:maxLines="2"
             android:textColor="@color/secondary_text_color"
             android:textSize="14sp"
-            tools:text="Official test \nPassed at February 22th" />
+            tools:text="II сесія, 2015 рік\nPassed at February 22th" />
     </RelativeLayout>
 
 </RelativeLayout>

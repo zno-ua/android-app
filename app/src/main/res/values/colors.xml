@@ -17,6 +17,18 @@
     <color name="blue_500">#2196F3</color>
     <!--  Blue  -->
 
+    <!-- Yellow -->
+    <color name="yellow_500">#FFEB3B</color>
+    <!-- Yellow -->
+
+    <!-- Amber -->
+    <color name="amber_500">#FFC107</color>
+    <!-- Amber -->
+
+    <!-- Orange -->
+    <color name="orange_500">#FF9800</color>
+    <!-- Orange -->
+
     <!-- Indigo -->
     <color name="indigo_300">#7986CB</color>
     <color name="indigo_500">#3F51B5</color>

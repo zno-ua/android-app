@@ -14,18 +14,15 @@ import net.zno_ua.app.provider.ZNOContract;
 
 import static android.text.TextUtils.isEmpty;
 import static net.zno_ua.app.provider.Query.Test.Column;
+import static net.zno_ua.app.provider.ZNOContract.Test.getTestLevel;
+import static net.zno_ua.app.provider.ZNOContract.Test.getTestSession;
+import static net.zno_ua.app.provider.ZNOContract.Test.getTestType;
 
 public class TestItemVewHolder extends CursorViewHolder implements View.OnClickListener {
     private final TextView mTvTitle;
     private final TextView mTvDescription;
     private final View mActionView;
     private final ImageView mIvActionIcon;
-    private final String mExperimentalTest;
-    private final String mOfficialTest;
-    private final String mSession;
-    private final String mVariant;
-    private final String mLevelBasic;
-    private final String mLevelSpecialized;
     private final OnTestItemClickListener mOnTestItemClickListener;
 
     public TestItemVewHolder(LayoutInflater inflater, ViewGroup parent,
@@ -35,12 +32,6 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
         mTvDescription = (TextView) itemView.findViewById(R.id.description);
         mActionView = itemView.findViewById(R.id.action);
         mIvActionIcon = (ImageView) itemView.findViewById(R.id.action_icon);
-        mOfficialTest = itemView.getContext().getString(R.string.official_test);
-        mExperimentalTest = itemView.getContext().getString(R.string.experimental_test);
-        mSession = itemView.getContext().getString(R.string.session);
-        mVariant = itemView.getContext().getString(R.string.variant);
-        mLevelBasic = itemView.getContext().getString(R.string.level_basic);
-        mLevelSpecialized = itemView.getContext().getString(R.string.level_specialized);
         mOnTestItemClickListener = listener;
         itemView.setOnClickListener(this);
         mActionView.setOnClickListener(this);
@@ -50,34 +41,15 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
     public void bind(Cursor cursor) {
         final int session = cursor.getInt(Column.SESSION);
         final int result = cursor.getInt(Column.RESULT);
-        String primary = "";
-        String description = "";
-        switch (cursor.getInt(Column.TYPE)) {
-            case ZNOContract.Test.TYPE_OFFICIAL:
-                primary = mOfficialTest;
-                description = (session == 1 ? "I " : "II ") + mSession;
-                break;
-            case ZNOContract.Test.TYPE_EXPERIMENTAL:
-                primary = mExperimentalTest;
-                if (session != 0) {
-                    description = session + " " + mVariant;
-                }
-                break;
-        }
-
-        switch (cursor.getInt(Column.LEVEL)) {
-            case ZNOContract.Test.LEVEL_BASIC:
-                primary += " " + mLevelBasic;
-                break;
-            case ZNOContract.Test.LEVEL_SPECIALIZED:
-                primary += " " + mLevelSpecialized;
-                break;
-        }
-
-        mTvTitle.setText(primary);
-
         final int status = cursor.getInt(Column.STATUS);
-
+        final int type = cursor.getInt(Column.TYPE);
+        final int level = cursor.getInt(Column.LEVEL);
+        String primary = getTestType(itemView.getContext(), type);
+        String description = session != 0 ? getTestSession(itemView.getContext(), type, session) : "";
+        if (level != 0) {
+            primary += " " + getTestLevel(itemView.getContext(), level);
+        }
+        mTvTitle.setText(primary);
         if (status == ZNOContract.Test.STATUS_IDLE) {
             final int actionResId;
             if (result == ZNOContract.Test.NO_LOADED_DATA) {
@@ -101,7 +73,6 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
             mIvActionIcon.setVisibility(View.GONE);
             description = itemView.getContext().getString(R.string.downloading);
         }
-
         mTvDescription.setText(description);
     }
 
@@ -120,11 +91,11 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
     @Override
     public void onClick(View v) {
         final boolean isAction = v.getId() == R.id.action;
-        mOnTestItemClickListener.onTestItemClicked(getAdapterPosition(), getItemId(), isAction);
+        mOnTestItemClickListener.onTestItemClicked(getAdapterPosition(), isAction);
     }
 
     public interface OnTestItemClickListener {
 
-        void onTestItemClicked(int adapterPosition, long itemId, boolean isAction);
+        void onTestItemClicked(int adapterPosition, boolean isAction);
     }
 }

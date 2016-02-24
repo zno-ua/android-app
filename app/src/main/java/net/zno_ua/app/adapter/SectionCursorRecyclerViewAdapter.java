@@ -3,12 +3,15 @@ package net.zno_ua.app.adapter;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseIntArray;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Vojko Vladimir
@@ -17,23 +20,25 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String ROW_ID_COLUMN_NAME = BaseColumns._ID;
 
-    public static final int TYPE_ITEM = 0;
-    public static final int TYPE_SECTION = 1;
+    public static final int VIEW_TYPE_ITEM = 0x0;
+    public static final int VIEW_TYPE_SECTION_ITEM = 0x1;
+    private static final int NO_POSITION = -1;
 
     private Cursor mCursor;
     private boolean mDataValid;
     private int mRowIDColumn;
     private DataSetObserver mDataSetObserver;
 
-    private ItemsAdapter mItemsAdapter;
+    private final Map<Integer, S> mSections;
+    private final ItemsAdapter mItemsAdapter;
 
     public SectionCursorRecyclerViewAdapter() {
         mCursor = null;
         mDataValid = false;
         mRowIDColumn = -1;
         mDataSetObserver = new NotifyingDataSetObserver();
-        mItemsAdapter = new ItemsAdapter(null, null);
-        setHasStableIds(true);
+        mSections = new HashMap<>();
+        mItemsAdapter = new ItemsAdapter();
     }
 
     public Cursor getCursor() {
@@ -60,15 +65,12 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
         if (newCursor == mCursor) {
             return null;
         }
-
-        Cursor oldCursor = mCursor;
+        final Cursor oldCursor = mCursor;
 
         if (oldCursor != null && mDataSetObserver != null) {
             oldCursor.unregisterDataSetObserver(mDataSetObserver);
         }
-
         mCursor = newCursor;
-
         if (mCursor == null) {
             mRowIDColumn = -1;
             mDataValid = false;
@@ -79,70 +81,30 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
             mRowIDColumn = newCursor.getColumnIndexOrThrow(ROW_ID_COLUMN_NAME);
             mDataValid = true;
         }
-
-        ItemsAdapter oldItemsAdapter = mItemsAdapter;
-
-        if (mDataValid)
-            mItemsAdapter = new ItemsAdapter(createSections(mCursor), mCursor);
-        else
-            mItemsAdapter = new ItemsAdapter(null, null);
-
-        if (oldItemsAdapter.getCount() == 0 && mItemsAdapter.getCount() != 0)
-            notifyItemRangeInserted(0, mItemsAdapter.getCount());
-        else if (oldItemsAdapter.getCount() != 0 && mItemsAdapter.getCount() == 0)
-            notifyItemRangeRemoved(0, oldItemsAdapter.getCount());
-        else if (oldCursor != null) {
-            int min = min(oldItemsAdapter.getCount(), mItemsAdapter.getCount());
-            int max = max(oldItemsAdapter.getCount(), mItemsAdapter.getCount());
-
-            for (int i = 0; i < min; i++) {
-                if (mItemsAdapter.isItem(i) && oldItemsAdapter.isItem(i)) {
-                    if (oldCursor.moveToPosition(oldItemsAdapter.getItemPosition(i))
-                            && mCursor.moveToPosition(mItemsAdapter.getItemPosition(i))) {
-                        if (!isCursorItemsEquals(oldCursor, mCursor))
-                            notifyItemChanged(i);
-                    } else if (!(mItemsAdapter.isItem(i) || oldItemsAdapter.isItem(i))) {
-                        if (!mItemsAdapter.getSection(i).equals(oldItemsAdapter.getSection(i)))
-                            notifyItemChanged(i);
-                    } else {
-                        notifyItemChanged(i);
-                    }
-                }
+        mSections.clear();
+        if (mDataValid) {
+            final Map<Integer, S> sections = createSections(mCursor);
+            if (sections != null) {
+                mSections.putAll(sections);
             }
-
-            notifyItemRangeInserted(min, max - min);
+            mItemsAdapter.setData(mCursor, mSections);
         }
-
+        notifyDataSetChanged();
         return oldCursor;
     }
 
-    private boolean isCursorItemsEquals(Cursor a, Cursor b) {
-        boolean isEquals = true;
-        for (int i = 0; i < min(a.getColumnCount(), b.getColumnCount()); i++) {
-            isEquals = a.getString(i).equals(b.getString(i));
-
-            if (!isEquals)
-                break;
-        }
-
-        return isEquals;
-    }
-
-    protected abstract HashMap<Integer, S> createSections(Cursor cursor);
+    @Nullable
+    protected abstract HashMap<Integer, S> createSections(@NonNull Cursor cursor);
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (mItemsAdapter.isItem(position)) {
-            if (!mDataValid) {
-                throw new IllegalStateException("this should only be called when the cursor is valid");
+        if (getItemViewType(position) == VIEW_TYPE_ITEM) {
+            if (mDataValid && mCursor.moveToPosition(mItemsAdapter.getItemPosition(position))) {
+                onBindItemViewHolder(holder, mCursor, position);
             }
-            int itemPosition = mItemsAdapter.getItemPosition(position);
-            if (!mCursor.moveToPosition(itemPosition)) {
-                throw new IllegalStateException("couldn't move cursor to position " + itemPosition);
-            }
-            onBindItemViewHolder(holder, mCursor, position);
         } else {
-            onBindSectionViewHolder(holder, mItemsAdapter.getSection(position), position);
+            final int sectionPosition = mItemsAdapter.getSectionPosition(position);
+            onBindSectionViewHolder(holder, mSections.get(sectionPosition), position);
         }
     }
 
@@ -152,12 +114,12 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
 
     @Override
     public int getItemCount() {
-        return mItemsAdapter.getCount();
+        return mItemsAdapter.getItemCount();
     }
 
     @Override
     public long getItemId(int position) {
-        if (mItemsAdapter.isItem(position)) {
+        if (getItemViewType(position) == VIEW_TYPE_ITEM) {
             if (mDataValid && mCursor.moveToPosition(mItemsAdapter.getItemPosition(position))) {
                 return mCursor.getLong(mRowIDColumn);
             }
@@ -172,72 +134,67 @@ public abstract class SectionCursorRecyclerViewAdapter<S>
 
     @Override
     public int getItemViewType(int position) {
-        return (mItemsAdapter.isItem(position)) ? TYPE_ITEM : TYPE_SECTION;
+        return mItemsAdapter.getItemType(position);
     }
 
-    public boolean isSection(int position) {
-        return !isItem(position);
-    }
-
-    public boolean isItem(int position) {
-        return mItemsAdapter.isItem(position);
-    }
-
-    /*
-    * TODO: optimize adapter.
-    * */
     private class ItemsAdapter {
-        private HashMap<Integer, Boolean> mItems;
-        private HashMap<Integer, S> mSections;
-        private HashMap<Integer, Integer> mItemsPositions;
+        private final List<Integer> mItemsTypes;
+        private final List<Integer> mSectionItemsPositions;
+        private final SparseIntArray mItemsPositions;
 
-        public ItemsAdapter(HashMap<Integer, S> sections, Cursor cursor) {
-            mItems = new HashMap<>();
-            mItemsPositions = new HashMap<>();
-            mSections = sections;
-
-            if (mSections == null) {
-                mSections = new HashMap<>();
-            }
-
-            if (cursor != null && cursor.moveToFirst()) {
-                for (int i = 0; i < cursor.getCount() + sections.size(); i++) {
-                    boolean isItem = !mSections.containsKey(i);
-                    mItems.put(i, isItem);
-                    if (isItem) {
-                        mItemsPositions.put(i, cursor.getPosition());
-                        cursor.moveToNext();
-                    }
-                }
-            } else {
-                for (int i = 0; i < mSections.size(); i++) {
-                    mItems.put(i, false);
-                }
-            }
+        private ItemsAdapter() {
+            mItemsTypes = new ArrayList<>();
+            mSectionItemsPositions = new ArrayList<>();
+            mItemsPositions = new SparseIntArray();
         }
 
-        public boolean hasItems() {
-            return getCount() != 0;
+        public int getItemCount() {
+            return mItemsTypes.size();
         }
 
-        public int getCount() {
-            return mItems.size();
+        public int getItemType(int position) {
+            return mItemsTypes.get(position);
         }
 
-        public boolean isItem(int position) {
-            return mItems.get(position);
-        }
 
         public int getItemPosition(int position) {
-            if (isItem(position)) {
+            if (hasItem(position)) {
                 return mItemsPositions.get(position);
             }
 
-            return -1;
+            return NO_POSITION;
         }
 
-        public S getSection(int position) {
-            return mSections.get(position);
+        public int getSectionPosition(int position) {
+            return mSectionItemsPositions.get(position);
+        }
+
+        public boolean hasItem(int position) {
+            return position >= 0 || position < getItemCount();
+        }
+
+        public void setData(@NonNull Cursor cursor, @NonNull Map<Integer, S> sections) {
+            mItemsTypes.clear();
+            mItemsPositions.clear();
+            mSectionItemsPositions.clear();
+            final int itemsListSize = cursor.getCount() + sections.size();
+            for (int sectionPosition : sections.keySet()) {
+                if (sectionPosition < 0 || sectionPosition > itemsListSize - 1) {
+                    throw new IllegalArgumentException("The sections shouldn't be placed outside the items list.");
+                }
+            }
+            int currentSectionPosition = 0;
+            for (int position = 0, itemPosition = 0; position < itemsListSize; position++) {
+                if (sections.containsKey(position)) {
+                    mItemsTypes.add(position, VIEW_TYPE_SECTION_ITEM);
+                    currentSectionPosition = position;
+                } else {
+                    mItemsTypes.add(position, VIEW_TYPE_ITEM);
+                    mItemsPositions.put(position, itemPosition);
+                    itemPosition++;
+                }
+                mSectionItemsPositions.add(position, currentSectionPosition);
+            }
         }
     }
 

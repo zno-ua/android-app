@@ -1,5 +1,6 @@
 package net.zno_ua.app.fragment;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,12 +11,12 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import net.zno_ua.app.R;
+import net.zno_ua.app.activity.TestingActivity;
 import net.zno_ua.app.adapter.TestingResultsAdapter;
 import net.zno_ua.app.util.Utils;
 import net.zno_ua.app.view.TestingResultItemVewHolder;
@@ -23,6 +24,8 @@ import net.zno_ua.app.widget.DividerItemDecoration;
 import net.zno_ua.app.widget.SelectableItemDecoration;
 
 import static net.zno_ua.app.provider.Query.TestingResult;
+import static net.zno_ua.app.provider.Query.TestingResult.Column;
+import static net.zno_ua.app.provider.ZNOContract.Test.TEST_LOADED;
 
 /**
  * @author vojkovladimir
@@ -70,7 +73,7 @@ public class TestingResultFragment extends BaseFragment implements LoaderManager
     @Nullable
     @Override
     protected String getTitle() {
-        return getString(R.string.testing_result);
+        return getString(R.string.my_results);
     }
 
     @Override
@@ -95,6 +98,19 @@ public class TestingResultFragment extends BaseFragment implements LoaderManager
 
     @Override
     public void onTestingItemClicked(int adapterPosition) {
-        Log.d("Logs", "clicked " + adapterPosition);
+        final Cursor cursor = mAdapter.getCursor();
+        if (cursor.moveToPosition(mAdapter.getItemPosition(adapterPosition))) {
+            final int result = cursor.getInt(Column.TEST_RESULT);
+            final long testingId = cursor.getLong(Column._ID);
+            final long testId = cursor.getLong(Column.TEST_ID);
+            if (result == TEST_LOADED) {
+                final Intent intent = new Intent(getActivity(), TestingActivity.class);
+                intent.setAction(TestingActivity.Action.VIEW_TEST);
+                intent.putExtra(TestingActivity.Key.TEST_ID, testId);
+                intent.putExtra(TestingActivity.Key.TESTING_ID, testingId);
+                getActivity().startActivity(intent);
+            }
+        }
+
     }
 }

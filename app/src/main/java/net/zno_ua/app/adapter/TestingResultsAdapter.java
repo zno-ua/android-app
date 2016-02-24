@@ -2,6 +2,7 @@ package net.zno_ua.app.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,7 @@ public class TestingResultsAdapter extends SectionCursorRecyclerViewAdapter<Stri
     }
 
     @Override
-    protected HashMap<Integer, String> createSections(Cursor cursor) {
+    protected HashMap<Integer, String> createSections(@NonNull Cursor cursor) {
         final HashMap<Integer, String> sections = new HashMap<>();
         String year;
         int position = 0;
@@ -64,9 +65,9 @@ public class TestingResultsAdapter extends SectionCursorRecyclerViewAdapter<Stri
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
-            case TYPE_ITEM:
+            case VIEW_TYPE_ITEM:
                 return new TestingResultItemVewHolder(mInflater, parent, mClickListener);
-            case TYPE_SECTION:
+            case VIEW_TYPE_SECTION_ITEM:
                 return new SectionViewHolder(mInflater, parent);
             default:
                 throw new IllegalArgumentException("Invalid viewType " + viewType);
@@ -75,6 +76,7 @@ public class TestingResultsAdapter extends SectionCursorRecyclerViewAdapter<Stri
 
     @Override
     public boolean isDecorated(int position, View view, RecyclerView parent) {
-        return isItem(position) && position < getItemCount() - 1 && isSection(position + 1);
+        return getItemViewType(position) == VIEW_TYPE_ITEM && position < getItemCount() - 1
+                && getItemViewType(position + 1) == VIEW_TYPE_SECTION_ITEM;
     }
 }

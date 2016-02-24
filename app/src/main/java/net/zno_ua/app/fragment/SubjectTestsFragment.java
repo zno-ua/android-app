@@ -116,11 +116,12 @@ public class SubjectTestsFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
-    public void onTestItemClicked(int position, long id, boolean isAction) {
+    public void onTestItemClicked(int position, boolean isAction) {
         final Cursor cursor = mAdapter.getCursor();
         if (cursor.moveToPosition(mAdapter.getItemPosition(position))) {
             final int status = cursor.getInt(Test.Column.STATUS);
             final int result = cursor.getInt(Test.Column.RESULT);
+            final long id = cursor.getLong(Test.Column._ID);
             if (status == ZNOContract.Test.STATUS_IDLE) {
                 if (result == ZNOContract.Test.TEST_LOADED) {
                     if (isAction) {

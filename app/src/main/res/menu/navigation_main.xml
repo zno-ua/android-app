@@ -12,7 +12,7 @@
             android:id="@+id/navigation_item_testing_results"
             android:checked="true"
             android:icon="@drawable/ic_poll_black_24dp"
-            android:title="@string/testing_result" />
+            android:title="@string/my_results" />
     </group>
 
 </menu>

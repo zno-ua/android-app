@@ -1,8 +1,15 @@
 package net.zno_ua.app.provider;
 
-import android.content.ContentResolver;
+import android.content.Context;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+
+import net.zno_ua.app.R;
 
 import static net.zno_ua.app.provider.ZNODatabase.Tables;
 
@@ -254,8 +261,6 @@ public class ZNOContract {
     static final String PATH_TESTING_RESULT = "testing_result";
 
     private static final String DOT = ".";
-    private static final String VND = "/vnd.";
-
     public static final String AS = " AS ";
     public static final String ASC = " ASC";
     public static final String DESC = " DESC";
@@ -265,27 +270,6 @@ public class ZNOContract {
         public static final long UKRAINIAN = 1;
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_SUBJECT).build();
-
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_SUBJECT;
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_SUBJECT;
-
-        public static final String[] PROJECTION = {
-                _ID,
-                POSITION,
-                LINK,
-                NAME,
-                NAME_GENITIVE,
-        };
-
-        public interface PROJECTION_ID {
-            int _ID = 0;
-            int POSITION = 1;
-            int LINK = 2;
-            int NAME = 3;
-            int NAME_GENITIVE = 4;
-        }
 
         public static Uri buildSubjectUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
@@ -343,11 +327,6 @@ public class ZNOContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_TEST).build();
 
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_TEST;
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_TEST;
-
         public static Uri buildTestItemUri(long id) {
             return buildItemUri(CONTENT_URI, id);
         }
@@ -358,6 +337,38 @@ public class ZNOContract {
 
         public static final String SORT_ORDER = YEAR + DESC + "," + TYPE + ASC
                 + "," + SESSION + ASC + "," + LEVEL + ASC;
+
+        @NonNull
+        public static String getTestType(@NonNull Context context, int type) {
+            if (type == ZNOContract.Test.TYPE_OFFICIAL) {
+                return context.getString(R.string.official_test);
+            } else {
+                return context.getString(R.string.experimental_test);
+            }
+        }
+
+        @NonNull
+        public static String getTestSession(@NonNull Context context, int type, int session) {
+            if (session != 0) {
+                if (type == TYPE_OFFICIAL) {
+                    return (session == 1 ? "I " : "II ") + context.getString(R.string.session);
+                }
+                if (type == TYPE_EXPERIMENTAL) {
+                    return session + " " + context.getString(R.string.variant);
+                }
+            }
+            return "";
+        }
+
+        @NonNull
+        public static String getTestLevel(@NonNull Context context, int level) {
+            if (level == LEVEL_BASIC) {
+                return context.getString(R.string.level_basic);
+            } else if (level == LEVEL_SPECIALIZED) {
+                return context.getString(R.string.level_specialized);
+            }
+            return "";
+        }
     }
 
     public static class Question implements QuestionColumns, BaseColumns {
@@ -385,11 +396,6 @@ public class ZNOContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_QUESTION).build();
 
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_QUESTION;
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_QUESTION;
-
         public static final String SORT_ORDER = POSITION_ON_TEST + ASC;
     }
 
@@ -397,9 +403,6 @@ public class ZNOContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_QUESTION_AND_ANSWER).build();
 
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT
-                        + PATH_QUESTION_AND_ANSWER;
         public static final String SORT_ORDER = POSITION_ON_TEST + ASC;
     }
 
@@ -407,10 +410,6 @@ public class ZNOContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_ANSWER).build();
 
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_ANSWER;
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_ANSWER;
     }
 
     public static class Testing implements BaseColumns, TestingColumns {
@@ -429,11 +428,6 @@ public class ZNOContract {
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_TESTING).build();
-
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_TESTING;
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_TESTING;
 
         public static final String[] PROJECTION = {
                 _ID,
@@ -458,11 +452,6 @@ public class ZNOContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_POINT).build();
 
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_POINT;
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + VND + CONTENT_AUTHORITY + DOT + PATH_POINT;
-
         public static final String SORT_ORDER = TEST_POINT + ASC;
     }
 
@@ -470,10 +459,69 @@ public class ZNOContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_TESTING_RESULT).build();
 
-        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + VND + CONTENT_AUTHORITY + DOT + PATH_TESTING_RESULT;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + VND + CONTENT_AUTHORITY + DOT + PATH_TESTING_RESULT;
+        public static final int RESULT_VERY_DISSATISFIED = 0x0;
+        public static final int RESULT_DISSATISFIED = 0x1;
+        public static final int RESULT_NEUTRAL = 0x2;
+        public static final int RESULT_SATISFIED = 0x3;
+        public static final int RESULT_VERY_SATISFIED = 0x4;
+
+        public static int getSentimentOfRatingPoint(float ratingPoint) {
+            if (ratingPoint >= 180.0f) {
+                return RESULT_VERY_SATISFIED;
+            } else if (ratingPoint >= 160.f) {
+                return RESULT_SATISFIED;
+            } else if (ratingPoint >= 140.0f) {
+                return RESULT_NEUTRAL;
+            } else if (ratingPoint >= 130.f) {
+                return RESULT_DISSATISFIED;
+            }
+
+            return RESULT_VERY_DISSATISFIED;
+        }
+
+        @DrawableRes
+        private static final int[] SENTIMENT_DRAWABLE_RESOURCES = {
+                R.drawable.ic_sentiment_very_dissatisfied_black_18dp,
+                R.drawable.ic_sentiment_dissatisfied_black_18dp,
+                R.drawable.ic_sentiment_neutral_black_18dp,
+                R.drawable.ic_sentiment_satisfied_black_18dp,
+                R.drawable.ic_sentiment_very_satisfied_black_18dp
+        };
+
+        @ColorRes
+        private static final int[] SENTIMENT_COLOR_RESOURCES = {
+                R.color.red_500,
+                R.color.orange_500,
+                R.color.amber_500,
+                R.color.yellow_500,
+                R.color.green_500,
+        };
+
+        @DrawableRes
+        public static int getSentimentResourceId(int sentimentResult) {
+            return SENTIMENT_DRAWABLE_RESOURCES[correctSentimentResult(sentimentResult)];
+        }
+
+        @ColorRes
+        public static int getSentimentColorRes(int sentimentResult) {
+            return SENTIMENT_COLOR_RESOURCES[sentimentResult];
+        }
+
+        @ColorInt
+        public static int getSentimentColor(@NonNull Context context, int sentimentReslut) {
+            return ContextCompat.getColor(context, getSentimentColorRes(sentimentReslut));
+        }
+
+        private static int correctSentimentResult(int sentimentResult) {
+            if (sentimentResult < RESULT_VERY_DISSATISFIED) {
+                sentimentResult = RESULT_VERY_DISSATISFIED;
+            } else if (sentimentResult > RESULT_VERY_SATISFIED) {
+                sentimentResult = RESULT_VERY_SATISFIED;
+            }
+
+            return sentimentResult;
+        }
+
     }
 
     private static Uri buildItemUri(Uri contentUri, Object item) {

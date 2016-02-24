@@ -1,6 +1,5 @@
 package net.zno_ua.app.provider;
 
-import android.content.ContentResolver;
 import android.net.Uri;
 
 /**
@@ -128,17 +127,22 @@ public class Query {
 
         public interface Column {
             int _ID = 0;
-            int YEAR = 8;
+            int TEST_ID = 1;
+            int TEST_YEAR = 8;
             int SUBJECT_NAME = 9;
             int DATE = 10;
             int ELAPSED_TIME = 11;
             int RATING_POINT = 13;
+            int TEST_SESSION = 6;
+            int TEST_LEVEL = 7;
+            int TEST_TYPE = 5;
+            int TEST_RESULT = 4;
         }
 
         public static final String SELECTION = ZNOContract.TestingResult.STATUS + "="
                 + ZNOContract.Testing.FINISHED;
-        public static final String SORT_ORDER = ZNOContract.TestingResult.SUBJECT_NAME + ASC + ", "
-                + ZNOContract.TestingResult.RATING_POINT + ASC;
+        public static final String SORT_ORDER = ZNOContract.TestingResult.SUBJECT_ID + ASC + ", "
+                + ZNOContract.TestingResult.DATE + ASC;
     }
 
     public static String[] selectionArgs(Object... args) {

@@ -179,5 +179,6 @@
     <string name="year_format">%d рік</string>
     <string name="passed_date_format">Пройдено %1$d %2$s</string>
     <string name="for_minutes_format">за %1$d хв</string>
+    <string name="my_results">Мої результати</string>
 
 </resources>

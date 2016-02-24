@@ -159,38 +159,7 @@ public class ZNOProvider extends ContentProvider {
 
     @Override
     public String getType(@NonNull Uri uri) {
-        final int match = sUriMatcher.match(uri);
-
-        switch (match) {
-            case URI_CODE.SUBJECT:
-                return Subject.CONTENT_TYPE;
-            case URI_CODE.SUBJECT_ID:
-                return Subject.CONTENT_ITEM_TYPE;
-            case URI_CODE.TEST:
-                return Test.CONTENT_TYPE;
-            case URI_CODE.TEST_ID:
-                return Test.CONTENT_ITEM_TYPE;
-            case URI_CODE.QUESTION:
-                return Question.CONTENT_TYPE;
-            case URI_CODE.QUESTION_AND_ANSWER:
-                return QuestionAndAnswer.CONTENT_TYPE;
-            case URI_CODE.QUESTION_ID:
-                return Question.CONTENT_ITEM_TYPE;
-            case URI_CODE.ANSWER:
-                return Answer.CONTENT_TYPE;
-            case URI_CODE.ANSWER_ID:
-                return Answer.CONTENT_ITEM_TYPE;
-            case URI_CODE.TESTING:
-                return Testing.CONTENT_TYPE;
-            case URI_CODE.TESTING_ID:
-                return Testing.CONTENT_ITEM_TYPE;
-            case URI_CODE.POINT:
-                return Point.CONTENT_TYPE;
-            case URI_CODE.POINT_ID:
-                return Point.CONTENT_ITEM_TYPE;
-            default:
-                throw new IllegalArgumentException("Unknown uri: " + uri);
-        }
+        return null;
     }
 
     @Override
