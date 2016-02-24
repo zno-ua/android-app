@@ -173,6 +173,8 @@
         ]]>
     </string>
     <string name="statement_question_number_en">W</string>
-    <string name="statement_question_number">П</string>
+    <string name="statement_question_number">В</string>
+    <string name="statement_en">Writing</string>
+    <string name="statement">Висловлювання</string>
 
 </resources>
