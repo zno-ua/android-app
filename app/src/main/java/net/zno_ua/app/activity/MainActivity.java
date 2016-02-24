@@ -1,5 +1,6 @@
 package net.zno_ua.app.activity;
 
+import android.annotation.SuppressLint;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -7,7 +8,6 @@ import android.content.Loader;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -36,6 +36,7 @@ import net.zno_ua.app.util.Utils;
 
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Random;
 
 import static java.lang.String.valueOf;
 import static net.zno_ua.app.provider.ZNOContract.Answer;
@@ -52,11 +53,14 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private int mSelectedNavigationItemId;
+    private String[] mQuotes;
+    private final Random mRandom = new Random();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mQuotes = getResources().getStringArray(R.array.quotes);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setUpActionBar(toolbar);
         setUpNavigationDrawerLayout(toolbar);
@@ -86,10 +90,20 @@ public class MainActivity extends AppCompatActivity
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        final View headerView = mNavigationView.inflateHeaderView(R.layout.drawer_header);
+        final View headerView = mNavigationView.inflateHeaderView(R.layout.view_drawer_header);
 
         final ImageView backgroundImage = (ImageView) headerView.findViewById(R.id.image);
         Picasso.with(this).load(R.drawable.ic_zno).fit().centerCrop().into(backgroundImage);
+        final TextView tvQuote = (TextView) headerView.findViewById(R.id.quote);
+        tvQuote.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View v) {
+                final String quote = mQuotes[mRandom.nextInt(mQuotes.length)];
+                tvQuote.setText(String.format(getString(R.string.quote_format), quote));
+            }
+        });
+        tvQuote.performClick();
 
         final Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR) + ((calendar.get(Calendar.MONTH) < 7) ? 0 : 1);

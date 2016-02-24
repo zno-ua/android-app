@@ -386,37 +386,8 @@ public class TestingActivity extends AppCompatActivity
         new MaterialDialog.Builder(this)
                 .title(R.string.test_completed)
                 .content(format(Locale.US, getString(R.string.your_rating_point_format), ratingPoint))
-                .positiveText(R.string.ok)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog materialDialog,
-                                        @NonNull DialogAction dialogAction) {
-                        showResultsDialog();
-                    }
-                })
-                .negativeText(R.string.exit)
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog materialDialog,
-                                        @NonNull DialogAction dialogAction) {
-                        finish();
-                    }
-                })
-                .cancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        finish();
-                    }
-                }).show();
-    }
-
-    private void showResultsDialog() {
-        new MaterialDialog.Builder(this)
-                .title(R.string.view_results_question)
-                .content(R.string.view_results_description)
                 .positiveText(R.string.view)
-                .negativeText(R.string.do_not_view)
-                .onAny(new MaterialDialog.SingleButtonCallback() {
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog materialDialog,
                                         @NonNull DialogAction dialogAction) {
@@ -427,6 +398,14 @@ public class TestingActivity extends AppCompatActivity
                             intent.putExtra(Key.TESTING_ID, mTestingInfo.getTestingId());
                             startActivity(intent);
                         }
+                        finish();
+                    }
+                })
+                .negativeText(R.string.exit)
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog materialDialog,
+                                        @NonNull DialogAction dialogAction) {
                         finish();
                     }
                 })
