@@ -203,6 +203,13 @@ public class TestingActivity extends AppCompatActivity
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.activity_open_alpha, R.anim.activity_close_translate_right);
+
+    }
+
     private long createTesting(long testId, long elapsedTime) {
         ContentValues values = new ContentValues();
         values.put(Testing.TEST_ID, testId);
@@ -397,6 +404,8 @@ public class TestingActivity extends AppCompatActivity
                             intent.putExtra(Key.TEST_ID, mTestingInfo.getTestId());
                             intent.putExtra(Key.TESTING_ID, mTestingInfo.getTestingId());
                             startActivity(intent);
+                            overridePendingTransition(R.anim.activity_open_translate_right,
+                                    R.anim.activity_close_alpha);
                         }
                         finish();
                     }

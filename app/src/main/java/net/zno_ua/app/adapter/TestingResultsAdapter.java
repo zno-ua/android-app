@@ -8,8 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.zno_ua.app.view.SectionViewHolder;
-import net.zno_ua.app.view.TestingResultItemVewHolder;
+import net.zno_ua.app.viewholder.SectionViewHolder;
+import net.zno_ua.app.viewholder.TestingResultItemVewHolder;
 import net.zno_ua.app.widget.SelectableItemDecoration;
 
 import java.util.HashMap;

@@ -85,7 +85,7 @@ public class TestProcessor {
                         * If the questions are not downloaded or downloaded, but the test is
                         * outdated, download the questions.
                         * */
-                        if (!isQuestionsLoaded || isDataOutdated || question.point != 0) {
+                        if ((!isQuestionsLoaded || isDataOutdated) && question.point != 0) {
                             saveQuestion(testId, question);
                         }
 

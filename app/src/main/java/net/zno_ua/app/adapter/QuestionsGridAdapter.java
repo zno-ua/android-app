@@ -6,8 +6,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import net.zno_ua.app.model.TestingInfo;
-import net.zno_ua.app.view.CursorViewHolder;
-import net.zno_ua.app.view.question.QuestionNumberVH;
+import net.zno_ua.app.viewholder.CursorViewHolder;
+import net.zno_ua.app.viewholder.question.QuestionNumberVH;
 
 /**
  * @author vojkovladimir.

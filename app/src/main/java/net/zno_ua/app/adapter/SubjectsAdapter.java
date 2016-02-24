@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import net.zno_ua.app.view.SubjectViewHolder;
+import net.zno_ua.app.viewholder.SubjectViewHolder;
 
 public class SubjectsAdapter extends CursorRecyclerViewAdapter<SubjectViewHolder> {
 

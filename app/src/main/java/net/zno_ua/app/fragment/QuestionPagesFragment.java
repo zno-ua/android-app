@@ -29,7 +29,7 @@ import net.zno_ua.app.adapter.QuestionsGridAdapter;
 import net.zno_ua.app.model.TestingInfo;
 import net.zno_ua.app.util.TestingAnswersUtils;
 import net.zno_ua.app.util.Utils;
-import net.zno_ua.app.view.question.QuestionNumberVH;
+import net.zno_ua.app.viewholder.question.QuestionNumberVH;
 import net.zno_ua.app.widget.SpaceItemDecoration;
 
 import static net.zno_ua.app.provider.Query.Question;

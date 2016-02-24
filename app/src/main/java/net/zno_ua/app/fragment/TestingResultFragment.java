@@ -19,7 +19,7 @@ import net.zno_ua.app.R;
 import net.zno_ua.app.activity.TestingActivity;
 import net.zno_ua.app.adapter.TestingResultsAdapter;
 import net.zno_ua.app.util.Utils;
-import net.zno_ua.app.view.TestingResultItemVewHolder;
+import net.zno_ua.app.viewholder.TestingResultItemVewHolder;
 import net.zno_ua.app.widget.DividerItemDecoration;
 import net.zno_ua.app.widget.SelectableItemDecoration;
 
@@ -109,6 +109,8 @@ public class TestingResultFragment extends BaseFragment implements LoaderManager
                 intent.putExtra(TestingActivity.Key.TEST_ID, testId);
                 intent.putExtra(TestingActivity.Key.TESTING_ID, testingId);
                 getActivity().startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.activity_open_translate_right,
+                        R.anim.activity_close_alpha);
             }
         }
 

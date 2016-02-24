@@ -1,4 +1,4 @@
-package net.zno_ua.app.view.question;
+package net.zno_ua.app.viewholder.question;
 
 import android.database.Cursor;
 import android.support.v4.content.ContextCompat;
@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.zno_ua.app.R;
-import net.zno_ua.app.view.CursorViewHolder;
+import net.zno_ua.app.viewholder.CursorViewHolder;
+
+import java.util.Locale;
 
 import static net.zno_ua.app.provider.Query.QuestionAndAnswer.Column;
 import static net.zno_ua.app.provider.ZNOContract.Question.TYPE_2;
@@ -56,7 +58,8 @@ public class QuestionNumberVH extends CursorViewHolder {
         if (type == TYPE_2 && cursor.getCount() - 1 == cursor.getPosition()) {
             mTvQuestionNumber.setText(mStatementText);
         } else {
-            mTvQuestionNumber.setText(String.format(NUMBER_FORMAT, cursor.getPosition() + 1));
+            final int number = cursor.getPosition() + 1;
+            mTvQuestionNumber.setText(String.format(Locale.US, NUMBER_FORMAT, number));
         }
         final String answer = cursor.getString(Column.ANSWER);
         if (mIsPassed) {

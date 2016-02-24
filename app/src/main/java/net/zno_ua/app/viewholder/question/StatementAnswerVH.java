@@ -1,4 +1,4 @@
-package net.zno_ua.app.view.question;
+package net.zno_ua.app.viewholder.question;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

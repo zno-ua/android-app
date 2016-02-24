@@ -139,6 +139,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.activity_open_alpha,
+                R.anim.activity_close_translate_down);
+
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item))
             return true;
@@ -235,6 +243,7 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra(TestingActivity.Key.TIMER_MODE, !data.isNull(COLUMN_ID.ELAPSED_TIME) &&
                 data.getLong(COLUMN_ID.ELAPSED_TIME) != -1);
         startActivity(intent);
+        overridePendingTransition(R.anim.activity_open_translate_right, R.anim.activity_close_alpha);
     }
 
     @Override

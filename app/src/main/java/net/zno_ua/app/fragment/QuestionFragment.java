@@ -30,9 +30,9 @@ import net.zno_ua.app.model.question.StatementAnswerVm;
 import net.zno_ua.app.model.question.UnAnsweredQuestionPrompt;
 import net.zno_ua.app.provider.Query;
 import net.zno_ua.app.util.Utils;
-import net.zno_ua.app.view.question.ChoicesAnswersVH;
-import net.zno_ua.app.view.question.OnAnswerChangeListener;
-import net.zno_ua.app.view.question.OneAnswerVH;
+import net.zno_ua.app.viewholder.question.ChoicesAnswersVH;
+import net.zno_ua.app.viewholder.question.OnAnswerChangeListener;
+import net.zno_ua.app.viewholder.question.OneAnswerVH;
 import net.zno_ua.app.widget.SpaceItemDecoration;
 
 import java.util.ArrayList;

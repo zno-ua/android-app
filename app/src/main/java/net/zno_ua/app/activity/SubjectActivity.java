@@ -81,6 +81,13 @@ public class SubjectActivity extends AppCompatActivity
     }
 
     @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.activity_open_alpha, R.anim.activity_close_translate_right);
+
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -168,6 +175,7 @@ public class SubjectActivity extends AppCompatActivity
         intent.putExtra(TestingActivity.Key.TEST_ID, id);
         intent.putExtra(TestingActivity.Key.TIMER_MODE, withTimer);
         startActivity(intent);
+        overridePendingTransition(R.anim.activity_open_translate_right, R.anim.activity_close_alpha);
     }
 
     private void startDownloadingTest(long id) {

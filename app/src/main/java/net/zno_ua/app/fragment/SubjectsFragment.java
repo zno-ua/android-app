@@ -20,7 +20,7 @@ import net.zno_ua.app.adapter.CursorRecyclerViewAdapter;
 import net.zno_ua.app.adapter.SubjectsAdapter;
 import net.zno_ua.app.provider.ZNOContract;
 import net.zno_ua.app.util.Utils;
-import net.zno_ua.app.view.SubjectViewHolder;
+import net.zno_ua.app.viewholder.SubjectViewHolder;
 import net.zno_ua.app.widget.SpaceItemDecoration;
 
 public class SubjectsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -47,6 +47,8 @@ public class SubjectsFragment extends BaseFragment implements LoaderManager.Load
                 final Intent intent = new Intent(getActivity(), SubjectActivity.class);
                 intent.putExtra(SubjectActivity.EXTRA_SUBJECT_ID, id);
                 getActivity().startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.activity_open_translate_right,
+                        R.anim.activity_close_alpha);
             }
         });
         mSpanCount = getResources().getInteger(R.integer.subjects_grid_span_count);

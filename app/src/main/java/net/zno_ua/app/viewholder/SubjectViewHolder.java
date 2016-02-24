@@ -1,4 +1,4 @@
-package net.zno_ua.app.view;
+package net.zno_ua.app.viewholder;
 
 import android.database.Cursor;
 import android.os.Build;

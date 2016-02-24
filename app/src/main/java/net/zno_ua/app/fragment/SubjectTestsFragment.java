@@ -18,7 +18,7 @@ import net.zno_ua.app.R;
 import net.zno_ua.app.adapter.TestsAdapter;
 import net.zno_ua.app.provider.ZNOContract;
 import net.zno_ua.app.util.Utils;
-import net.zno_ua.app.view.TestItemVewHolder;
+import net.zno_ua.app.viewholder.TestItemVewHolder;
 import net.zno_ua.app.widget.DividerItemDecoration;
 import net.zno_ua.app.widget.SelectableItemDecoration;
 

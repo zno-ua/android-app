@@ -1,4 +1,4 @@
-package net.zno_ua.app.view;
+package net.zno_ua.app.viewholder;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
