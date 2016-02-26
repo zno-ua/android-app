@@ -105,7 +105,7 @@ public class QuestionFragment extends Fragment
         final char firstLetter = isEnglish ? 'A' : 'А';
         final boolean isEditable = !mTestingInfo.isPassed();
         final ArrayList<QuestionItem> items = new ArrayList<>();
-        items.add(new QuestionText(getActivity(), text, additionalText, isEnglish));
+        items.add(new QuestionText(text, additionalText, isEnglish));
         if (type == Question.TYPE_1) {
             if (mTestingInfo.isPassed() && TextUtils.isEmpty(answer)) {
                 items.add(new UnAnsweredQuestionPrompt());

@@ -40,6 +40,8 @@ public class TestProcessor {
     private static final String IMAGE = "IMAGE";
     private static final String IMAGE_REGEX = "\\$" + IMAGE + "\\$";
     private static final String IMAGE_SRC_FORMAT = "<img src=\"/%d" + FORMULAS_PATH + "/%s\"/>";
+    private static final String HR = "<hr>";
+    private static final String BR = "<br>";
 
     private final FileManager mFileManager;
     private final APIClient mApiClient;
@@ -239,7 +241,7 @@ public class TestProcessor {
                 }
             }
         }
-        question.text = question.text.replace(HREF, HREF_REPLACEMENT);
+        question.text = question.text.replace(HREF, HREF_REPLACEMENT).replace(HR, BR);
     }
 
     private static String cleanAnswers(String answers) {
