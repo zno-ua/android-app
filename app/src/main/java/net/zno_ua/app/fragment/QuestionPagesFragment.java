@@ -298,7 +298,7 @@ public class QuestionPagesFragment extends Fragment
     @Override
     public void onQuestionAnswered() {
         final int nextItem = mViewPager.getCurrentItem() + 1;
-        if (mPagerChangeListener != null) {
+        if (mPagerChangeListener != null && nextItem < mQuestionsAdapter.getCount()) {
             mPagerChangeListener.onCurrentItemChanged(nextItem);
         }
         mViewPager.setCurrentItem(nextItem);
