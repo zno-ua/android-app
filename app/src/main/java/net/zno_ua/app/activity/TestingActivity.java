@@ -12,9 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,7 +44,7 @@ import static net.zno_ua.app.provider.ZNOContract.Testing;
 import static net.zno_ua.app.provider.ZNOContract.Testing.buildTestingItemUri;
 
 
-public class TestingActivity extends AppCompatActivity
+public class TestingActivity extends BaseActivity
         implements QuestionPagesFragment.OnViewPagerChangeListener {
     private static final long MINUTE = 60000;
 
@@ -279,13 +277,15 @@ public class TestingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onViewPagerAttached(ViewPager viewPager) {
+    public void onViewPagerDataChanged(ViewPager viewPager) {
+        /*
+        * Temporary workaround
+        * TODO: change when fix will be available.
+        * */
+        for (int j = 0; j < 17; j++) {
+            mTabLayout.newTab();
+        }
         mTabLayout.setupWithViewPager(viewPager);
-    }
-
-    @Override
-    public void onViewPagerChanged(PagerAdapter adapter) {
-        mTabLayout.setTabsFromPagerAdapter(adapter);
     }
 
     @Override
@@ -298,6 +298,7 @@ public class TestingActivity extends AppCompatActivity
 
     @Override
     public void onViewPagerDetached() {
+        mTabLayout.removeAllTabs();
         mTabLayout.setVisibility(View.GONE);
     }
 

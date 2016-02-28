@@ -14,7 +14,7 @@ import java.io.FileNotFoundException;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 
-public class ViewImageActivity extends AppCompatActivity {
+public class ViewImageActivity extends BaseActivity {
     public static final String DATA_SCHEMA = "image";
 
     private static final String SRC = "src";

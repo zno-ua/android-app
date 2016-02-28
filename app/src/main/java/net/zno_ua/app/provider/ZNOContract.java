@@ -9,6 +9,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 
+import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.R;
 
 import static net.zno_ua.app.provider.ZNODatabase.Tables;
@@ -247,7 +248,7 @@ public class ZNOContract {
     /**
      * Authority for the provider of the content of the {@link ZNODataBase}
      */
-    public static final String CONTENT_AUTHORITY = "net.zno_ua.app.provider.ZNOProvider";
+    public static final String CONTENT_AUTHORITY = BuildConfig.APPLICATION_ID + ".ZNOProvider";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 

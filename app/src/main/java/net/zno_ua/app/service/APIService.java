@@ -1,6 +1,7 @@
 package net.zno_ua.app.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.IBinder;
@@ -16,7 +17,7 @@ import static net.zno_ua.app.provider.ZNOContract.Test;
 public class APIService extends Service {
 
     public interface Action {
-        String RESTART_PENDING_REQUESTS = "net.zno_ua.app.RESTART_PENDING_REQUESTS";
+        String RESTART_PENDING_REQUESTS = BuildConfig.APPLICATION_ID + ".RESTART_PENDING_REQUESTS";
     }
 
     public interface Extra {
@@ -31,6 +32,28 @@ public class APIService extends Service {
 
     public APIService() {
         mPendingCommands = new SparseArray<>();
+    }
+
+    public static void restartPendingRequests(Context context) {
+        context.startService(getIntent(context).setAction(APIService.Action.RESTART_PENDING_REQUESTS));
+    }
+
+    public static void getTest(Context context, long testId) {
+        context.startService(getIntent(context)
+                .putExtra(APIService.Extra.METHOD, APIService.Method.GET)
+                .putExtra(APIService.Extra.RESOURCE_TYPE, APIService.ResourceType.TEST)
+                .putExtra(APIService.Extra.ID, testId));
+    }
+
+    public static void deleteTest(Context context, long testId) {
+        context.startService(getIntent(context)
+                .putExtra(APIService.Extra.METHOD, APIService.Method.DELETE)
+                .putExtra(APIService.Extra.RESOURCE_TYPE, APIService.ResourceType.TEST)
+                .putExtra(APIService.Extra.ID, testId));
+    }
+
+    private static Intent getIntent(Context context) {
+        return new Intent(context, APIService.class);
     }
 
     @Override
@@ -104,10 +127,10 @@ public class APIService extends Service {
                             if (!isCommandPending(method, ResourceType.TEST, id)) {
                                 switch (method) {
                                     case Method.GET:
-                                        APIServiceHelper.getTest(getBaseContext(), id);
+                                        APIService.getTest(getBaseContext(), id);
                                         break;
                                     case Method.DELETE:
-                                        APIServiceHelper.deleteTest(getBaseContext(), id);
+                                        APIService.deleteTest(getBaseContext(), id);
                                         break;
                                 }
                             }

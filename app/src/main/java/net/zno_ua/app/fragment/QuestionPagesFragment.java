@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -245,17 +244,12 @@ public class QuestionPagesFragment extends Fragment
                 if (mQuestionsAdapter.getCursor() == data) {
                     return;
                 }
-                final boolean hasData = mQuestionsAdapter.getCount() > 0;
                 mQuestionsAdapter.changeCursor(data);
                 if (mCurrentItem != TestingAnswersUtils.NO_POSITION) {
                     mViewPager.setCurrentItem(mCurrentItem, true);
                     mCurrentItem = TestingAnswersUtils.NO_POSITION;
                 }
-                if (hasData) {
-                    onViewPagerChanged();
-                } else {
-                    onViewPagerAttached();
-                }
+                onViewPagerChanged();
                 mPagerChangeListener.onViewPagerVisibilityChanged(mView == VIEW_CAROUSEL);
                 break;
             case LOADER_QUESTIONS_AND_ANSWERS:
@@ -279,13 +273,7 @@ public class QuestionPagesFragment extends Fragment
 
     private void onViewPagerChanged() {
         if (mPagerChangeListener != null) {
-            mPagerChangeListener.onViewPagerChanged(mQuestionsAdapter);
-        }
-    }
-
-    private void onViewPagerAttached() {
-        if (mPagerChangeListener != null) {
-            mPagerChangeListener.onViewPagerAttached(mViewPager);
+            mPagerChangeListener.onViewPagerDataChanged(mViewPager);
         }
     }
 
@@ -312,9 +300,7 @@ public class QuestionPagesFragment extends Fragment
 
     public interface OnViewPagerChangeListener {
 
-        void onViewPagerAttached(ViewPager viewPager);
-
-        void onViewPagerChanged(PagerAdapter adapter);
+        void onViewPagerDataChanged(ViewPager viewPager);
 
         void onViewPagerVisibilityChanged(boolean isVisible);
 
