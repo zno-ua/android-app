@@ -17,14 +17,14 @@ import com.squareup.picasso.Picasso;
 
 import net.zno_ua.app.R;
 import net.zno_ua.app.fragment.SubjectTestsFragment;
-import net.zno_ua.app.service.APIServiceHelper;
+import net.zno_ua.app.service.APIService;
 import net.zno_ua.app.util.Utils;
 import net.zno_ua.app.widget.AspectRatioImageView;
 
 import static net.zno_ua.app.provider.ZNOContract.Subject;
 import static net.zno_ua.app.provider.ZNOContract.Subject.buildSubjectUri;
 
-public class SubjectActivity extends AppCompatActivity
+public class SubjectActivity extends BaseActivity
         implements SubjectTestsFragment.OnTestSelectedListener {
     public static final String EXTRA_SUBJECT_ID = "net.zno_ua.app.ui.SUBJECT_ID";
 
@@ -179,10 +179,10 @@ public class SubjectActivity extends AppCompatActivity
     }
 
     private void startDownloadingTest(long id) {
-        APIServiceHelper.getTest(this, id);
+        APIService.getTest(this, id);
     }
 
     private void startDeletingTest(long id) {
-        APIServiceHelper.deleteTest(this, id);
+        APIService.deleteTest(this, id);
     }
 }

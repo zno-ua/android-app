@@ -150,17 +150,6 @@
     <string name="test_completed">Тест завершено</string>
     <string name="your_rating_point_format">Ваш рейтинговий бал складає %1$.1f.\nВи зможете подивитися на які питання ви відповіли вірно, а на які ні.</string>
     <string name="deleting">Видаляеться…</string>
-    <string name="html_format">
-        <![CDATA[
-        <html>
-            <head>
-                <link href="file:///android_asset/style/question.css" rel="stylesheet" type="text/css">
-                <style> html, body, table { font-size: %1$dpx; } </style>
-            </head>
-            <body>%2$s</body>
-        </html>
-        ]]>
-    </string>
     <string name="statement_question_number_en">W</string>
     <string name="statement_question_number">В</string>
     <string name="statement_en">Writing</string>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="@dimen/key_line_8dp"
@@ -11,21 +12,56 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingTop="@dimen/key_line_1">
 
-        <ViewStub
-            android:id="@+id/text_view_stub"
+        <TextView
+            android:id="@+id/text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/key_line_1"
-            android:layout="@layout/view_text" />
+            android:layout_marginLeft="@dimen/key_line_1"
+            android:layout_marginRight="@dimen/key_line_1"
+            android:textColor="@color/primary_text_color"
+            android:textSize="14sp"
+            tools:text="Question text\nlorem ipsum dolor" />
 
-        <ViewStub
-            android:id="@+id/web_view_stub"
+        <LinearLayout
+            android:id="@+id/table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/key_line_1"
-            android:layout="@layout/view_text_tagged" />
+            android:layout_marginLeft="@dimen/key_line_1"
+            android:layout_marginRight="@dimen/key_line_1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/text1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:textColor="@color/primary_text_color"
+                android:textSize="14sp"
+                tools:text="column1\ncolumn1\ncolumn1\ncolumn1" />
+
+            <Space
+                android:layout_width="@dimen/key_line_8dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/text2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:textColor="@color/primary_text_color"
+                android:textSize="14sp"
+                tools:text="column2\ncolumn2\ncolumn2\ncolumn2" />
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/key_line_1" />
 
         <ViewStub
             android:id="@+id/additional_text_view_stub"

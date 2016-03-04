@@ -19,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,12 +27,18 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.squareup.picasso.Picasso;
 
 import net.zno_ua.app.R;
+import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.fragment.BaseFragment;
 import net.zno_ua.app.fragment.SubjectsFragment;
 import net.zno_ua.app.fragment.TestingResultFragment;
+import net.zno_ua.app.service.GcmRegistrationService;
 import net.zno_ua.app.util.Utils;
 
 import java.util.Calendar;
@@ -44,10 +51,12 @@ import static net.zno_ua.app.provider.ZNOContract.Testing;
 import static net.zno_ua.app.provider.ZNOContract.Testing.COLUMN_ID;
 import static net.zno_ua.app.provider.ZNOContract.Testing.buildTestingItemUri;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor>, BaseFragment.OnTitleChangeListener {
     private static final String KEY_SELECTED_NAVIGATION_ITEM_ID = "KEY_SELECTED_NAVIGATION_ITEM_ID";
+    private static final String TAG = "Logs";
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
@@ -71,6 +80,9 @@ public class MainActivity extends AppCompatActivity
         } else {
             mSelectedNavigationItemId = savedInstanceState.getInt(KEY_SELECTED_NAVIGATION_ITEM_ID);
         }
+        if (checkPlayServices()) {
+            startService(new Intent(this, GcmRegistrationService.class));
+        }
     }
 
     private void setUpActionBar(Toolbar toolBar) {
@@ -85,13 +97,10 @@ public class MainActivity extends AppCompatActivity
                 Utils.getThemeAttribute(this, R.attr.colorPrimaryDark).resourceId
         );
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
-
         final View headerView = mNavigationView.inflateHeaderView(R.layout.view_drawer_header);
-
         final ImageView backgroundImage = (ImageView) headerView.findViewById(R.id.image);
         Picasso.with(this).load(R.drawable.ic_zno).fit().centerCrop().into(backgroundImage);
         final TextView tvQuote = (TextView) headerView.findViewById(R.id.quote);
@@ -104,7 +113,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
         tvQuote.performClick();
-
         final Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR) + ((calendar.get(Calendar.MONTH) < 7) ? 0 : 1);
         final TextView headerTitle = (TextView) headerView.findViewById(R.id.text);
@@ -212,7 +220,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
-        if (data.moveToFirst()) {
+        if (data != null && data.moveToFirst()) {
             new MaterialDialog.Builder(this)
                     .title(R.string.start_unfinished_test_question)
                     .content(R.string.start_unfinished_test_description)
@@ -273,4 +281,25 @@ public class MainActivity extends AppCompatActivity
     public Fragment getMainContentFragment() {
         return getSupportFragmentManager().findFragmentById(R.id.main_content);
     }
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        final GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        final int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
 }
