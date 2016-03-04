@@ -6,12 +6,6 @@
     android:fitsSystemWindows="true"
     tools:context=".activity.SubjectActivity">
 
-    <FrameLayout
-        android:id="@+id/main_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +18,7 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginEnd="@dimen/abc_action_bar_content_inset_material"
+            app:expandedTitleMarginEnd="@dimen/key_line_1"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:statusBarScrim="?attr/colorPrimaryDark">
 
@@ -40,16 +34,6 @@
                 app:layout_collapseParallaxMultiplier="0.7"
                 tools:ignore="UnusedAttribute" />
 
-            <View
-                android:id="@+id/status_bar_background"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/material_default_status_bar_height"
-                android:layout_gravity="top"
-                android:background="@color/translucent_status_bar"
-                android:fitsSystemWindows="true"
-                android:visibility="gone"
-                app:layout_collapseMode="pin" />
-
             <android.support.v7.widget.Toolbar
                 android:id="@+id/app_bar"
                 android:layout_width="match_parent"
@@ -62,5 +46,11 @@
         </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
+
+    <FrameLayout
+        android:id="@+id/main_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>

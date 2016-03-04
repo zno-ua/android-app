@@ -43,9 +43,6 @@ public class SubjectActivity extends BaseActivity
     private void init() {
         initToolbar();
         initToolbarLayout();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            findViewById(R.id.status_bar_background).setVisibility(View.VISIBLE);
-        }
 
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

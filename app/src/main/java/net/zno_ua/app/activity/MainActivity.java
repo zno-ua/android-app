@@ -55,7 +55,6 @@ public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor>, BaseFragment.OnTitleChangeListener {
     private static final String KEY_SELECTED_NAVIGATION_ITEM_ID = "KEY_SELECTED_NAVIGATION_ITEM_ID";
-    private static final String TAG = "Logs";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private ActionBarDrawerToggle mDrawerToggle;
@@ -144,14 +143,6 @@ public class MainActivity extends BaseActivity
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.activity_open_alpha,
-                R.anim.activity_close_translate_down);
-
     }
 
     @Override
