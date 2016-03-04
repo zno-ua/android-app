@@ -2,11 +2,11 @@ package net.zno_ua.app.viewholder;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.AppCompatImageView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.zno_ua.app.R;
@@ -22,7 +22,7 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
     private final TextView mTvTitle;
     private final TextView mTvDescription;
     private final View mActionView;
-    private final ImageView mIvActionIcon;
+    private final AppCompatImageView mIvActionIcon;
     private final OnTestItemClickListener mOnTestItemClickListener;
 
     public TestItemVewHolder(LayoutInflater inflater, ViewGroup parent,
@@ -31,7 +31,7 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
         mTvTitle = (TextView) itemView.findViewById(R.id.title);
         mTvDescription = (TextView) itemView.findViewById(R.id.description);
         mActionView = itemView.findViewById(R.id.action);
-        mIvActionIcon = (ImageView) itemView.findViewById(R.id.action_icon);
+        mIvActionIcon = (AppCompatImageView) itemView.findViewById(R.id.action_icon);
         mOnTestItemClickListener = listener;
         itemView.setOnClickListener(this);
         mActionView.setOnClickListener(this);
@@ -53,15 +53,15 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
         if (status == ZNOContract.Test.STATUS_IDLE) {
             final int actionResId;
             if (result == ZNOContract.Test.NO_LOADED_DATA) {
-                actionResId = R.drawable.ic_file_download_black_24dp;
+                actionResId = R.drawable.ic_file_download_white_24dp;
                 description += TextUtils.isEmpty(description) ? "" : ", ";
                 description += itemView.getContext().getString(R.string.needed_to_download);
             } else if (result == ZNOContract.Test.TEST_LOADED) {
-                actionResId = R.drawable.ic_delete_black_24dp;
+                actionResId = R.drawable.ic_delete_white_24dp;
                 description += (isEmpty(description) ? "" : ", ");
                 description += buildQuestionsCount(cursor.getInt(Column.QUESTIONS_COUNT));
             } else {
-                actionResId = R.drawable.ic_refresh_black_24dp;
+                actionResId = R.drawable.ic_refresh_white_24dp;
                 description = itemView.getContext().getString(R.string.downloading_error);
             }
             mIvActionIcon.setImageResource(actionResId);

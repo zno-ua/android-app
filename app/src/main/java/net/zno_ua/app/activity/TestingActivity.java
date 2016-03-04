@@ -176,7 +176,7 @@ public class TestingActivity extends BaseActivity
         if (mTestingInfo.isPassed()) {
             mFab.setImageResource(R.drawable.ic_share_white_24dp);
         } else {
-            mFab.setImageResource(R.drawable.ic_done_black_24dp);
+            mFab.setImageResource(R.drawable.ic_done_white_24dp);
         }
         mFab.setOnClickListener(mOnFabClickListener);
     }

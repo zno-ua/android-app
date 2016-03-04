@@ -15,7 +15,7 @@
         android:minWidth="@dimen/key_line_1"
         tools:ignore="RtlHardcoded">
 
-        <ImageView
+        <android.support.v7.widget.AppCompatImageView
             android:id="@+id/action_icon"
             android:layout_width="@dimen/action_icon_width"
             android:layout_height="@dimen/action_icon_width"

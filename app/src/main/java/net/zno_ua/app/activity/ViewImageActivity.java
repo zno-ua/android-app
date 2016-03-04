@@ -3,7 +3,7 @@ package net.zno_ua.app.activity;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.MainThread;
 import android.view.View;
 
 import net.zno_ua.app.FileManager;
@@ -18,21 +18,26 @@ public class ViewImageActivity extends BaseActivity {
     public static final String DATA_SCHEMA = "image";
 
     private static final String SRC = "src";
+    private ImageViewTouch mImageViewTouch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_image);
-        final FileManager fileManager = new FileManager(this);
-        final ImageViewTouch imageViewTouch = (ImageViewTouch) findViewById(R.id.image);
+        mImageViewTouch = (ImageViewTouch) findViewById(R.id.image);
         final String path = getIntent().getData().getQueryParameter(SRC);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    final FileManager fileManager = new FileManager(ViewImageActivity.this);
                     final Bitmap image = fileManager.openBitmap(path);
-                    imageViewTouch.setImageBitmap(image, new Matrix(), 0.5f, 3.0f);
-                    imageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_IF_BIGGER);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setImage(image);
+                        }
+                    });
                 } catch (FileNotFoundException e) {
                     finish();
                 }
@@ -44,6 +49,12 @@ public class ViewImageActivity extends BaseActivity {
                 finish();
             }
         });
+    }
+
+    @MainThread
+    private void setImage(final Bitmap bitmap) {
+        mImageViewTouch.setImageBitmap(bitmap, new Matrix(), 0.5f, 3.0f);
+        mImageViewTouch.setDisplayType(ImageViewTouchBase.DisplayType.FIT_IF_BIGGER);
     }
 
 }

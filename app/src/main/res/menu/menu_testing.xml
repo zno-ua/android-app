@@ -4,7 +4,7 @@
     tools:context=".activity.TestingActivity">
     <item
         android:id="@+id/action_time"
-        android:icon="@drawable/ic_av_timer_white_24dp"
+        android:icon="@drawable/ic_timer_white_24dp"
         android:orderInCategory="100"
         android:title="@string/action_time"
         android:visible="false"
