@@ -1,7 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recycler_view"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:scrollbars="vertical" />
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/pass_testing_prompt_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:visibility="invisible">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/pass_testing_prompt_icon"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_centerHorizontal="true"
+            android:tint="@color/grey_410"
+            app:srcCompat="@drawable/ic_school_white_72dp" />
+
+        <LinearLayout
+            android:id="@+id/pass_testing_prompt_actions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/pass_testing_prompt_icon"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:paddingBottom="48dp"
+            android:paddingLeft="@dimen/key_line_1"
+            android:paddingRight="@dimen/key_line_1"
+            android:paddingTop="36dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/pass_testing"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="#a2a2a2"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/key_line_1"
+                android:text="@string/pass_testing_description"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="#a2a2a2" />
+
+            <Button
+                android:id="@+id/pass_testing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/key_line_1"
+                android:text="@string/pass_test"
+                android:textColor="#6C6C6C"
+                android:theme="@style/AppCompat.Button.Raised.White" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:scrollbars="vertical"
+        android:visibility="gone" />
+
+</FrameLayout>

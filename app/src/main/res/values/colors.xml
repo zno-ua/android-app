@@ -41,6 +41,7 @@
 
     <!-- Grey -->
     <color name="grey_50">#FAFAFA</color>
+    <color name="grey_410">#B8B8B8</color>
     <!-- Grey -->
 
     <!-- Black -->
@@ -76,4 +77,6 @@
     <color name="translucent_status_bar">#32000000</color>
     <color name="list_item_tint_selection">#12000000</color>
     <color name="divider">#1e000000</color>
+    <color name="black_54pct">#82000000</color>
+    <color name="black_38pct">#61000000</color>
 </resources>

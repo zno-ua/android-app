@@ -160,5 +160,8 @@
     <string name="my_results">Мої результати</string>
     <string name="view">подивитися</string>
     <string name="quote_format">Перл з твору: \"%s\".</string>
+    <string name="pass_testing">Пройдіть тестування</string>
+    <string name="pass_test">Пройти тестування</string>
+    <string name="pass_testing_description">Щоб визначити свій рівень підготовки.</string>
 
 </resources>

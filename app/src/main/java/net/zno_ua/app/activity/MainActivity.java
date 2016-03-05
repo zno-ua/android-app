@@ -17,9 +17,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -27,14 +25,11 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.squareup.picasso.Picasso;
 
 import net.zno_ua.app.R;
-import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.fragment.BaseFragment;
 import net.zno_ua.app.fragment.SubjectsFragment;
 import net.zno_ua.app.fragment.TestingResultFragment;
@@ -53,7 +48,8 @@ import static net.zno_ua.app.provider.ZNOContract.Testing.buildTestingItemUri;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        LoaderManager.LoaderCallbacks<Cursor>, BaseFragment.OnTitleChangeListener {
+        LoaderManager.LoaderCallbacks<Cursor>, BaseFragment.OnTitleChangeListener,
+        TestingResultFragment.OnPassTestingSelectListener {
     private static final String KEY_SELECTED_NAVIGATION_ITEM_ID = "KEY_SELECTED_NAVIGATION_ITEM_ID";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -293,4 +289,8 @@ public class MainActivity extends BaseActivity
         return true;
     }
 
+    @Override
+    public void onPassTestingSelected() {
+        onNavigationItemSelected(mNavigationView.getMenu().findItem(R.id.navigation_item_testing));
+    }
 }
