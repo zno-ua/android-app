@@ -11,6 +11,8 @@ import android.view.inputmethod.InputMethodManager;
 
 import net.zno_ua.app.R;
 
+import java.util.regex.Pattern;
+
 /**
  * @author Vojko Vladimir
  */
@@ -42,6 +44,8 @@ public class Utils {
             R.color.chemistry
     };
 
+    public static final long MIN_TASK_DELAY = 1_500;
+
     public static TypedValue getThemeAttribute(Context context, int attr) {
         final TypedValue value = new TypedValue();
         context.getTheme().resolveAttribute(attr, value, true);
@@ -69,22 +73,11 @@ public class Utils {
         return "file://" + context.getFilesDir().getPath();
     }
 
-    private static final String STRING_SEPARATOR = "$";
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]" +
+            "+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)" +
+            "+[a-zA-Z]{2,}))$");
 
-    public static String convertArrayToString(String... array) {
-        String str = "";
-        for (int i = 0; i < array.length; i++) {
-            str = str + array[i];
-            // Do not append comma at the end of last element
-            if (i < array.length - 1) {
-                str = str + STRING_SEPARATOR;
-            }
-        }
-        return str;
+    public static boolean isValidEmail(String email) {
+        return EMAIL_PATTERN.matcher(email).matches();
     }
-
-    public static String[] convertStringToArray(String string) {
-        return string.split(STRING_SEPARATOR);
-    }
-
 }

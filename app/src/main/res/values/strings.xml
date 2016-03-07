@@ -163,5 +163,21 @@
     <string name="pass_testing">Пройдіть тестування</string>
     <string name="pass_test">Пройти тестування</string>
     <string name="pass_testing_description">Щоб визначити свій рівень підготовки.</string>
+    <string name="give_feedback">Залишити відгук</string>
+    <string name="message_send_please_wait">Зачекайте будь ласка…</string>
+    <string name="message_thank_you">Дякуємо</string>
+    <string name="message_send_review_success">Ваш відгук успішно надіслано</string>
+    <string name="ok">OK</string>
+    <string name="message_send_review_error">Не можливо надіслати відгук, спробуйте будь ласка пізніше</string>
+    <string name="send_review">Залишити відгук</string>
+    <string name="no_name_error_message">Введіть ваше ім’я</string>
+    <string name="no_email_error_message">Введіть вашу пошту</string>
+    <string name="no_message_error_message">Введіть повідомлення</string>
+    <string name="send_later">надіслати пізніше</string>
+    <string name="send">Надіслати</string>
+    <string name="not_valid_email_error_message">Некорректна поштова адреса</string>
+    <string name="your_name">Ваше ім’я</string>
+    <string name="your_email">Ваша пошта</string>
+    <string name="your_message">Ваше повідомлення</string>
 
 </resources>

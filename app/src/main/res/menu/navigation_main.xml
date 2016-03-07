@@ -15,4 +15,13 @@
             android:title="@string/my_results" />
     </group>
 
+    <group
+        android:id="@+id/other"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/navigation_item_give_feedback"
+            android:icon="@drawable/ic_rate_review_white_24dp"
+            android:title="@string/give_feedback" />
+    </group>
+
 </menu>

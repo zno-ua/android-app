@@ -1,19 +1,23 @@
 package net.zno_ua.app.activity;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
+
+import net.zno_ua.app.PreferencesHelper;
 
 /**
  * @author vojkovladimir.
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
+    private PreferencesHelper mPreferencesHelper;
+
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPreferencesHelper = PreferencesHelper.getInstance(this);
     }
 
     @Override
@@ -26,5 +30,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         GoogleAnalytics.getInstance(this).reportActivityStop(this);
+    }
+
+    protected PreferencesHelper getPreferencesHelper() {
+        return mPreferencesHelper;
     }
 }

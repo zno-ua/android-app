@@ -8,6 +8,7 @@ import android.content.Loader;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -22,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -30,10 +32,13 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.squareup.picasso.Picasso;
 
 import net.zno_ua.app.R;
+import net.zno_ua.app.SendReviewDialogWrapper;
 import net.zno_ua.app.fragment.BaseFragment;
 import net.zno_ua.app.fragment.SubjectsFragment;
 import net.zno_ua.app.fragment.TestingResultFragment;
+import net.zno_ua.app.rest.model.Review;
 import net.zno_ua.app.service.GcmRegistrationService;
+import net.zno_ua.app.task.SendReviewTask;
 import net.zno_ua.app.util.Utils;
 
 import java.util.Calendar;
@@ -49,25 +54,31 @@ import static net.zno_ua.app.provider.ZNOContract.Testing.buildTestingItemUri;
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor>, BaseFragment.OnTitleChangeListener,
-        TestingResultFragment.OnPassTestingSelectListener {
+        TestingResultFragment.OnPassTestingSelectListener, SendReviewDialogWrapper.Callback {
     private static final String KEY_SELECTED_NAVIGATION_ITEM_ID = "KEY_SELECTED_NAVIGATION_ITEM_ID";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
+    private Toolbar mToolbar;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private int mSelectedNavigationItemId;
     private String[] mQuotes;
     private final Random mRandom = new Random();
+    private SendReviewTask mSendReviewTask = null;
+    private SendReviewDialogWrapper mSendReviewDialogWrapper = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mQuotes = getResources().getStringArray(R.array.quotes);
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setUpActionBar(toolbar);
-        setUpNavigationDrawerLayout(toolbar);
+        setUpActionBar();
+        setUpNavigationDrawerLayout();
+        mSendReviewDialogWrapper = new SendReviewDialogWrapper(this, this, getPreferencesHelper());
+        mSendReviewDialogWrapper.setName(getPreferencesHelper().getName());
+        mSendReviewDialogWrapper.setEmail(getPreferencesHelper().getEmail());
+        mSendReviewDialogWrapper.setMessage(getPreferencesHelper().getMessage());
         getLoaderManager().initLoader(0, null, this);
         if (savedInstanceState == null) {
             mSelectedNavigationItemId = R.id.navigation_item_testing;
@@ -80,18 +91,19 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void setUpActionBar(Toolbar toolBar) {
-        setSupportActionBar(toolBar);
+    private void setUpActionBar() {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
-    private void setUpNavigationDrawerLayout(Toolbar toolBar) {
+    private void setUpNavigationDrawerLayout() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(
                 Utils.getThemeAttribute(this, R.attr.colorPrimaryDark).resourceId
         );
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, 0, 0);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
@@ -164,6 +176,9 @@ public class MainActivity extends BaseActivity
                 onTestingResultsSelected();
                 isChecked = true;
                 break;
+            case R.id.navigation_item_give_feedback:
+                giveReview();
+                break;
         }
         setNavigationItemSelected(item, isChecked);
         mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -191,6 +206,49 @@ public class MainActivity extends BaseActivity
         final Fragment fragment = getMainContentFragment();
         if (!(fragment instanceof TestingResultFragment)) {
             replaceMainContent(TestingResultFragment.newInstance());
+        }
+    }
+
+    private void giveReview() {
+        if (!mSendReviewDialogWrapper.isShown()) {
+            mSendReviewDialogWrapper.show();
+        }
+    }
+
+    @Override
+    public void send(@NonNull Review review) {
+        if (mSendReviewTask == null) {
+            getPreferencesHelper().saveReview(review);
+            mSendReviewTask = new SendReviewTask(this, new SendReviewTask.CallBack() {
+                @Override
+                public void onFinish(final boolean isSuccess) {
+                    mSendReviewTask = null;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showSendReviewDialogSuccess(isSuccess);
+                        }
+                    });
+                }
+            });
+            mSendReviewTask.execute(review);
+        }
+    }
+
+    @MainThread
+    private void showSendReviewDialogSuccess(boolean isSuccess) {
+        if (isSuccess) {
+            mSendReviewDialogWrapper.clear();
+            getPreferencesHelper().saveMessage(null);
+            new MaterialDialog.Builder(this)
+                    .title(R.string.message_thank_you)
+                    .content(R.string.message_send_review_success)
+                    .positiveText(R.string.ok)
+                    .show();
+        } else {
+            mSendReviewDialogWrapper.show();
+            Toast.makeText(MainActivity.this, R.string.message_send_review_error,
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
