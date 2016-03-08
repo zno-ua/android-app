@@ -19,6 +19,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,14 +33,15 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.squareup.picasso.Picasso;
 
 import net.zno_ua.app.R;
-import net.zno_ua.app.SendReviewDialogWrapper;
 import net.zno_ua.app.fragment.BaseFragment;
 import net.zno_ua.app.fragment.SubjectsFragment;
 import net.zno_ua.app.fragment.TestingResultFragment;
+import net.zno_ua.app.helper.CustomTabActivityHelper;
 import net.zno_ua.app.rest.model.Review;
 import net.zno_ua.app.service.GcmRegistrationService;
 import net.zno_ua.app.task.SendReviewTask;
 import net.zno_ua.app.util.Utils;
+import net.zno_ua.app.widget.SendReviewDialogWrapper;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -67,6 +69,7 @@ public class MainActivity extends BaseActivity
     private final Random mRandom = new Random();
     private SendReviewTask mSendReviewTask = null;
     private SendReviewDialogWrapper mSendReviewDialogWrapper = null;
+    private CustomTabActivityHelper mCustomTabActivityHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +82,7 @@ public class MainActivity extends BaseActivity
         mSendReviewDialogWrapper.setName(getPreferencesHelper().getName());
         mSendReviewDialogWrapper.setEmail(getPreferencesHelper().getEmail());
         mSendReviewDialogWrapper.setMessage(getPreferencesHelper().getMessage());
+        mCustomTabActivityHelper = new CustomTabActivityHelper();
         getLoaderManager().initLoader(0, null, this);
         if (savedInstanceState == null) {
             mSelectedNavigationItemId = R.id.navigation_item_testing;
@@ -154,11 +158,29 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item))
-            return true;
+    protected void onStart() {
+        super.onStart();
+        mCustomTabActivityHelper.bindCustomTabsService(this);
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mCustomTabActivityHelper.unbindCustomTabsService(this);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.give_review:
+                giveReview();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -176,8 +198,14 @@ public class MainActivity extends BaseActivity
                 onTestingResultsSelected();
                 isChecked = true;
                 break;
-            case R.id.navigation_item_give_feedback:
+            case R.id.navigation_item_give_review:
                 giveReview();
+                break;
+            case R.id.navigation_item_calculator:
+                Utils.openUriInCustomTabs(this, mCustomTabActivityHelper, Utils.CALCULATOR_URI);
+                break;
+            case R.id.navigation_item_visit_site:
+                Utils.openUriInCustomTabs(this, mCustomTabActivityHelper, Utils.SITE_URI);
                 break;
         }
         setNavigationItemSelected(item, isChecked);

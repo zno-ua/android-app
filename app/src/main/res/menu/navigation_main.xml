@@ -15,13 +15,31 @@
             android:title="@string/my_results" />
     </group>
 
+    <item
+        android:id="@+id/navigation_item_calculator"
+        android:icon="@drawable/ic_calculator_white_24dp"
+        android:title="@string/test_calc" />
+
     <group
         android:id="@+id/other"
         android:checkableBehavior="none">
         <item
-            android:id="@+id/navigation_item_give_feedback"
+            android:id="@+id/navigation_item_visit_site"
+            android:icon="@drawable/ic_public_white_24dp"
+            android:title="@string/visit_site" />
+
+        <item
+            android:id="@+id/navigation_item_give_review"
             android:icon="@drawable/ic_rate_review_white_24dp"
             android:title="@string/give_feedback" />
+    </group>
+
+    <group android:id="@+id/app">
+
+        <item
+            android:id="@+id/navigation_item_settings"
+            android:icon="@drawable/ic_settings_white_24dp"
+            android:title="@string/settings" />
     </group>
 
 </menu>

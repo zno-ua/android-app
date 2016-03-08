@@ -2,14 +2,22 @@ package net.zno_ua.app.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.customtabs.CustomTabsSession;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.R;
+import net.zno_ua.app.helper.CustomTabActivityHelper;
 
 import java.util.regex.Pattern;
 
@@ -46,6 +54,9 @@ public class Utils {
 
     public static final long MIN_TASK_DELAY = 1_500;
 
+    public static final Uri SITE_URI = Uri.parse(BuildConfig.SERVER_URL);
+    public static final Uri CALCULATOR_URI = Uri.parse(BuildConfig.SERVER_URL + "/calculator");
+
     public static TypedValue getThemeAttribute(Context context, int attr) {
         final TypedValue value = new TypedValue();
         context.getTheme().resolveAttribute(attr, value, true);
@@ -79,5 +90,24 @@ public class Utils {
 
     public static boolean isValidEmail(String email) {
         return EMAIL_PATTERN.matcher(email).matches();
+    }
+
+    public static void openUriInCustomTabs(@NonNull Activity activity,
+                                           @NonNull CustomTabActivityHelper helper,
+                                           @NonNull Uri uri) {
+        if (helper.mayLaunchUrl(uri, null, null)) {
+            final CustomTabsSession session = helper.getSession();
+            final CustomTabsIntent intent = new CustomTabsIntent.Builder(session)
+                    .setToolbarColor(ContextCompat.getColor(activity, R.color.indigo_500))
+                    .setSecondaryToolbarColor(ContextCompat.getColor(activity, R.color.indigo_700))
+                    .setStartAnimations(activity, R.anim.activity_open_translate_right,
+                            R.anim.activity_close_alpha)
+                    .setExitAnimations(activity, R.anim.activity_open_alpha,
+                            R.anim.activity_close_translate_right)
+                    .build();
+            CustomTabActivityHelper.openCustomTab(activity, intent, uri, null);
+        } else {
+            activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(uri));
+        }
     }
 }

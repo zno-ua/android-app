@@ -1,18 +1,17 @@
-package net.zno_ua.app;
+package net.zno_ua.app.widget;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import net.zno_ua.app.R;
+import net.zno_ua.app.helper.PreferencesHelper;
 import net.zno_ua.app.rest.model.Review;
 import net.zno_ua.app.util.Utils;
 

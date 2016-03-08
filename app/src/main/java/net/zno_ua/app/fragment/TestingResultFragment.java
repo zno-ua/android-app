@@ -17,6 +17,9 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -24,6 +27,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import net.zno_ua.app.R;
 import net.zno_ua.app.activity.TestingActivity;
 import net.zno_ua.app.adapter.TestingResultsAdapter;
+import net.zno_ua.app.provider.ZNOContract;
 import net.zno_ua.app.util.Utils;
 import net.zno_ua.app.viewholder.TestingResultItemVewHolder;
 import net.zno_ua.app.widget.DividerItemDecoration;
@@ -68,6 +72,26 @@ public class TestingResultFragment extends BaseFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAdapter = new TestingResultsAdapter(getActivity(), this);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_fragment_testing_results, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.clear_all_testing_results).setVisible(mAdapter.getItemCount() > 0);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.clear_all_testing_results) {
+            getActivity().getContentResolver().delete(ZNOContract.Testing.CONTENT_URI, null, null);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Nullable
@@ -125,10 +149,12 @@ public class TestingResultFragment extends BaseFragment
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.changeCursor(null);
-        validateData(null);
+        showPassTestingPrompt();
+        getActivity().invalidateOptionsMenu();
     }
 
     private void validateData(Cursor data) {
+        getActivity().invalidateOptionsMenu();
         if (data == null || data.getCount() == 0) {
             showPassTestingPrompt();
         } else {
@@ -161,6 +187,7 @@ public class TestingResultFragment extends BaseFragment
     }
 
     private void showPassTestingPrompt() {
+        mRecyclerView.setVisibility(View.GONE);
         mPassTestingPromptLayout.setVisibility(View.VISIBLE);
         float stopY = mPassTestingPromptIcon.getY() + mPassTestingPromptIcon.getHeight();
         float startY = stopY + mPassTestingPromptActions.getHeight() / 5;

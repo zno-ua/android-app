@@ -19,6 +19,7 @@ import static net.zno_ua.app.provider.ZNOContract.QuestionAndAnswer;
 import static net.zno_ua.app.provider.ZNOContract.Subject;
 import static net.zno_ua.app.provider.ZNOContract.Test;
 import static net.zno_ua.app.provider.ZNOContract.Testing;
+import static net.zno_ua.app.provider.ZNOContract.TestingResult;
 import static net.zno_ua.app.provider.ZNODatabase.Tables;
 
 /**
@@ -239,6 +240,7 @@ public class ZNOProvider extends ContentProvider {
                 break;
             case URI_CODE.TESTING:
                 table = Tables.TESTING;
+                delete(Answer.CONTENT_URI, null, null);
                 break;
             case URI_CODE.TESTING_ID:
                 table = Tables.TESTING;
@@ -330,6 +332,10 @@ public class ZNOProvider extends ContentProvider {
         switch (match) {
             case URI_CODE.ANSWER:
                 notifyChange(QuestionAndAnswer.CONTENT_URI);
+                notifyChange(TestingResult.CONTENT_URI);
+                break;
+            case URI_CODE.TESTING:
+                notifyChange(TestingResult.CONTENT_URI);
                 break;
         }
         notifyChange(uri);

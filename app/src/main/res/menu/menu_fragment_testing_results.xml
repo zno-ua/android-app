@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/clear_all_testing_results"
+        android:icon="@drawable/ic_clear_all_white_24dp"
+        android:orderInCategory="200"
+        android:title="@string/clear_all_results"
+        app:showAsAction="ifRoom" />
+
+</menu>

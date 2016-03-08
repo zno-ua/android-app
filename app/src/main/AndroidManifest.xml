@@ -137,6 +137,9 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
         <!-- AdMob -->
+        <!-- CustomTabs -->
+        <service android:name="org.chromium.customtabsclient.shared.KeepAliveService" />
+        <!-- CustomTabs -->
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package net.zno_ua.app;
+package net.zno_ua.app.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -179,5 +179,9 @@
     <string name="your_name">Ваше ім’я</string>
     <string name="your_email">Ваша пошта</string>
     <string name="your_message">Ваше повідомлення</string>
+    <string name="test_calc">Калькулятор тестів</string>
+    <string name="visit_site">Відвідати сайт</string>
+    <string name="settings">Налаштування</string>
+    <string name="clear_all_results">Видалити усі результати</string>
 
 </resources>

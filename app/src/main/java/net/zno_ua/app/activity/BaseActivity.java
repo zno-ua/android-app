@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 
-import net.zno_ua.app.PreferencesHelper;
+import net.zno_ua.app.helper.PreferencesHelper;
 
 /**
  * @author vojkovladimir.
