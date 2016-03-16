@@ -1,4 +1,4 @@
-package net.zno_ua.app.processor2;
+package net.zno_ua.app.processor;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -45,7 +45,7 @@ public abstract class Processor<T> {
             if (!cursor.moveToFirst()) {
                 insert(t);
             } else if (shouldUpdate(t, cursor)) {
-                update(t);
+                update(t, cursor);
             }
             cursor.close();
         }
@@ -53,7 +53,7 @@ public abstract class Processor<T> {
 
     protected abstract void insert(@NonNull T t);
 
-    protected abstract void update(@NonNull T t);
+    protected abstract void update(@NonNull T t, @NonNull Cursor cursor);
 
     protected abstract Cursor query(@NonNull T t);
 
@@ -90,7 +90,6 @@ public abstract class Processor<T> {
         return args;
     }
 
-    @NonNull
     protected abstract String createSelectionArg(@NonNull T t);
 
     public static String createPlaceHolders(@Nullable List data) {

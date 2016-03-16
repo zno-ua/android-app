@@ -1,28 +1,40 @@
-package net.zno_ua.app.processor2;
+package net.zno_ua.app.processor;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
+import net.zno_ua.app.FileManager;
 import net.zno_ua.app.activity.ViewImageActivity;
 import net.zno_ua.app.provider.Query;
+import net.zno_ua.app.rest.APIClient;
+import net.zno_ua.app.rest.ServiceGenerator;
 import net.zno_ua.app.rest.model.Question;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
+import okhttp3.ResponseBody;
+import retrofit2.Response;
+
+import static java.lang.String.valueOf;
 import static net.zno_ua.app.provider.ZNOContract.Question.ADDITIONAL_TEXT;
 import static net.zno_ua.app.provider.ZNOContract.Question.ANSWERS;
 import static net.zno_ua.app.provider.ZNOContract.Question.CONTENT_URI;
 import static net.zno_ua.app.provider.ZNOContract.Question.CORRECT_ANSWER;
 import static net.zno_ua.app.provider.ZNOContract.Question.POINT;
 import static net.zno_ua.app.provider.ZNOContract.Question.POSITION_ON_TEST;
+import static net.zno_ua.app.provider.ZNOContract.Question.TEST_ID;
 import static net.zno_ua.app.provider.ZNOContract.Question.TEXT;
 import static net.zno_ua.app.provider.ZNOContract.Question.TYPE;
 import static net.zno_ua.app.provider.ZNOContract.Question._ID;
 
+import static net.zno_ua.app.provider.ZNOContract.Test.IMAGES_LOADED;
 /**
  * @author Vojko Vladimir vojkovladimir@gmail.com
  * @since 16.03.16.
@@ -40,10 +52,23 @@ public class QuestionProcessor extends Processor<Question> {
     private static final String HR = "<hr>";
     private static final String BR = "<br>";
 
-    private long mTestId;
+    private long mTestId = NO_ID;
+    private boolean mDownloadImages = false;
+    private boolean mUpdateQuestions = false;
+    private boolean mIsImagesDownloadsSuccessfully = false;
+    private final APIClient mApiClient;
+    private final FileManager mFileManager;
 
     public QuestionProcessor(@NonNull Context context) {
         super(context);
+        mApiClient = ServiceGenerator.create();
+        mFileManager = new FileManager(context);
+    }
+
+    public void prepare(long testId, boolean updateQuestions, boolean downloadImages) {
+        mTestId = testId;
+        mUpdateQuestions = updateQuestions;
+        mDownloadImages = downloadImages;
     }
 
     @Override
@@ -51,12 +76,26 @@ public class QuestionProcessor extends Processor<Question> {
         if (mTestId == NO_ID) {
             throw new IllegalArgumentException("Test id didn't specified");
         }
+        if (mDownloadImages) mIsImagesDownloadsSuccessfully = true;
         super.process(data);
+        if (mDownloadImages && mIsImagesDownloadsSuccessfully) {
+            TestProcessor.updateTestResult(getContentResolver(), mTestId, IMAGES_LOADED);
+        }
         mTestId = NO_ID;
+        mDownloadImages = false;
+        mIsImagesDownloadsSuccessfully = false;
+        mUpdateQuestions = false;
     }
 
     @Override
     protected void processItem(Question question) {
+        if (mDownloadImages) {
+            try {
+                mIsImagesDownloadsSuccessfully &= downloadQuestionImages(question);
+            } catch (IOException e) {
+                mIsImagesDownloadsSuccessfully = false;
+            }
+        }
         prepareQuestion(mTestId, question);
         super.processItem(question);
     }
@@ -87,11 +126,12 @@ public class QuestionProcessor extends Processor<Question> {
 
     @Override
     protected void insert(@NonNull Question question) {
+        if (question.getPoint() == 0) return;
         getContentResolver().insert(Query.Question.URI, createContentValuesForInsert(question));
     }
 
     @Override
-    protected void update(@NonNull Question question) {
+    protected void update(@NonNull Question question, @NonNull Cursor cursor) {
         final String selection = Query.Question.SELECTION_ID;
         final String[] selectionArgs = Query.selectionArgs(question.getId());
         final ContentValues values = createContentValuesForUpdate(question);
@@ -112,7 +152,7 @@ public class QuestionProcessor extends Processor<Question> {
 
     @Override
     protected boolean shouldUpdate(@NonNull Question question, @NonNull Cursor cursor) {
-        return true;
+        return mUpdateQuestions;
     }
 
     @Override
@@ -135,7 +175,43 @@ public class QuestionProcessor extends Processor<Question> {
         return values;
     }
 
-    @NonNull
+    private boolean downloadQuestionImages(Question question) throws IOException {
+        boolean imagesLoaded = true;
+        String localPath = "/" + mTestId;
+        if (!TextUtils.isEmpty(question.getImagesRelativeUrl())) {
+            imagesLoaded = downloadAndSaveImage(localPath, question.getImagesRelativeUrl(), question.getImages());
+        }
+
+        if (!TextUtils.isEmpty(question.getImagesFormulasUrl())) {
+            localPath += FORMULAS_PATH;
+            imagesLoaded &= downloadAndSaveImage(localPath, question.getImagesRelativeUrl(), question.getImagesFormulas());
+        }
+
+        return imagesLoaded;
+    }
+
+    private boolean downloadAndSaveImage(String localPath, String relativeUrl, String[] images)
+            throws IOException {
+        boolean imagesLoaded = true;
+        Response<ResponseBody> imageResponse;
+        InputStream inputStream;
+        for (String name : images) {
+            if (!mFileManager.isFileExists(localPath, name)) {
+                imageResponse = mApiClient.getImage(relativeUrl, name).execute();
+                if (imageResponse.isSuccess()) {
+                    inputStream = imageResponse.body().byteStream();
+                    imagesLoaded &= mFileManager.saveFile(localPath, name, inputStream);
+                }
+            }
+        }
+        return imagesLoaded;
+    }
+
+    public void delete(long testId) {
+        getContentResolver().delete(CONTENT_URI, TEST_ID + "=?", new String[]{valueOf(testId)});
+        mFileManager.deleteTestDirectory(testId);
+    }
+
     @Override
     protected String createSelectionArg(@NonNull Question question) {
         return String.valueOf(question.getId());

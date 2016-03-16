@@ -60,7 +60,7 @@ public class APIService extends Service {
     public void onCreate() {
         super.onCreate();
         mApiClient = ServiceGenerator.createService(APIClient.class, BuildConfig.API_KEY);
-        mTestProcessor = new TestProcessor(getApplicationContext(), mApiClient);
+//        mTestProcessor = new TestProcessor(getApplicationContext(), mApiClient);
     }
 
     @Override

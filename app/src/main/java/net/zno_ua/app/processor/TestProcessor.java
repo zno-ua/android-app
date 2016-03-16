@@ -5,213 +5,177 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 
-import net.zno_ua.app.FileManager;
-import net.zno_ua.app.activity.ViewImageActivity;
-import net.zno_ua.app.provider.ZNOContract;
+import net.zno_ua.app.provider.Query;
 import net.zno_ua.app.rest.APIClient;
+import net.zno_ua.app.rest.ServiceGenerator;
 import net.zno_ua.app.rest.model.Objects;
 import net.zno_ua.app.rest.model.Point;
 import net.zno_ua.app.rest.model.Question;
 import net.zno_ua.app.rest.model.TestInfo;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Locale;
 
-import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.Response;
 
-import static java.lang.String.valueOf;
 import static net.zno_ua.app.provider.ZNOContract.Test;
 import static net.zno_ua.app.provider.ZNOContract.Test.NO_LOADED_DATA;
 import static net.zno_ua.app.provider.ZNOContract.Test.buildTestItemUri;
 
+
 /**
- * @author Vojko Vladimir
+ * @author Vojko Vladimir vojkovladimir@gmail.com
+ * @since 16.03.16.
  */
-public class TestProcessor {
-    private static final String HREF = "<a href=\"";
-    private static final String HREF_REPLACEMENT = "<a href=\"" + ViewImageActivity.DATA_SCHEMA
-            + "://?src=";
-    private static final String FORMULAS_PATH = "/formulas";
-    private static final String IMAGE = "IMAGE";
-    private static final String IMAGE_REGEX = "\\$" + IMAGE + "\\$";
-    private static final String IMAGE_SRC_FORMAT = "<img src=\"/%d" + FORMULAS_PATH + "/%s\"/>";
-    private static final String HR = "<hr>";
-    private static final String BR = "<br>";
+public class TestProcessor extends Processor<TestInfo> {
 
-    private final FileManager mFileManager;
     private final APIClient mApiClient;
-    private final ContentResolver mContentResolver;
+    private final QuestionProcessor mQuestionProcessor;
+    private final PointProcessor mPointProcessor;
 
-    public TestProcessor(Context context, APIClient apiClient) {
-        mContentResolver = context.getContentResolver();
-        mFileManager = new FileManager(context);
-        mApiClient = apiClient;
+    public TestProcessor(@NonNull Context context) {
+        super(context);
+        mApiClient = ServiceGenerator.create();
+        mQuestionProcessor = new QuestionProcessor(context);
+        mPointProcessor = new PointProcessor(context);
     }
 
+    @WorkerThread
     public void get(long testId) {
-        get(testId, true);
-    }
-
-    public void get(long testId, boolean checkLastUpdate) {
-        updateTestStatus(testId, Test.STATUS_DOWNLOADING);
+        final Call<TestInfo> testInfoCall = mApiClient.getTestInfo(testId);
         try {
-            boolean isDataOutdated = true;
-            final int result = getResult(testId);
-            TestInfo testInfo = null;
-            /*
-            * Check test last update if necessary.
-            * */
-            if (checkLastUpdate) {
-                final Response<TestInfo> testInfoResponse = mApiClient.getTestInfo(testId).execute();
-                if (testInfoResponse.isSuccess()) {
-                    testInfo = testInfoResponse.body();
-                    isDataOutdated = isDataOutdated(testInfo);
-                }
-            }
-
-            final boolean isQuestionsLoaded = Test.testResult(result, Test.QUESTIONS_LOADED);
-            final boolean isImagesLoaded = Test.testResult(result, Test.IMAGES_LOADED);
-            if (!isQuestionsLoaded || !isImagesLoaded || isDataOutdated) {
-                final Response<Objects<Question>> objectsResponse =
-                        mApiClient.getTestQuestions(testId).execute();
-                if (objectsResponse.isSuccess()) {
-                    final List<Question> questions = objectsResponse.body().objects;
-                    boolean isDownloadImagesSuccess = true;
-                    for (Question question : questions) {
-                        /*
-                        * If the questions are not downloaded or downloaded, but the test is
-                        * outdated, download the questions.
-                        * */
-//                        if ((!isQuestionsLoaded || isDataOutdated) && question.point != 0) {
-//                            saveQuestion(testId, question);
-//                        }
-
-                        /*
-                        * If the images are not downloaded or downloaded, but the test is outdated,
-                        * download the images.
-                        * */
-                        if (!isImagesLoaded || isDataOutdated) {
-                            isDownloadImagesSuccess &= downloadQuestionImages(testId, question);
-                        }
+            final Response<TestInfo> testInfoResponse = testInfoCall.execute();
+            if (testInfoResponse.isSuccess()) {
+                final TestInfo testInfo = testInfoResponse.body();
+                final Cursor cursor = query(testInfo);
+                if (cursor != null) {
+                    final int result = cursor.getInt(Query.Test.Column.RESULT);
+                    final boolean isQuestionsLoaded = Test.testResult(result, Test.QUESTIONS_LOADED);
+                    final boolean isImagesLoaded = Test.testResult(result, Test.IMAGES_LOADED);
+                    if (!(isQuestionsLoaded && isImagesLoaded)) {
+                        getQuestions(testId, !isQuestionsLoaded, !isImagesLoaded);
                     }
-                    updateTestResult(testId, Test.QUESTIONS_LOADED);
-                    if (isDownloadImagesSuccess) {
-                        updateTestResult(testId, Test.IMAGES_LOADED);
-                    }
-                }
-            }
 
-            /*
-            * If the points are not downloaded or downloaded, but the test is outdated, download the
-            * points.
-            * */
-            if (!Test.testResult(result, Test.POINTS_LOADED) || isDataOutdated) {
-                final Response<Objects<Point>> objectsResponse =
-                        mApiClient.getTestPoints(testId).execute();
-                if (objectsResponse.isSuccess()) {
-                    for (Point point : objectsResponse.body().objects) {
-                        savePoint(testId, point);
+                    final boolean isPointsLoaded = Test.testResult(result, Test.POINTS_LOADED);
+                    if (!isPointsLoaded) {
+                        getPoints(testId);
                     }
-                    updateTestResult(testId, Test.POINTS_LOADED);
+                    if (!cursor.isClosed()) cursor.close();
                 }
-            }
-
-            if (testInfo != null) {
-                updateTestInfo(testInfo);
             }
         } catch (IOException ignored) {
-        } finally {
-            updateTestStatus(testId, Test.STATUS_IDLE);
         }
     }
 
-    private boolean downloadQuestionImages(long testId, Question question) throws IOException {
-        boolean imagesLoaded = true;
-        String localPath = "/" + testId;
-//        if (!TextUtils.isEmpty(question.imagesRelativeUrl)) {
-//            imagesLoaded = downloadAndSaveImage(localPath, question.imagesRelativeUrl, question.images);
-//        }
-
-//        if (!TextUtils.isEmpty(question.imagesFormulasUrl)) {
-//            localPath += FORMULAS_PATH;
-//            imagesLoaded &= downloadAndSaveImage(localPath, question.imagesFormulasUrl, question.imagesFormulas);
-//        }
-
-        return imagesLoaded;
-    }
-
-    private boolean downloadAndSaveImage(String localPath, String relativeUrl, String[] images)
-            throws IOException {
-        boolean imagesLoaded = true;
-        Response<ResponseBody> imageResponse;
-        InputStream inputStream;
-        for (String name : images) {
-            if (!mFileManager.isFileExists(localPath, name)) {
-                imageResponse = mApiClient.getImage(relativeUrl, name).execute();
-                if (imageResponse.isSuccess()) {
-                    inputStream = imageResponse.body().byteStream();
-                    imagesLoaded &= mFileManager.saveFile(localPath, name, inputStream);
-                }
-            }
-        }
-        return imagesLoaded;
-    }
-
-    private int getResult(long testId) {
-        final Cursor cursor = mContentResolver.query(buildTestItemUri(testId),
-                new String[]{Test.RESULT}, null, null, null);
-        int result = Test.NO_LOADED_DATA;
-        if (cursor != null) {
-            result = cursor.moveToFirst() ? cursor.getInt(0) : Test.NO_LOADED_DATA;
-            cursor.close();
-        }
-        return result;
-    }
-
-    private boolean isDataOutdated(TestInfo testInfo) {
-//        final Cursor cursor = mContentResolver.query(buildTestItemUri(testInfo.id),
-//                new String[]{Test.LAST_UPDATE}, null, null, null);
-//        boolean isDataOutdated = true;
-//        if (cursor != null) {
-//            if (cursor.moveToFirst()) {
-//                isDataOutdated = testInfo.lastUpdate != cursor.getLong(0);
-//            }
-//            cursor.close();
-//        }
-//        return isDataOutdated;
-        return false;
-    }
-
+    @WorkerThread
     public void delete(long testId) {
+        mQuestionProcessor.delete(testId);
+        mPointProcessor.delete(testId);
+        updateTestResult(testId, NO_LOADED_DATA);
     }
 
-    private void savePoint(long testId, Point point) {
-        final ContentValues values = new ContentValues();
-        values.put(ZNOContract.Point.TEST_ID, testId);
-        values.put(ZNOContract.Point.TEST_POINT, point.testPoint);
-        values.put(ZNOContract.Point.RATING_POINT, point.ratingPoint);
+    private void getQuestions(long testId, boolean updateQuestions, boolean downloadImages)
+            throws IOException {
+        final Call<Objects<Question>> questionsCall = mApiClient.getTestQuestions(testId);
+        final Response<Objects<Question>> questionsResponse = questionsCall.execute();
+        if (questionsResponse.isSuccess()) {
+            mQuestionProcessor.prepare(testId, updateQuestions, downloadImages);
+            mQuestionProcessor.process(questionsResponse.body().get());
 
-        final int rowsUpdated = mContentResolver.update(ZNOContract.Point.CONTENT_URI, values,
-                ZNOContract.Point.TEST_ID + "=? AND " + ZNOContract.Point.TEST_POINT + "=?",
-                new String[]{valueOf(testId), valueOf(point.testPoint)});
-        if (rowsUpdated == 0) {
-            mContentResolver.insert(ZNOContract.Point.CONTENT_URI, values);
+            updateTestResult(testId, Test.QUESTIONS_LOADED);
         }
     }
 
-    private void updateTestStatus(long testId, int status) {
-        final ContentValues values = new ContentValues();
-        values.put(Test.STATUS, status);
-        mContentResolver.update(buildTestItemUri(testId), values, null, null);
+    private void getPoints(long testId) throws IOException {
+        final Call<Objects<Point>> pointsCall = mApiClient.getTestPoints(testId);
+        final Response<Objects<Point>> pointsResponse = pointsCall.execute();
+        if (pointsResponse.isSuccess()) {
+            mPointProcessor.process(pointsResponse.body().get());
+
+            updateTestResult(testId, Test.POINTS_LOADED);
+        }
     }
 
-    private void updateTestResult(long testId, int result) {
-        final Cursor cursor = mContentResolver.query(buildTestItemUri(testId),
+    @Override
+    protected void insert(@NonNull TestInfo testInfo) {
+        getContentResolver().insert(Query.Test.URI, createContentValuesForInsert(testInfo));
+    }
+
+    @Override
+    protected void update(@NonNull TestInfo testInfo, @NonNull Cursor cursor) {
+        if (cursor.getInt(Query.Test.Column.RESULT) != NO_LOADED_DATA) {
+            final Call<Objects<Question>> call = mApiClient.getTestQuestions(testInfo.getId());
+            try {
+                final Response<Objects<Question>> response = call.execute();
+                if (response.isSuccess()) {
+                    mQuestionProcessor.prepare(testInfo.getId(), true, true);
+                    mQuestionProcessor.process(response.body().get());
+                    finishUpdate(testInfo);
+                }
+            } catch (IOException ignored) {
+            }
+        } else {
+            finishUpdate(testInfo);
+        }
+    }
+
+    private void finishUpdate(@NonNull TestInfo testInfo) {
+        final String selection = Query.Test.SELECTION_ID;
+        final String[] selectionArgs = Query.selectionArgs(testInfo.getId());
+        final ContentValues values = createContentValuesForUpdate(testInfo);
+        getContentResolver().update(Query.Test.URI, values, selection, selectionArgs);
+    }
+
+    @Override
+    protected Cursor query(@NonNull TestInfo testInfo) {
+        return getContentResolver().query(buildTestItemUri(testInfo.getId()), Query.Test.PROJECTION, null, null, null);
+    }
+
+    @Override
+    protected void cleanUp(@Nullable List<TestInfo> data) {
+        final String selection = Query.Test.SELECTION_NOT_IN + createPlaceHolders(data);
+        final String[] selectionArgs = createSelectionArgs(data);
+        getContentResolver().delete(Query.Test.URI, selection, selectionArgs);
+    }
+
+    @Override
+    protected boolean shouldUpdate(@NonNull TestInfo testInfo, @NonNull Cursor cursor) {
+        return testInfo.getLastUpdate() > cursor.getLong(Query.Test.Column.LAST_UPDATE);
+    }
+
+    @Override
+    public ContentValues createContentValuesForInsert(TestInfo testInfo) {
+        final ContentValues values = createContentValuesForUpdate(testInfo);
+        values.put(Test._ID, testInfo.getId());
+        return values;
+    }
+
+    @Override
+    public ContentValues createContentValuesForUpdate(TestInfo testInfo) {
+        final ContentValues values = new ContentValues();
+        values.put(Test.SUBJECT_ID, testInfo.getSubjectId());
+        values.put(Test.QUESTIONS_COUNT, testInfo.getQuestionsCount());
+        values.put(Test.TYPE, testInfo.getType());
+        values.put(Test.SESSION, testInfo.getSession());
+        values.put(Test.LEVEL, testInfo.getLevel());
+        values.put(Test.TIME, testInfo.getTime());
+        values.put(Test.YEAR, testInfo.getYear());
+        values.put(Test.LAST_UPDATE, testInfo.getLastUpdate());
+        return values;
+    }
+
+    @Override
+    protected String createSelectionArg(@NonNull TestInfo testInfo) {
+        return String.valueOf(testInfo.getId());
+    }
+
+    @WorkerThread
+    public static void updateTestResult(ContentResolver contentResolver, long testId, int result) {
+        final Cursor cursor = contentResolver.query(buildTestItemUri(testId),
                 new String[]{Test.RESULT}, null, null, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -222,20 +186,11 @@ public class TestProcessor {
 
         final ContentValues values = new ContentValues();
         values.put(Test.RESULT, result);
-        mContentResolver.update(buildTestItemUri(testId), values, null, null);
+        contentResolver.update(buildTestItemUri(testId), values, null, null);
     }
 
-    private void updateTestInfo(@NonNull TestInfo testInfo) {
-//        final ContentValues values = new ContentValues();
-//        values.put(Test.SUBJECT_ID, testInfo.subjectId);
-//        values.put(Test.QUESTIONS_COUNT, testInfo.questionsCount);
-//        values.put(Test.TYPE, testInfo.type);
-//        values.put(Test.SESSION, testInfo.session);
-//        values.put(Test.LEVEL, testInfo.level);
-//        values.put(Test.TIME, testInfo.time);
-//        values.put(Test.YEAR, testInfo.year);
-//        values.put(Test.LAST_UPDATE, testInfo.lastUpdate);
-//        mContentResolver.update(buildTestItemUri(testInfo.id), values, null, null);
+    @WorkerThread
+    private void updateTestResult(long testId, int result) {
+        updateTestResult(getContentResolver(), testId, result);
     }
-
 }
