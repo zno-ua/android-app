@@ -51,9 +51,10 @@ public class TestProcessor extends Processor<TestInfo> {
             final Response<TestInfo> testInfoResponse = testInfoCall.execute();
             if (testInfoResponse.isSuccess()) {
                 final TestInfo testInfo = testInfoResponse.body();
-                final Cursor cursor = query(testInfo);
-                if (cursor != null) {
-                    final int result = cursor.getInt(Query.Test.Column.RESULT);
+                final Cursor c = query(testInfo);
+                if (c != null) {
+                    final int result = c.moveToFirst() ? c.getInt(Query.Test.Column.RESULT)
+                            : Test.NO_LOADED_DATA;
                     final boolean isQuestionsLoaded = Test.testResult(result, Test.QUESTIONS_LOADED);
                     final boolean isImagesLoaded = Test.testResult(result, Test.IMAGES_LOADED);
                     if (!(isQuestionsLoaded && isImagesLoaded)) {
@@ -64,7 +65,7 @@ public class TestProcessor extends Processor<TestInfo> {
                     if (!isPointsLoaded) {
                         getPoints(testId);
                     }
-                    if (!cursor.isClosed()) cursor.close();
+                    if (!c.isClosed()) c.close();
                 }
             }
         } catch (IOException ignored) {
@@ -75,7 +76,7 @@ public class TestProcessor extends Processor<TestInfo> {
     public void delete(long testId) {
         mQuestionProcessor.delete(testId);
         mPointProcessor.delete(testId);
-        updateTestResult(testId, NO_LOADED_DATA);
+        updateTestResult(testId, NO_LOADED_DATA, false);
     }
 
     private void getQuestions(long testId, boolean updateQuestions, boolean downloadImages)
@@ -86,7 +87,7 @@ public class TestProcessor extends Processor<TestInfo> {
             mQuestionProcessor.prepare(testId, updateQuestions, downloadImages);
             mQuestionProcessor.process(questionsResponse.body().get());
 
-            updateTestResult(testId, Test.QUESTIONS_LOADED);
+            updateTestResult(testId, Test.QUESTIONS_LOADED, true);
         }
     }
 
@@ -96,7 +97,7 @@ public class TestProcessor extends Processor<TestInfo> {
         if (pointsResponse.isSuccess()) {
             mPointProcessor.process(pointsResponse.body().get());
 
-            updateTestResult(testId, Test.POINTS_LOADED);
+            updateTestResult(testId, Test.POINTS_LOADED, true);
         }
     }
 
@@ -174,14 +175,16 @@ public class TestProcessor extends Processor<TestInfo> {
     }
 
     @WorkerThread
-    public static void updateTestResult(ContentResolver contentResolver, long testId, int result) {
-        final Cursor cursor = contentResolver.query(buildTestItemUri(testId),
-                new String[]{Test.RESULT}, null, null, null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                result |= cursor.getInt(0);
+    public static void updateTestResult(ContentResolver contentResolver, long testId, int result, boolean multiply) {
+        if (multiply) {
+            final Cursor cursor = contentResolver.query(buildTestItemUri(testId),
+                    new String[]{Test.RESULT}, null, null, null);
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    result |= cursor.getInt(0);
+                }
+                cursor.close();
             }
-            cursor.close();
         }
 
         final ContentValues values = new ContentValues();
@@ -190,7 +193,7 @@ public class TestProcessor extends Processor<TestInfo> {
     }
 
     @WorkerThread
-    private void updateTestResult(long testId, int result) {
-        updateTestResult(getContentResolver(), testId, result);
+    private void updateTestResult(long testId, int result, boolean multiply) {
+        updateTestResult(getContentResolver(), testId, result, multiply);
     }
 }

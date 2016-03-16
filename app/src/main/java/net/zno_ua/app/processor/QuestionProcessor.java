@@ -79,7 +79,7 @@ public class QuestionProcessor extends Processor<Question> {
         if (mDownloadImages) mIsImagesDownloadsSuccessfully = true;
         super.process(data);
         if (mDownloadImages && mIsImagesDownloadsSuccessfully) {
-            TestProcessor.updateTestResult(getContentResolver(), mTestId, IMAGES_LOADED);
+            TestProcessor.updateTestResult(getContentResolver(), mTestId, IMAGES_LOADED, true);
         }
         mTestId = NO_ID;
         mDownloadImages = false;
@@ -165,6 +165,7 @@ public class QuestionProcessor extends Processor<Question> {
     @Override
     public ContentValues createContentValuesForUpdate(Question question) {
         final ContentValues values = new ContentValues();
+        values.put(TEST_ID, mTestId);
         values.put(ANSWERS, question.getAnswers());
         values.put(POINT, question.getPoint());
         values.put(CORRECT_ANSWER, question.getCorrectAnswer());
