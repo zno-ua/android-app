@@ -4,18 +4,18 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.zno_ua.app.R;
 import net.zno_ua.app.activity.MainActivity;
+import net.zno_ua.app.util.Utils;
+
+import java.io.IOException;
 
 public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerService {
-
-    private static final String TAG = "Logs";
 
     /**
      * Called when message is received.
@@ -26,16 +26,10 @@ public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerSe
      */
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString("message");
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Message: " + message);
-
-        if (from.startsWith("/topics/")) {
-            // message received from some topic.
-        } else {
-            // normal downstream message.
+        if (from.startsWith(GcmRegistrationService.TOPICS)) {
+            final String topic = from.replace(GcmRegistrationService.TOPICS, "");
+            onTopicReceived(topic, data);
         }
-
         /**
          * Production applications would usually process the message here.
          * Eg: - Syncing with server.
@@ -47,7 +41,35 @@ public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerSe
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification(message);
+//        sendNotification(message);
+    }
+
+    private void onTopicReceived(String topic, Bundle data) {
+        switch (topic) {
+            case GcmRegistrationService.GLOBAL_NEWS:
+            case GcmRegistrationService.NEWS:
+                onNewsReceived(data);
+                break;
+            case GcmRegistrationService.GLOBAL_UPDATE:
+            case GcmRegistrationService.UPDATE:
+                onUpdateReceived(data);
+                break;
+        }
+    }
+
+    private void onNewsReceived(Bundle data) {
+        final String title = data.getString("title");
+        final String description = data.getString("description");
+        final String link = data.getString("link");
+    }
+
+    private void onUpdateReceived(Bundle data) {
+        final ObjectMapper mapper = new ObjectMapper();
+//        try {
+//            final long[] testIds = mapper.readValue(data.getString("tests_id"), long[].class);
+//            APIService.updateTests(getBaseContext(), testIds);
+//        } catch (IOException ignored) {
+//        }
     }
 
     /**
@@ -61,13 +83,12 @@ public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerSe
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_school_white_24dp)
                 .setContentTitle("GCM Message")
                 .setContentText(message)
                 .setAutoCancel(true)
-                .setSound(defaultSoundUri)
+                .setSound(Utils.DEFAULT_SOUND_URI)
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =

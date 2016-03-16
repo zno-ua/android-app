@@ -3,6 +3,7 @@ package net.zno_ua.app.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,6 +21,8 @@ import net.zno_ua.app.R;
 import net.zno_ua.app.helper.CustomTabActivityHelper;
 
 import java.util.regex.Pattern;
+
+import static android.media.RingtoneManager.getDefaultUri;
 
 /**
  * @author Vojko Vladimir
@@ -56,6 +59,8 @@ public class Utils {
 
     public static final Uri SITE_URI = Uri.parse(BuildConfig.SERVER_URL);
     public static final Uri CALCULATOR_URI = Uri.parse(BuildConfig.SERVER_URL + "/calculator");
+
+    public static final Uri DEFAULT_SOUND_URI = getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
     public static TypedValue getThemeAttribute(Context context, int attr) {
         final TypedValue value = new TypedValue();

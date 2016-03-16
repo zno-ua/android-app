@@ -1,13 +1,10 @@
 package net.zno_ua.app.service;
 
 import android.content.Intent;
-import android.util.Log;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
 
 public class GcmInstanceIDListenerService extends InstanceIDListenerService {
-
-    private static final String TAG = "Logs";
 
     /**
      * Called if InstanceID token is updated. This may occur if the security of
@@ -16,8 +13,6 @@ public class GcmInstanceIDListenerService extends InstanceIDListenerService {
      */
     @Override
     public void onTokenRefresh() {
-        final Intent intent = new Intent(this, GcmRegistrationService.class);
-        startService(intent);
-        Log.d(TAG, "onTokenRefresh");
+        startService(new Intent(this, GcmRegistrationService.class));
     }
 }
