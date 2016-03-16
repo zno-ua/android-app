@@ -87,9 +87,9 @@ public class TestProcessor {
                         * If the questions are not downloaded or downloaded, but the test is
                         * outdated, download the questions.
                         * */
-                        if ((!isQuestionsLoaded || isDataOutdated) && question.point != 0) {
-                            saveQuestion(testId, question);
-                        }
+//                        if ((!isQuestionsLoaded || isDataOutdated) && question.point != 0) {
+//                            saveQuestion(testId, question);
+//                        }
 
                         /*
                         * If the images are not downloaded or downloaded, but the test is outdated,
@@ -133,14 +133,14 @@ public class TestProcessor {
     private boolean downloadQuestionImages(long testId, Question question) throws IOException {
         boolean imagesLoaded = true;
         String localPath = "/" + testId;
-        if (!TextUtils.isEmpty(question.imagesRelativeUrl)) {
-            imagesLoaded = downloadAndSaveImage(localPath, question.imagesRelativeUrl, question.images);
-        }
+//        if (!TextUtils.isEmpty(question.imagesRelativeUrl)) {
+//            imagesLoaded = downloadAndSaveImage(localPath, question.imagesRelativeUrl, question.images);
+//        }
 
-        if (!TextUtils.isEmpty(question.imagesFormulasUrl)) {
-            localPath += FORMULAS_PATH;
-            imagesLoaded &= downloadAndSaveImage(localPath, question.imagesFormulasUrl, question.imagesFormulas);
-        }
+//        if (!TextUtils.isEmpty(question.imagesFormulasUrl)) {
+//            localPath += FORMULAS_PATH;
+//            imagesLoaded &= downloadAndSaveImage(localPath, question.imagesFormulasUrl, question.imagesFormulas);
+//        }
 
         return imagesLoaded;
     }
@@ -174,79 +174,20 @@ public class TestProcessor {
     }
 
     private boolean isDataOutdated(TestInfo testInfo) {
-        final Cursor cursor = mContentResolver.query(buildTestItemUri(testInfo.id),
-                new String[]{Test.LAST_UPDATE}, null, null, null);
-        boolean isDataOutdated = true;
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                isDataOutdated = testInfo.lastUpdate != cursor.getLong(0);
-            }
-            cursor.close();
-        }
-        return isDataOutdated;
+//        final Cursor cursor = mContentResolver.query(buildTestItemUri(testInfo.id),
+//                new String[]{Test.LAST_UPDATE}, null, null, null);
+//        boolean isDataOutdated = true;
+//        if (cursor != null) {
+//            if (cursor.moveToFirst()) {
+//                isDataOutdated = testInfo.lastUpdate != cursor.getLong(0);
+//            }
+//            cursor.close();
+//        }
+//        return isDataOutdated;
+        return false;
     }
 
     public void delete(long testId) {
-        updateTestStatus(testId, Test.STATUS_DELETING);
-        mFileManager.deleteTestDirectory(testId);
-
-        mContentResolver.delete(ZNOContract.Point.CONTENT_URI, ZNOContract.Point.TEST_ID
-                + " =?", new String[]{valueOf(testId)});
-        mContentResolver.delete(ZNOContract.Question.CONTENT_URI, ZNOContract.Question.TEST_ID
-                + " =?", new String[]{valueOf(testId)});
-
-        final ContentValues values = new ContentValues();
-        values.put(Test.RESULT, NO_LOADED_DATA);
-        mContentResolver.update(buildTestItemUri(testId), values, null, null);
-        updateTestStatus(testId, Test.STATUS_IDLE);
-    }
-
-    private void saveQuestion(long testId, Question question) {
-        prepareQuestion(testId, question);
-        final ContentValues values = new ContentValues();
-        values.put(ZNOContract.Question.TEST_ID, testId);
-        values.put(ZNOContract.Question.POSITION_ON_TEST, question.positionOnTest);
-        values.put(ZNOContract.Question.TYPE, question.type);
-        values.put(ZNOContract.Question.TEXT, question.text);
-        values.put(ZNOContract.Question.ADDITIONAL_TEXT, question.additionalText);
-        values.put(ZNOContract.Question.ANSWERS, cleanAnswers(question.answers));
-        values.put(ZNOContract.Question.CORRECT_ANSWER, question.correctAnswer);
-        values.put(ZNOContract.Question.POINT, question.point);
-
-        final int rowsUpdated = mContentResolver.update(ZNOContract.Question.CONTENT_URI,
-                values, ZNOContract.Question._ID + "=?", new String[]{String.valueOf(question.id)});
-        if (0 == rowsUpdated) {
-            values.put(ZNOContract.Question._ID, question.id);
-            mContentResolver.insert(ZNOContract.Question.CONTENT_URI, values);
-        }
-    }
-
-    private void prepareQuestion(long testId, Question question) {
-        final String localPath = "/" + testId;
-        if (question.imagesRelativeUrl != null) {
-            question.text = question.text.replace(question.imagesRelativeUrl, localPath);
-            question.answers = question.answers.replace(question.imagesRelativeUrl, localPath);
-        }
-
-        String imageName;
-        String imageSrc;
-        if (question.imagesFormulasUrl != null && question.imagesFormulas != null) {
-            for (int position = 0; position < question.imagesFormulas.length; position++) {
-                imageName = question.imagesFormulas[position];
-                imageSrc = String.format(Locale.US, IMAGE_SRC_FORMAT, testId, imageName);
-                if (question.text.contains(IMAGE)) {
-                    question.text = question.text.replaceFirst(IMAGE_REGEX, imageSrc);
-                } else if (question.answers.contains(IMAGE)) {
-                    question.answers = question.answers.replaceFirst(IMAGE_REGEX, imageSrc);
-                }
-            }
-        }
-        question.text = question.text.replace(HREF, HREF_REPLACEMENT).replace(HR, BR);
-    }
-
-    private static String cleanAnswers(String answers) {
-        return answers.replaceFirst("^.*?(\\.\\s|\\s)", "")
-                .replaceAll("(\r\n|\n).*?(\\.\\s|\\s)", "\r\n");
     }
 
     private void savePoint(long testId, Point point) {
@@ -285,16 +226,16 @@ public class TestProcessor {
     }
 
     private void updateTestInfo(@NonNull TestInfo testInfo) {
-        final ContentValues values = new ContentValues();
-        values.put(Test.SUBJECT_ID, testInfo.subjectId);
-        values.put(Test.QUESTIONS_COUNT, testInfo.questionsCount);
-        values.put(Test.TYPE, testInfo.type);
-        values.put(Test.SESSION, testInfo.session);
-        values.put(Test.LEVEL, testInfo.level);
-        values.put(Test.TIME, testInfo.time);
-        values.put(Test.YEAR, testInfo.year);
-        values.put(Test.LAST_UPDATE, testInfo.lastUpdate);
-        mContentResolver.update(buildTestItemUri(testInfo.id), values, null, null);
+//        final ContentValues values = new ContentValues();
+//        values.put(Test.SUBJECT_ID, testInfo.subjectId);
+//        values.put(Test.QUESTIONS_COUNT, testInfo.questionsCount);
+//        values.put(Test.TYPE, testInfo.type);
+//        values.put(Test.SESSION, testInfo.session);
+//        values.put(Test.LEVEL, testInfo.level);
+//        values.put(Test.TIME, testInfo.time);
+//        values.put(Test.YEAR, testInfo.year);
+//        values.put(Test.LAST_UPDATE, testInfo.lastUpdate);
+//        mContentResolver.update(buildTestItemUri(testInfo.id), values, null, null);
     }
 
 }
