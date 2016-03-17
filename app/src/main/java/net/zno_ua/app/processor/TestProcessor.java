@@ -46,6 +46,16 @@ public class TestProcessor extends Processor<TestInfo> {
 
     @WorkerThread
     public void get(long testId) {
+        get(testId, false);
+    }
+
+    @WorkerThread
+    public void update(long testId) {
+        get(testId, true);
+    }
+
+    @WorkerThread
+    private void get(long testId, boolean onlyUpdate) {
         final Call<TestInfo> testInfoCall = mApiClient.getTestInfo(testId);
         try {
             final Response<TestInfo> testInfoResponse = testInfoCall.execute();
@@ -53,19 +63,33 @@ public class TestProcessor extends Processor<TestInfo> {
                 final TestInfo testInfo = testInfoResponse.body();
                 final Cursor c = query(testInfo);
                 if (c != null) {
-                    final int result = c.moveToFirst() ? c.getInt(Query.Test.Column.RESULT)
-                            : Test.NO_LOADED_DATA;
-                    final boolean isQuestionsLoaded = Test.testResult(result, Test.QUESTIONS_LOADED);
-                    final boolean isImagesLoaded = Test.testResult(result, Test.IMAGES_LOADED);
+                    final boolean isQuestionsLoaded;
+                    final boolean isImagesLoaded;
+                    final boolean isPointsLoaded;
+                    if ( c.moveToFirst()) {
+                        insert(testInfo);
+                        final int result = c.getInt(Query.Test.Column.RESULT);
+                        isQuestionsLoaded = Test.testResult(result, Test.QUESTIONS_LOADED);
+                        isImagesLoaded = Test.testResult(result, Test.IMAGES_LOADED);
+                        isPointsLoaded = Test.testResult(result, Test.POINTS_LOADED);
+                    } else {
+                        isQuestionsLoaded = onlyUpdate;
+                        isImagesLoaded = onlyUpdate;
+                        isPointsLoaded = onlyUpdate;
+                    }
+
                     if (!(isQuestionsLoaded && isImagesLoaded)) {
                         getQuestions(testId, !isQuestionsLoaded, !isImagesLoaded);
                     }
-
-                    final boolean isPointsLoaded = Test.testResult(result, Test.POINTS_LOADED);
                     if (!isPointsLoaded) {
                         getPoints(testId);
                     }
-                    if (!c.isClosed()) c.close();
+
+                    c.close();
+                } else {
+                    insert(testInfo);
+                    getQuestions(testId, true, true);
+                    getPoints(testId);
                 }
             }
         } catch (IOException ignored) {

@@ -13,6 +13,7 @@ public class APIService extends IntentService {
 
     private static final String ACTION_RESTART_PENDING_REQUESTS = BuildConfig.APPLICATION_ID + ".action.RESTART_PENDING_REQUESTS";
     private static final String ACTION_GET_TEST = BuildConfig.APPLICATION_ID + ".action.GET_TEST";
+    private static final String ACTION_UPDATE_TEST = BuildConfig.APPLICATION_ID + ".action.UPDATE_TEST";
     private static final String ACTION_DELETE_TEST = BuildConfig.APPLICATION_ID + ".action.DELETE_TEST";
 
     private static final String KEY_TEST_ID = BuildConfig.APPLICATION_ID + ".KEY_TEST_ID";
@@ -38,6 +39,9 @@ public class APIService extends IntentService {
             case ACTION_DELETE_TEST:
                 mSyncManager.deleteTest(intent.getLongExtra(KEY_TEST_ID, -1));
                 break;
+            case ACTION_UPDATE_TEST:
+                mSyncManager.updateTest(intent.getLongExtra(KEY_TEST_ID, -1));
+                break;
             case ACTION_RESTART_PENDING_REQUESTS:
                 restartPendingRequests();
                 break;
@@ -59,6 +63,8 @@ public class APIService extends IntentService {
                         mSyncManager.getTest(id);
                     } else if (status == ZNOContract.Test.STATUS_DELETING) {
                         mSyncManager.deleteTest(id);
+                    } else if (status == ZNOContract.Test.STATUS_UPDATING) {
+                        mSyncManager.updateTest(id);
                     }
                 } while (cursor.moveToNext());
             }
@@ -73,6 +79,10 @@ public class APIService extends IntentService {
 
     public static void getTest(Context context, long testId) {
         context.startService(getIntent(context).setAction(ACTION_GET_TEST).putExtra(KEY_TEST_ID, testId));
+    }
+
+    public static void updateTest(Context context, long testId) {
+        context.startService(getIntent(context).setAction(ACTION_UPDATE_TEST).putExtra(KEY_TEST_ID, testId));
     }
 
     public static void deleteTest(Context context, long testId) {

@@ -62,6 +62,16 @@ public class TestSyncManager implements TestSyncRunnable.Methods {
         }
     }
 
+    public void updateTest(long testId) {
+        synchronized (mRequests) {
+            if (!isPending(testId)) {
+                updateTestStatus(testId, ZNOContract.Test.STATUS_UPDATING);
+                mRequests.add(testId);
+                mExecutor.execute(TestSyncRunnable.get(testId, this));
+            }
+        }
+    }
+
     public void deleteTest(long testId) {
         synchronized (mRequests) {
             if (!isPending(testId)) {

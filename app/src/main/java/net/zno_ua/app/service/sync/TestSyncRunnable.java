@@ -12,6 +12,7 @@ public class TestSyncRunnable implements Runnable {
 
     public static final int GET = 0x1;
     public static final int DELETE = 0x2;
+    public static final int UPDATE = 0x3;
 
     private final Methods mMethods;
     private final int mOperation;
@@ -27,6 +28,10 @@ public class TestSyncRunnable implements Runnable {
         return new TestSyncRunnable(testId, GET, methods);
     }
 
+    public static TestSyncRunnable update(long testId, @NonNull Methods methods) {
+        return new TestSyncRunnable(testId, UPDATE, methods);
+    }
+
     public static TestSyncRunnable delete(long testId, @NonNull Methods methods) {
         return new TestSyncRunnable(testId, DELETE, methods);
     }
@@ -36,6 +41,9 @@ public class TestSyncRunnable implements Runnable {
         switch (mOperation) {
             case GET:
                 mMethods.getTestProcessor().get(mTestId);
+                break;
+            case UPDATE:
+                mMethods.getTestProcessor().update(mTestId);
                 break;
             case DELETE:
                 final long startTime = System.currentTimeMillis();
