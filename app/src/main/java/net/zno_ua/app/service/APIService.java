@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 
 import net.zno_ua.app.BuildConfig;
+import net.zno_ua.app.helper.PreferencesHelper;
 import net.zno_ua.app.provider.ZNOContract;
 import net.zno_ua.app.service.sync.TestSyncManager;
 
@@ -43,7 +44,7 @@ public class APIService extends IntentService {
             case ACTION_UPDATE_TEST:
                 final long[] testsId = intent.getLongArrayExtra(KEY_TEST_ID);
                 for (long testId : testsId) {
-                    mSyncManager.updateTest(testId) ;
+                    mSyncManager.updateTest(testId);
                 }
                 break;
             case ACTION_CHECK_FOR_UPDATES:
@@ -56,16 +57,16 @@ public class APIService extends IntentService {
     }
 
     private void restartPendingRequests() {
-        final Cursor cursor = getContentResolver().query(ZNOContract.Test.CONTENT_URI,
+        final Cursor c = getContentResolver().query(ZNOContract.Test.CONTENT_URI,
                 new String[]{ZNOContract.Test._ID, ZNOContract.Test.STATUS},
                 ZNOContract.Test.STATUS + " != " + ZNOContract.Test.STATUS_IDLE,
                 null,
                 null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
+        if (c != null) {
+            if (c.moveToFirst()) {
                 do {
-                    long id = cursor.getLong(0);
-                    int status = cursor.getInt(1);
+                    long id = c.getLong(0);
+                    int status = c.getInt(1);
                     if (status == ZNOContract.Test.STATUS_DOWNLOADING) {
                         mSyncManager.getTest(id);
                     } else if (status == ZNOContract.Test.STATUS_DELETING) {
@@ -73,13 +74,33 @@ public class APIService extends IntentService {
                     } else if (status == ZNOContract.Test.STATUS_UPDATING) {
                         mSyncManager.updateTest(id);
                     }
-                } while (cursor.moveToNext());
+                } while (c.moveToNext());
             }
-            cursor.close();
+            c.close();
+        }
+        restartPendingUpdates();
+        if (PreferencesHelper.getInstance(getBaseContext()).needUpdate()) {
+            mSyncManager.updateTests();
         }
     }
 
-    public static void checkTestsUpdate(Context context) {
+    private void restartPendingUpdates() {
+        final Cursor c = getContentResolver().query(ZNOContract.TestUpdate.CONTENT_URI,
+                new String[]{ZNOContract.TestUpdate.TEST_ID},
+                null,
+                null,
+                null);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    mSyncManager.updateTest(c.getLong(0));
+                } while (c.moveToNext());
+            }
+            c.close();
+        }
+    }
+
+    public static void checkTestsUpdates(Context context) {
         context.startService(getIntent(context).setAction(ACTION_CHECK_FOR_UPDATES));
     }
 

@@ -2,7 +2,6 @@ package net.zno_ua.app.service.sync;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
 
 import net.zno_ua.app.processor.TestProcessor;
 import net.zno_ua.app.provider.ZNOContract;
@@ -24,19 +23,15 @@ public class TestSyncManager implements TestSyncRunnable.Methods {
     private final ThreadPoolExecutor mExecutor;
     private final Set<Long> mRequests;
     private final TestProcessor mTestProcessor;
+    private final Context mContext;
 
     private TestSyncManager(@NonNull Context context) {
+        mContext = context;
         mExecutor = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         mRequests = new HashSet<>();
         mTestProcessor = new TestProcessor(context);
-        prepare();
     }
 
-    private void prepare() {
-        /*TODO restart unfinished tasks*/
-    }
-
-    @WorkerThread
     public static synchronized TestSyncManager getInstance(@NonNull Context context) {
         synchronized (TestSyncManager.class) {
             if (sInstance == null) {
@@ -64,7 +59,9 @@ public class TestSyncManager implements TestSyncRunnable.Methods {
     public void updateTest(long testId) {
         synchronized (mRequests) {
             if (isPending(testId) || !getTestProcessor().canBeUpdated(testId)) {
-                mTestProcessor.requestUpdate(testId);
+                if (getTestProcessor().getStatus(testId) != ZNOContract.Test.STATUS_UPDATING) {
+                    mTestProcessor.requestUpdate(testId);
+                }
             } else {
                 mTestProcessor.updateTestStatus(testId, ZNOContract.Test.STATUS_UPDATING);
                 mRequests.add(testId);
@@ -90,6 +87,11 @@ public class TestSyncManager implements TestSyncRunnable.Methods {
     @Override
     public TestProcessor getTestProcessor() {
         return mTestProcessor;
+    }
+
+    @Override
+    public Context getContext() {
+        return mContext;
     }
 
     @Override

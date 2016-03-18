@@ -1,15 +1,19 @@
 package net.zno_ua.app.service.sync;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.ZNOApplication;
+import net.zno_ua.app.helper.PreferencesHelper;
 import net.zno_ua.app.processor.TestProcessor;
 import net.zno_ua.app.rest.APIServiceGenerator;
 import net.zno_ua.app.rest.model.Objects;
 import net.zno_ua.app.rest.model.TestInfo;
+import net.zno_ua.app.service.APIService;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -68,13 +72,14 @@ public class TestSyncRunnable implements Runnable {
                 mMethods.getTestProcessor().delete(mTestId);
                 break;
             case CHECK_UPDATES:
-                final Call<Objects<TestInfo>> testsCall = APIServiceGenerator.getAPIClient().getTestsInfo();
+                final Call<Objects<TestInfo>> testsCall = APIServiceGenerator.getAPIClient()
+                        .getTestsInfo();
                 try {
                     final Response<Objects<TestInfo>> testsResponse = testsCall.execute();
                     if (testsResponse.isSuccess()) {
                         mMethods.getTestProcessor().process(testsResponse.body().get());
-                    } else {
-                        /*TODO alarm */
+                        PreferencesHelper.getInstance(mMethods.getContext())
+                                .saveLastUpdateTime(System.currentTimeMillis());
                     }
                 } catch (IOException ignored) {
                 }
@@ -101,6 +106,8 @@ public class TestSyncRunnable implements Runnable {
 
     public interface Methods {
         TestProcessor getTestProcessor();
+
+        Context getContext();
 
         void finishTask(long testId);
     }

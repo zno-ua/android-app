@@ -16,6 +16,7 @@ public class PreferencesHelper {
     private static final String KEY_EMAIL = "KEY_EMAIL";
     private static final String KEY_NAME = "KEY_NAME";
     private static final String KEY_MESSAGE = "KEY_MESSAGE";
+    private static final String KEY_LAST_UPDATE = "KEY_LAST_UPDATE";
 
     private static volatile PreferencesHelper sInstance = null;
 
@@ -40,6 +41,7 @@ public class PreferencesHelper {
     private String mEmail;
     private String mName;
     private String mMessage;
+    private long mLastUpdateTime;
 
     private PreferencesHelper(Context context) {
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -50,6 +52,7 @@ public class PreferencesHelper {
         mEmail = mPreferences.getString(KEY_EMAIL, null);
         mName = mPreferences.getString(KEY_NAME, null);
         mMessage = mPreferences.getString(KEY_MESSAGE, null);
+        mLastUpdateTime = mPreferences.getLong(KEY_LAST_UPDATE, 0L);
     }
 
     @Nullable
@@ -65,6 +68,10 @@ public class PreferencesHelper {
     @Nullable
     public String getMessage() {
         return mMessage;
+    }
+
+    public long getLastUpdateTime() {
+        return mLastUpdateTime;
     }
 
     public void saveEmail(@Nullable String email) {
@@ -88,4 +95,12 @@ public class PreferencesHelper {
         saveMessage(review.getMessage());
     }
 
+    public void saveLastUpdateTime(long time) {
+        mLastUpdateTime = time;
+        mPreferences.edit().putLong(KEY_LAST_UPDATE, time).apply();
+    }
+
+    public boolean needUpdate() {
+        return System.currentTimeMillis() - getLastUpdateTime() > 3 * 24 * 60 * 60 * 1000;
+    }
 }

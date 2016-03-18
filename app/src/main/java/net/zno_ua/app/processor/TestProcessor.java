@@ -18,6 +18,7 @@ import net.zno_ua.app.rest.model.Objects;
 import net.zno_ua.app.rest.model.Point;
 import net.zno_ua.app.rest.model.Question;
 import net.zno_ua.app.rest.model.TestInfo;
+import net.zno_ua.app.service.APIService;
 
 import java.io.IOException;
 import java.util.List;
@@ -269,6 +270,7 @@ public class TestProcessor extends Processor<TestInfo> {
         contentResolver.update(buildTestItemUri(testId), values, null, null);
     }
 
+    @WorkerThread
     public void updateTestStatus(long testId, int status) {
         final ContentValues values = new ContentValues(1);
         values.put(ZNOContract.Test.STATUS, status);
@@ -285,7 +287,8 @@ public class TestProcessor extends Processor<TestInfo> {
         return getStatus(testId) == Test.STATUS_IDLE && !isTestPassing(testId);
     }
 
-    private int getStatus(long testId) {
+    @WorkerThread
+    public int getStatus(long testId) {
         int status = Test.STATUS_IDLE;
         final Cursor c = query(testId);
         if (c != null) {
@@ -298,6 +301,7 @@ public class TestProcessor extends Processor<TestInfo> {
         return status;
     }
 
+    @WorkerThread
     private boolean isTestPassing(long testId) {
         boolean isPassing = false;
         final Cursor c = getContentResolver().query(Query.Testing.URI, Query.Testing.PROJECTION,
@@ -311,6 +315,7 @@ public class TestProcessor extends Processor<TestInfo> {
         return isPassing;
     }
 
+    @WorkerThread
     public void requestUpdate(long testId) {
         final Cursor c = getContentResolver().query(TestUpdate.URI, TestUpdate.PROJECTION,
                 TestUpdate.SELECTION, selectionArgs(testId), null);
@@ -324,7 +329,6 @@ public class TestProcessor extends Processor<TestInfo> {
         if (!exists) {
             final ContentValues values = new ContentValues(1);
             values.put(ZNOContract.TestUpdate.TEST_ID, testId);
-                    /*TODO: setAlarm to restartUpdate */
             getContentResolver().insert(TestUpdate.URI, values);
         }
     }
