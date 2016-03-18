@@ -7,11 +7,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.FileManager;
+import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.activity.ViewImageActivity;
 import net.zno_ua.app.provider.Query;
 import net.zno_ua.app.rest.APIClient;
-import net.zno_ua.app.rest.ServiceGenerator;
+import net.zno_ua.app.rest.APIServiceGenerator;
 import net.zno_ua.app.rest.model.Question;
 
 import java.io.IOException;
@@ -40,7 +42,6 @@ import static net.zno_ua.app.provider.ZNOContract.Test.IMAGES_LOADED;
  * @since 16.03.16.
  */
 public class QuestionProcessor extends Processor<Question> {
-    private static final long NO_ID = Long.MIN_VALUE;
 
     private static final String HREF = "<a href=\"";
     private static final String HREF_REPLACEMENT = "<a href=\"" + ViewImageActivity.DATA_SCHEMA
@@ -52,36 +53,32 @@ public class QuestionProcessor extends Processor<Question> {
     private static final String HR = "<hr>";
     private static final String BR = "<br>";
 
-    private long mTestId = NO_ID;
     private boolean mDownloadImages = false;
     private boolean mUpdateQuestions = false;
     private boolean mIsImagesDownloadsSuccessfully = false;
+    private final long mTestId;
     private final APIClient mApiClient;
     private final FileManager mFileManager;
 
-    public QuestionProcessor(@NonNull Context context) {
+    public QuestionProcessor(@NonNull Context context, long testId) {
         super(context);
-        mApiClient = ServiceGenerator.create();
+        mApiClient = APIServiceGenerator.getAPIClient();
         mFileManager = new FileManager(context);
+        mTestId = testId;
     }
 
-    public void prepare(long testId, boolean updateQuestions, boolean downloadImages) {
-        mTestId = testId;
+    public void prepare(boolean updateQuestions, boolean downloadImages) {
         mUpdateQuestions = updateQuestions;
         mDownloadImages = downloadImages;
     }
 
     @Override
     public void process(@Nullable List<Question> data) {
-        if (mTestId == NO_ID) {
-            throw new IllegalArgumentException("Test id didn't specified");
-        }
         if (mDownloadImages) mIsImagesDownloadsSuccessfully = true;
         super.process(data);
         if (mDownloadImages && mIsImagesDownloadsSuccessfully) {
             TestProcessor.updateTestResult(getContentResolver(), mTestId, IMAGES_LOADED, true);
         }
-        mTestId = NO_ID;
         mDownloadImages = false;
         mIsImagesDownloadsSuccessfully = false;
         mUpdateQuestions = false;
@@ -94,6 +91,9 @@ public class QuestionProcessor extends Processor<Question> {
                 mIsImagesDownloadsSuccessfully &= downloadQuestionImages(question);
             } catch (IOException e) {
                 mIsImagesDownloadsSuccessfully = false;
+                if (BuildConfig.DEBUG) {
+                    ZNOApplication.log("-GetQuestionsImages: q# " + question.getId() + " ex: " + e.toString());
+                }
             }
         }
         prepareQuestion(mTestId, question);

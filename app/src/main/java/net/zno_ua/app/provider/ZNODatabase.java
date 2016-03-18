@@ -31,6 +31,7 @@ public class ZNODatabase extends SQLiteAssetHelper {
                 + "=" + TESTING + "." + TestingColumns.TEST_ID
                 + " INNER JOIN " + SUBJECT + " ON " + SUBJECT + "." + Subject._ID + "="
                 + TEST + "." + Test.SUBJECT_ID;
+        String TEST_UPDATE = "test_update";
     }
 
     public ZNODatabase(Context context) {

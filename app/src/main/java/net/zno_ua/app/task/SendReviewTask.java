@@ -9,6 +9,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.R;
 import net.zno_ua.app.rest.APIClient;
+import net.zno_ua.app.rest.APIServiceGenerator;
 import net.zno_ua.app.rest.model.Review;
 import net.zno_ua.app.util.Utils;
 
@@ -16,8 +17,6 @@ import java.lang.ref.WeakReference;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
-
-import static net.zno_ua.app.rest.ServiceGenerator.createService;
 
 /**
  * @author vojkovladimir.
@@ -44,7 +43,7 @@ public class SendReviewTask extends AsyncTask<Review, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Review... params) {
         final long startTime = System.currentTimeMillis();
-        final APIClient apiClient = createService(APIClient.class, BuildConfig.API_KEY);
+        final APIClient apiClient = APIServiceGenerator.getAPIClient();
         boolean isSuccess = false;
         try {
             final Response<ResponseBody> response = apiClient.sendReview(params[0]).execute();

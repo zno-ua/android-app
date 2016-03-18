@@ -150,6 +150,7 @@
     <string name="test_completed">Тест завершено</string>
     <string name="your_rating_point_format">Ваш рейтинговий бал складає %1$.1f.\nВи зможете подивитися на які питання ви відповіли вірно, а на які ні.</string>
     <string name="deleting">Видаляеться…</string>
+    <string name="updating">Оновлюється…</string>
     <string name="statement_question_number_en">W</string>
     <string name="statement_question_number">В</string>
     <string name="statement_en">Writing</string>

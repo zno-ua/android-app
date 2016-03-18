@@ -12,14 +12,7 @@ import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import static net.zno_ua.app.provider.ZNOContract.Answer;
-import static net.zno_ua.app.provider.ZNOContract.Point;
-import static net.zno_ua.app.provider.ZNOContract.Question;
-import static net.zno_ua.app.provider.ZNOContract.QuestionAndAnswer;
-import static net.zno_ua.app.provider.ZNOContract.Subject;
-import static net.zno_ua.app.provider.ZNOContract.Test;
-import static net.zno_ua.app.provider.ZNOContract.Testing;
-import static net.zno_ua.app.provider.ZNOContract.TestingResult;
+import static net.zno_ua.app.provider.ZNOContract.*;
 import static net.zno_ua.app.provider.ZNODatabase.Tables;
 
 /**
@@ -49,6 +42,7 @@ public class ZNOProvider extends ContentProvider {
         int POINT_ID = 601;
         int TESTING_RESULT = 701;
         int TESTING_RESULT_ID = 702;
+        int TEST_UPDATE = 800;
     }
 
     /**
@@ -57,22 +51,22 @@ public class ZNOProvider extends ContentProvider {
      */
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-        final String authority = ZNOContract.CONTENT_AUTHORITY;
-        matcher.addURI(authority, ZNOContract.PATH_SUBJECT, URI_CODE.SUBJECT);
-        matcher.addURI(authority, ZNOContract.PATH_SUBJECT + "/#", URI_CODE.SUBJECT_ID);
-        matcher.addURI(authority, ZNOContract.PATH_TEST, URI_CODE.TEST);
-        matcher.addURI(authority, ZNOContract.PATH_TEST + "/#", URI_CODE.TEST_ID);
-        matcher.addURI(authority, ZNOContract.PATH_QUESTION, URI_CODE.QUESTION);
-        matcher.addURI(authority, ZNOContract.PATH_QUESTION + "/#", URI_CODE.QUESTION_ID);
-        matcher.addURI(authority, ZNOContract.PATH_QUESTION_AND_ANSWER, URI_CODE.QUESTION_AND_ANSWER);
-        matcher.addURI(authority, ZNOContract.PATH_ANSWER, URI_CODE.ANSWER);
-        matcher.addURI(authority, ZNOContract.PATH_ANSWER + "/#", URI_CODE.ANSWER_ID);
-        matcher.addURI(authority, ZNOContract.PATH_TESTING, URI_CODE.TESTING);
-        matcher.addURI(authority, ZNOContract.PATH_TESTING + "/#", URI_CODE.TESTING_ID);
-        matcher.addURI(authority, ZNOContract.PATH_POINT, URI_CODE.POINT);
-        matcher.addURI(authority, ZNOContract.PATH_POINT + "/#", URI_CODE.POINT_ID);
-        matcher.addURI(authority, ZNOContract.PATH_TESTING_RESULT, URI_CODE.TESTING_RESULT);
-        matcher.addURI(authority, ZNOContract.PATH_TESTING_RESULT + "/#", URI_CODE.TESTING_RESULT_ID);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_SUBJECT, URI_CODE.SUBJECT);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_SUBJECT + "/#", URI_CODE.SUBJECT_ID);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_TEST, URI_CODE.TEST);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_TEST + "/#", URI_CODE.TEST_ID);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_QUESTION, URI_CODE.QUESTION);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_QUESTION + "/#", URI_CODE.QUESTION_ID);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_QUESTION_AND_ANSWER, URI_CODE.QUESTION_AND_ANSWER);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_ANSWER, URI_CODE.ANSWER);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_ANSWER + "/#", URI_CODE.ANSWER_ID);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_TESTING, URI_CODE.TESTING);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_TESTING + "/#", URI_CODE.TESTING_ID);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_POINT, URI_CODE.POINT);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_POINT + "/#", URI_CODE.POINT_ID);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_TESTING_RESULT, URI_CODE.TESTING_RESULT);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_TESTING_RESULT + "/#", URI_CODE.TESTING_RESULT_ID);
+        matcher.addURI(CONTENT_AUTHORITY, PATH_TEST_UPDATE, URI_CODE.TEST_UPDATE);
         return matcher;
     }
 
@@ -141,6 +135,9 @@ public class ZNOProvider extends ContentProvider {
                 queryBuilder.setTables(Tables.TESTING_RESULT);
                 queryBuilder.appendWhere(BaseColumns._ID + EQ + uri.getLastPathSegment());
                 break;
+            case URI_CODE.TEST_UPDATE:
+                queryBuilder.setTables(Tables.TEST_UPDATE);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
         }
@@ -189,11 +186,14 @@ public class ZNOProvider extends ContentProvider {
             case URI_CODE.POINT:
                 table = Tables.POINT;
                 break;
+            case URI_CODE.TEST_UPDATE:
+                table = Tables.TEST_UPDATE;
+                break;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
         }
 
-        id = db.insertOrThrow(table, null, values);
+        id = db.insertWithOnConflict(table, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
         notifyChange(uri, match);
 
@@ -252,6 +252,9 @@ public class ZNOProvider extends ContentProvider {
             case URI_CODE.POINT_ID:
                 table = Tables.POINT;
                 where = Point._ID + EQ + uri.getLastPathSegment();
+                break;
+            case URI_CODE.TEST_UPDATE:
+                table = Tables.TEST_UPDATE;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
@@ -316,6 +319,9 @@ public class ZNOProvider extends ContentProvider {
             case URI_CODE.POINT_ID:
                 table = Tables.POINT;
                 where = Point._ID + EQ + uri.getLastPathSegment();
+                break;
+            case URI_CODE.TEST_UPDATE:
+                table = Tables.TEST_UPDATE;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);

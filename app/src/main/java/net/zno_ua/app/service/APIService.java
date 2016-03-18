@@ -15,6 +15,7 @@ public class APIService extends IntentService {
     private static final String ACTION_GET_TEST = BuildConfig.APPLICATION_ID + ".action.GET_TEST";
     private static final String ACTION_UPDATE_TEST = BuildConfig.APPLICATION_ID + ".action.UPDATE_TEST";
     private static final String ACTION_DELETE_TEST = BuildConfig.APPLICATION_ID + ".action.DELETE_TEST";
+    private static final String ACTION_CHECK_FOR_UPDATES = BuildConfig.APPLICATION_ID + ".action.CHECK_FOR_UPDATES";
 
     private static final String KEY_TEST_ID = BuildConfig.APPLICATION_ID + ".KEY_TEST_ID";
 
@@ -40,7 +41,13 @@ public class APIService extends IntentService {
                 mSyncManager.deleteTest(intent.getLongExtra(KEY_TEST_ID, -1));
                 break;
             case ACTION_UPDATE_TEST:
-                mSyncManager.updateTest(intent.getLongExtra(KEY_TEST_ID, -1));
+                final long[] testsId = intent.getLongArrayExtra(KEY_TEST_ID);
+                for (long testId : testsId) {
+                    mSyncManager.updateTest(testId) ;
+                }
+                break;
+            case ACTION_CHECK_FOR_UPDATES:
+                mSyncManager.updateTests();
                 break;
             case ACTION_RESTART_PENDING_REQUESTS:
                 restartPendingRequests();
@@ -72,6 +79,9 @@ public class APIService extends IntentService {
         }
     }
 
+    public static void checkTestsUpdate(Context context) {
+        context.startService(getIntent(context).setAction(ACTION_CHECK_FOR_UPDATES));
+    }
 
     public static void restartPendingRequests(Context context) {
         context.startService(getIntent(context).setAction(ACTION_RESTART_PENDING_REQUESTS));
@@ -81,8 +91,8 @@ public class APIService extends IntentService {
         context.startService(getIntent(context).setAction(ACTION_GET_TEST).putExtra(KEY_TEST_ID, testId));
     }
 
-    public static void updateTest(Context context, long testId) {
-        context.startService(getIntent(context).setAction(ACTION_UPDATE_TEST).putExtra(KEY_TEST_ID, testId));
+    public static void updateTests(Context context, long[] testsId) {
+        context.startService(getIntent(context).setAction(ACTION_UPDATE_TEST).putExtra(KEY_TEST_ID, testsId));
     }
 
     public static void deleteTest(Context context, long testId) {

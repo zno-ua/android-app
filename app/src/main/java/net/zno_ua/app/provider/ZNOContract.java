@@ -144,12 +144,6 @@ public class ZNOContract {
          * The list of images (may be null).
          * <P>Type: TEXT</P>
          */
-        String IMAGES = "images";
-        /**
-         * The relative url of the images (may be null).
-         * <P>Type: TEXT</P>
-         */
-        String IMAGES_RELATIVE_URL = "images_relative_url";
     }
 
     public interface QuestionAndAnswerColumns extends QuestionColumns, AnswerColumns {
@@ -226,6 +220,11 @@ public class ZNOContract {
         String RATING_POINT = "rating_point";
     }
 
+    public interface TestUpdateColumns {
+        String _ID = BaseColumns._ID;
+        String TEST_ID = "test_id";
+    }
+
     public interface TestingResultColumns {
         String _ID = Tables.TESTING + DOT + BaseColumns._ID + AS + BaseColumns._ID;
         String TEST_ID = Tables.TEST + DOT + BaseColumns._ID;
@@ -252,14 +251,15 @@ public class ZNOContract {
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
-    static final String PATH_SUBJECT = ZNODatabase.Tables.SUBJECT;
-    static final String PATH_TEST = ZNODatabase.Tables.TEST;
-    static final String PATH_QUESTION = ZNODatabase.Tables.QUESTION;
+    static final String PATH_SUBJECT = Tables.SUBJECT;
+    static final String PATH_TEST = Tables.TEST;
+    static final String PATH_QUESTION = Tables.QUESTION;
     static final String PATH_QUESTION_AND_ANSWER = "question_and_answer";
-    static final String PATH_ANSWER = ZNODatabase.Tables.ANSWER;
-    static final String PATH_TESTING = ZNODatabase.Tables.TESTING;
-    static final String PATH_POINT = ZNODatabase.Tables.POINT;
+    static final String PATH_ANSWER = Tables.ANSWER;
+    static final String PATH_TESTING = Tables.TESTING;
+    static final String PATH_POINT = Tables.POINT;
     static final String PATH_TESTING_RESULT = "testing_result";
+    static final String PATH_TEST_UPDATE = Tables.TEST_UPDATE;
 
     private static final String DOT = ".";
     public static final String AS = " AS ";
@@ -527,6 +527,11 @@ public class ZNOContract {
             return sentimentResult;
         }
 
+    }
+
+    public static class TestUpdate implements TestUpdateColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_TEST_UPDATE).build();
     }
 
     private static Uri buildItemUri(Uri contentUri, Object item) {

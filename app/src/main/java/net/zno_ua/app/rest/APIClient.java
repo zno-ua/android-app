@@ -20,6 +20,9 @@ import retrofit2.http.Streaming;
  * @author vojkovladimir.
  */
 public interface APIClient {
+    @GET("test/")
+    Call<Objects<TestInfo>> getTestsInfo();
+
     @GET("test/{test_id}/")
     Call<TestInfo> getTestInfo(@Path("test_id") long testId);
 

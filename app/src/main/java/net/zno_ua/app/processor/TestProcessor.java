@@ -8,9 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
+import net.zno_ua.app.BuildConfig;
+import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.provider.Query;
+import net.zno_ua.app.provider.ZNOContract;
 import net.zno_ua.app.rest.APIClient;
-import net.zno_ua.app.rest.ServiceGenerator;
+import net.zno_ua.app.rest.APIServiceGenerator;
 import net.zno_ua.app.rest.model.Objects;
 import net.zno_ua.app.rest.model.Point;
 import net.zno_ua.app.rest.model.Question;
@@ -22,8 +25,12 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import static net.zno_ua.app.provider.Query.TestUpdate;
+import static net.zno_ua.app.provider.Query.selectionArgs;
 import static net.zno_ua.app.provider.ZNOContract.Test;
 import static net.zno_ua.app.provider.ZNOContract.Test.NO_LOADED_DATA;
+import static net.zno_ua.app.provider.ZNOContract.Test.STATUS_IDLE;
+import static net.zno_ua.app.provider.ZNOContract.Test.STATUS_UPDATING;
 import static net.zno_ua.app.provider.ZNOContract.Test.buildTestItemUri;
 
 
@@ -34,13 +41,11 @@ import static net.zno_ua.app.provider.ZNOContract.Test.buildTestItemUri;
 public class TestProcessor extends Processor<TestInfo> {
 
     private final APIClient mApiClient;
-    private final QuestionProcessor mQuestionProcessor;
     private final PointProcessor mPointProcessor;
 
     public TestProcessor(@NonNull Context context) {
         super(context);
-        mApiClient = ServiceGenerator.create();
-        mQuestionProcessor = new QuestionProcessor(context);
+        mApiClient = APIServiceGenerator.getAPIClient();
         mPointProcessor = new PointProcessor(context);
     }
 
@@ -51,11 +56,20 @@ public class TestProcessor extends Processor<TestInfo> {
 
     @WorkerThread
     public void update(long testId) {
-        get(testId, true);
+        if (canBeUpdated(testId)) {
+            get(testId, true);
+        } else {
+            if (getStatus(testId) == Test.STATUS_IDLE) {
+                requestUpdate(testId);
+            }
+        }
     }
 
     @WorkerThread
     private void get(long testId, boolean onlyUpdate) {
+        if (BuildConfig.DEBUG) {
+            ZNOApplication.log("--GetTest: #" + testId + (onlyUpdate ? " update" : " download"));
+        }
         final Call<TestInfo> testInfoCall = mApiClient.getTestInfo(testId);
         try {
             final Response<TestInfo> testInfoResponse = testInfoCall.execute();
@@ -66,39 +80,53 @@ public class TestProcessor extends Processor<TestInfo> {
                     final boolean isQuestionsLoaded;
                     final boolean isImagesLoaded;
                     final boolean isPointsLoaded;
-                    if ( c.moveToFirst()) {
-                        insert(testInfo);
+                    if (c.moveToFirst()) {
                         final int result = c.getInt(Query.Test.Column.RESULT);
                         isQuestionsLoaded = Test.testResult(result, Test.QUESTIONS_LOADED);
                         isImagesLoaded = Test.testResult(result, Test.IMAGES_LOADED);
                         isPointsLoaded = Test.testResult(result, Test.POINTS_LOADED);
                     } else {
-                        isQuestionsLoaded = onlyUpdate;
-                        isImagesLoaded = onlyUpdate;
-                        isPointsLoaded = onlyUpdate;
+                        isQuestionsLoaded = false;
+                        isImagesLoaded = false;
+                        isPointsLoaded = false;
                     }
 
-                    if (!(isQuestionsLoaded && isImagesLoaded)) {
+                    if (onlyUpdate && (isQuestionsLoaded || isImagesLoaded) || !onlyUpdate) {
                         getQuestions(testId, !isQuestionsLoaded, !isImagesLoaded);
                     }
-                    if (!isPointsLoaded) {
+
+                    if (onlyUpdate && isPointsLoaded || !onlyUpdate) {
                         getPoints(testId);
                     }
 
                     c.close();
                 } else {
                     insert(testInfo);
-                    getQuestions(testId, true, true);
-                    getPoints(testId);
+                    if (!onlyUpdate) {
+                        getQuestions(testId, true, true);
+                        getPoints(testId);
+                    }
+                }
+                removeFromRequestedUpdates(testId);
+            } else {
+                if (BuildConfig.DEBUG) {
+                    ZNOApplication.log("--GetTestInfo: #" + testId + " failed");
                 }
             }
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            if (BuildConfig.DEBUG) {
+                ZNOApplication.log("--GetTest: #" + testId + (onlyUpdate ? " update" : " get") + " ex: " + e.toString());
+            }
         }
+    }
+
+    private void removeFromRequestedUpdates(long testId) {
+        getContentResolver().delete(TestUpdate.URI, TestUpdate.SELECTION, selectionArgs(testId));
     }
 
     @WorkerThread
     public void delete(long testId) {
-        mQuestionProcessor.delete(testId);
+        new QuestionProcessor(getContext(), testId).delete(testId);
         mPointProcessor.delete(testId);
         updateTestResult(testId, NO_LOADED_DATA, false);
     }
@@ -108,10 +136,14 @@ public class TestProcessor extends Processor<TestInfo> {
         final Call<Objects<Question>> questionsCall = mApiClient.getTestQuestions(testId);
         final Response<Objects<Question>> questionsResponse = questionsCall.execute();
         if (questionsResponse.isSuccess()) {
-            mQuestionProcessor.prepare(testId, updateQuestions, downloadImages);
-            mQuestionProcessor.process(questionsResponse.body().get());
-
+            final QuestionProcessor questionProcessor = new QuestionProcessor(getContext(), testId);
+            questionProcessor.prepare(updateQuestions, downloadImages);
+            questionProcessor.process(questionsResponse.body().get());
             updateTestResult(testId, Test.QUESTIONS_LOADED, true);
+        } else {
+            if (BuildConfig.DEBUG) {
+                ZNOApplication.log("--GetTestQuestions: #" + testId + " failed");
+            }
         }
     }
 
@@ -120,29 +152,41 @@ public class TestProcessor extends Processor<TestInfo> {
         final Response<Objects<Point>> pointsResponse = pointsCall.execute();
         if (pointsResponse.isSuccess()) {
             mPointProcessor.process(pointsResponse.body().get());
-
             updateTestResult(testId, Test.POINTS_LOADED, true);
+        } else {
+            if (BuildConfig.DEBUG) {
+                ZNOApplication.log("--GetTestPoints: #" + testId + " failed");
+            }
         }
     }
 
     @Override
     protected void insert(@NonNull TestInfo testInfo) {
         getContentResolver().insert(Query.Test.URI, createContentValuesForInsert(testInfo));
+        removeFromRequestedUpdates(testInfo.getId());
     }
 
     @Override
     protected void update(@NonNull TestInfo testInfo, @NonNull Cursor cursor) {
         if (cursor.getInt(Query.Test.Column.RESULT) != NO_LOADED_DATA) {
+            updateTestStatus(testInfo.getId(), STATUS_UPDATING);
             final Call<Objects<Question>> call = mApiClient.getTestQuestions(testInfo.getId());
             try {
                 final Response<Objects<Question>> response = call.execute();
                 if (response.isSuccess()) {
-                    mQuestionProcessor.prepare(testInfo.getId(), true, true);
-                    mQuestionProcessor.process(response.body().get());
+                    final QuestionProcessor questionProcessor =
+                            new QuestionProcessor(getContext(), testInfo.getId());
+                    questionProcessor.prepare(true, true);
+                    questionProcessor.process(response.body().get());
                     finishUpdate(testInfo);
                 }
-            } catch (IOException ignored) {
+                removeFromRequestedUpdates(testInfo.getId());
+            } catch (IOException e) {
+                if (BuildConfig.DEBUG) {
+                    ZNOApplication.log("--GetQuestions: #" + testInfo.getId() + " ex: " + e.toString());
+                }
             }
+            updateTestStatus(testInfo.getId(), STATUS_IDLE);
         } else {
             finishUpdate(testInfo);
         }
@@ -153,11 +197,17 @@ public class TestProcessor extends Processor<TestInfo> {
         final String[] selectionArgs = Query.selectionArgs(testInfo.getId());
         final ContentValues values = createContentValuesForUpdate(testInfo);
         getContentResolver().update(Query.Test.URI, values, selection, selectionArgs);
+        removeFromRequestedUpdates(testInfo.getId());
     }
 
     @Override
     protected Cursor query(@NonNull TestInfo testInfo) {
-        return getContentResolver().query(buildTestItemUri(testInfo.getId()), Query.Test.PROJECTION, null, null, null);
+        return query(testInfo.getId());
+    }
+
+    protected Cursor query(long testId) {
+        return getContentResolver().query(buildTestItemUri(testId), Query.Test.PROJECTION, null,
+                null, null);
     }
 
     @Override
@@ -176,6 +226,8 @@ public class TestProcessor extends Processor<TestInfo> {
     public ContentValues createContentValuesForInsert(TestInfo testInfo) {
         final ContentValues values = createContentValuesForUpdate(testInfo);
         values.put(Test._ID, testInfo.getId());
+        values.put(Test.STATUS, Test.STATUS_IDLE);
+        values.put(Test.RESULT, Test.NO_LOADED_DATA);
         return values;
     }
 
@@ -199,7 +251,8 @@ public class TestProcessor extends Processor<TestInfo> {
     }
 
     @WorkerThread
-    public static void updateTestResult(ContentResolver contentResolver, long testId, int result, boolean multiply) {
+    public static void updateTestResult(ContentResolver contentResolver, long testId, int result,
+                                        boolean multiply) {
         if (multiply) {
             final Cursor cursor = contentResolver.query(buildTestItemUri(testId),
                     new String[]{Test.RESULT}, null, null, null);
@@ -216,8 +269,63 @@ public class TestProcessor extends Processor<TestInfo> {
         contentResolver.update(buildTestItemUri(testId), values, null, null);
     }
 
+    public void updateTestStatus(long testId, int status) {
+        final ContentValues values = new ContentValues(1);
+        values.put(ZNOContract.Test.STATUS, status);
+        getContentResolver().update(buildTestItemUri(testId), values, null, null);
+    }
+
     @WorkerThread
     private void updateTestResult(long testId, int result, boolean multiply) {
         updateTestResult(getContentResolver(), testId, result, multiply);
+    }
+
+    @WorkerThread
+    public boolean canBeUpdated(long testId) {
+        return getStatus(testId) == Test.STATUS_IDLE && !isTestPassing(testId);
+    }
+
+    private int getStatus(long testId) {
+        int status = Test.STATUS_IDLE;
+        final Cursor c = query(testId);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                status = c.getInt(Query.Test.Column.STATUS);
+            }
+            c.close();
+        }
+
+        return status;
+    }
+
+    private boolean isTestPassing(long testId) {
+        boolean isPassing = false;
+        final Cursor c = getContentResolver().query(Query.Testing.URI, Query.Testing.PROJECTION,
+                Query.Testing.SELECTION_PASSING, selectionArgs(testId), null);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                isPassing = true;
+            }
+            c.close();
+        }
+        return isPassing;
+    }
+
+    public void requestUpdate(long testId) {
+        final Cursor c = getContentResolver().query(TestUpdate.URI, TestUpdate.PROJECTION,
+                TestUpdate.SELECTION, selectionArgs(testId), null);
+        boolean exists = false;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                exists = true;
+            }
+            c.close();
+        }
+        if (!exists) {
+            final ContentValues values = new ContentValues(1);
+            values.put(ZNOContract.TestUpdate.TEST_ID, testId);
+                    /*TODO: setAlarm to restartUpdate */
+            getContentResolver().insert(TestUpdate.URI, values);
+        }
     }
 }

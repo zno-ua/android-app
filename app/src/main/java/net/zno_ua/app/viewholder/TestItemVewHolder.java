@@ -61,7 +61,7 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
                 description += (isEmpty(description) ? "" : ", ");
                 description += buildQuestionsCount(cursor.getInt(Column.QUESTIONS_COUNT));
             } else {
-                actionResId = R.drawable.ic_refresh_white_24dp;
+                actionResId = R.drawable.ic_sync_problem_white_24dp;
                 description = itemView.getContext().getString(R.string.downloading_error);
             }
             mIvActionIcon.setImageResource(actionResId);
@@ -69,6 +69,10 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
         } else if (status == ZNOContract.Test.STATUS_DELETING) {
             mIvActionIcon.setVisibility(View.GONE);
             description = itemView.getContext().getString(R.string.deleting);
+        } else if (status == ZNOContract.Test.STATUS_UPDATING) {
+            mIvActionIcon.setImageResource(R.drawable.ic_sync_white_24dp);
+            mIvActionIcon.setVisibility(View.VISIBLE);
+            description = itemView.getContext().getString(R.string.updating);
         } else {
             mIvActionIcon.setVisibility(View.GONE);
             description = itemView.getContext().getString(R.string.downloading);

@@ -1,6 +1,7 @@
 package net.zno_ua.app;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
@@ -9,6 +10,7 @@ import net.zno_ua.app.service.APIService;
 
 public class ZNOApplication extends Application {
 
+    public static final String TAG = "ZNOLogs";
     private static ZNOApplication sInstance;
 
     private Tracker mTracker;
@@ -37,5 +39,9 @@ public class ZNOApplication extends Application {
      */
     public Tracker getTracker() {
         return mTracker;
+    }
+
+    public static void log(String message) {
+        Log.d(TAG, message);
     }
 }

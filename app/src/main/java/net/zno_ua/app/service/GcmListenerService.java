@@ -9,13 +9,21 @@ import android.support.v4.app.NotificationCompat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.R;
+import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.activity.MainActivity;
 import net.zno_ua.app.util.Utils;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerService {
+
+    private static final java.lang.String KEY_TITLE = "title";
+    private static final java.lang.String KEY_DESCRIPTION = "description";
+    private static final java.lang.String KEY_LINK = "link";
+    private static final java.lang.String KEY_TEST_ID = "tests_id";
 
     /**
      * Called when message is received.
@@ -30,18 +38,6 @@ public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerSe
             final String topic = from.replace(GcmRegistrationService.TOPICS, "");
             onTopicReceived(topic, data);
         }
-        /**
-         * Production applications would usually process the message here.
-         * Eg: - Syncing with server.
-         *     - Store message in local database.
-         *     - Update UI.
-         */
-
-        /**
-         * In some cases it may be useful to show a notification indicating to the user
-         * that a message was received.
-         */
-//        sendNotification(message);
     }
 
     private void onTopicReceived(String topic, Bundle data) {
@@ -58,18 +54,29 @@ public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerSe
     }
 
     private void onNewsReceived(Bundle data) {
-        final String title = data.getString("title");
-        final String description = data.getString("description");
-        final String link = data.getString("link");
+        final String title = data.getString(KEY_TITLE);
+        final String description = data.getString(KEY_DESCRIPTION);
+        final String link = data.getString(KEY_LINK);
+        if (BuildConfig.DEBUG) {
+            ZNOApplication.log("GCM news received: " + title + ": " + description + " " + link);
+        }
     }
 
     private void onUpdateReceived(Bundle data) {
         final ObjectMapper mapper = new ObjectMapper();
-//        try {
-//            final long[] testIds = mapper.readValue(data.getString("tests_id"), long[].class);
-//            APIService.updateTests(getBaseContext(), testIds);
-//        } catch (IOException ignored) {
-//        }
+        try {
+            final long[] testIds = mapper.readValue(data.getString(KEY_TEST_ID), long[].class);
+            if (BuildConfig.DEBUG) {
+                ZNOApplication.log("GCM update received: " + Arrays.toString(testIds));
+            }
+            if (testIds != null && testIds.length != 0) {
+                APIService.updateTests(getBaseContext(), testIds);
+            }
+        } catch (IOException e) {
+            if (BuildConfig.DEBUG) {
+                ZNOApplication.log("GCM update received: " + e.toString());
+            }
+        }
     }
 
     /**

@@ -150,6 +150,31 @@ public class Query {
                 + ZNOContract.TestingResult.DATE + ASC;
     }
 
+    public static final class TestUpdate {
+        public static final Uri URI = ZNOContract.TestUpdate.CONTENT_URI;
+        public static final String[] PROJECTION = new String[]{
+                ZNOContract.TestUpdate._ID,
+                ZNOContract.TestUpdate.TEST_ID
+        };
+        public interface Column {
+            int _ID = 0;
+            int TEST_ID = 1;
+        }
+        public static final String SELECTION = ZNOContract.TestUpdate.TEST_ID + "=?";
+    }
+
+    public static final class Testing {
+        public static final Uri URI = ZNOContract.Testing.CONTENT_URI;
+        public static final String[] PROJECTION = new String[]{
+                ZNOContract.Testing._ID,
+        };
+        public interface Column {
+            int _ID = 0;
+        }
+        public static final String SELECTION_PASSING = ZNOContract.Testing.TEST_ID + "=?" +
+                " AND " + ZNOContract.Testing.STATUS + "=" + ZNOContract.Testing.IN_PROGRESS;
+    }
+
     public static String[] selectionArgs(Object... args) {
         String[] combination = new String[args.length];
         for (int i = 0; i < args.length; i++) {
