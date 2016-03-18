@@ -51,4 +51,8 @@ public class ServiceGenerator {
         final Retrofit retrofit = sBuilder.client(client).build();
         return retrofit.create(serviceClass);
     }
+
+    public static APIClient create() {
+        return createService(APIClient.class, BuildConfig.API_KEY);
+    }
 }

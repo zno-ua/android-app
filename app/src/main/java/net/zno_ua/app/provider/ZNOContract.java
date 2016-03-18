@@ -312,6 +312,10 @@ public class ZNOContract {
          * STATUS value that indicates that processor deleting this resource.
          */
         public static final int STATUS_DELETING = 0x2;
+        /**
+         * STATUS value that indicates that processor updating this resource.
+         */
+        public static final int STATUS_UPDATING = 0x3;
 
         /**
          * Official test type.

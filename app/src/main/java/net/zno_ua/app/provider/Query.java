@@ -32,6 +32,7 @@ public class Query {
         }
 
         public static final String SELECTION = ZNOContract.Question.TEST_ID + " = ?";
+        public static final String SELECTION_ID = ZNOContract.Question._ID + " = ?";
 
         public static final String SORT_ORDER = ZNOContract.Question.SORT_ORDER;
     }
@@ -87,6 +88,7 @@ public class Query {
                 ZNOContract.Test.QUESTIONS_COUNT,
                 ZNOContract.Test.STATUS,
                 ZNOContract.Test.RESULT,
+                ZNOContract.Test.LAST_UPDATE
         };
 
         public interface Column {
@@ -98,9 +100,12 @@ public class Query {
             int QUESTIONS_COUNT = 5;
             int STATUS = 6;
             int RESULT = 7;
+            int LAST_UPDATE = 8;
         }
 
         public static final String SELECTION = ZNOContract.Test.SUBJECT_ID + " = ?";
+        public static final String SELECTION_ID = ZNOContract.Test._ID + " = ?";
+        public static final String SELECTION_NOT_IN = ZNOContract.Test._ID + " NOT IN ";
 
         public static final String SORT_ORDER = ZNOContract.Test.SORT_ORDER;
     }
