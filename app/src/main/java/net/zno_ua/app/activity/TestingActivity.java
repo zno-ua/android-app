@@ -20,6 +20,10 @@ import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.HitBuilders;
 
 import net.zno_ua.app.R;
@@ -81,6 +85,7 @@ public class TestingActivity extends BaseActivity
     private TabLayout mTabLayout;
     private CoordinatorLayout mCoordinatorLayout;
     private FloatingActionButton mFab;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +96,17 @@ public class TestingActivity extends BaseActivity
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
         mFab = (FloatingActionButton) findViewById(R.id.fab);
+
+        final AdView mAdView = (AdView) findViewById(R.id.ad_view);
+        if (mAdView != null) {
+            final AdRequest adRequest = new AdRequest.Builder().build();
+            mAdView.loadAd(adRequest);
+        }
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getString(R.string.INTERSTITIAL_UNIT_ID));
+        final AdRequest adRequest = new AdRequest.Builder().build();
+        mInterstitialAd.loadAd(adRequest);
 
         setUpActionBar();
         setUpFloatingActionButton();
@@ -312,7 +328,12 @@ public class TestingActivity extends BaseActivity
 
     private void exit() {
         if (mTestingInfo.isPassed()) {
-            finish();
+            showInterstitial(new Runnable() {
+                @Override
+                public void run() {
+                    finish();
+                }
+            });
         } else {
             showExitTestAlert();
         }
@@ -371,7 +392,26 @@ public class TestingActivity extends BaseActivity
         getContentResolver().delete(buildTestingItemUri(mTestingInfo.getTestingId()), null, null);
         getContentResolver().delete(Answer.CONTENT_URI, Answer.TESTING_ID + " = ?",
                 new String[]{valueOf(mTestingInfo.getTestingId())});
-        finish();
+        showInterstitial(new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        });
+    }
+
+    private void showInterstitial(final Runnable runnable) {
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.setAdListener(new AdListener() {
+                @Override
+                public void onAdClosed() {
+                    runnable.run();
+                }
+            });
+            mInterstitialAd.show();
+        } else {
+            runnable.run();
+        }
     }
 
     private void finishTest() {
@@ -414,7 +454,12 @@ public class TestingActivity extends BaseActivity
                             overridePendingTransition(R.anim.activity_open_translate_right,
                                     R.anim.activity_close_alpha);
                         }
-                        finish();
+                        showInterstitial(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        });
                     }
                 })
                 .negativeText(R.string.exit)
@@ -422,7 +467,12 @@ public class TestingActivity extends BaseActivity
                     @Override
                     public void onClick(@NonNull MaterialDialog materialDialog,
                                         @NonNull DialogAction dialogAction) {
-                        finish();
+                        showInterstitial(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        });
                     }
                 })
                 .cancelListener(new DialogInterface.OnCancelListener() {
