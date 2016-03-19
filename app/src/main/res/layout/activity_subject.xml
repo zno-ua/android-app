@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        app:theme="?attr/toolbarTheme">
+        android:theme="?attr/toolbarTheme">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar_layout"
@@ -41,7 +41,6 @@
                 android:minHeight="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:popupTheme="?attr/toolbarPopupTheme"
-                app:theme="?attr/toolbarTheme"
                 tools:ignore="UnusedAttribute" />
         </android.support.design.widget.CollapsingToolbarLayout>
 

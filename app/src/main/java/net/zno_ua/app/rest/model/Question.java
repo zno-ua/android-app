@@ -1,14 +1,10 @@
 package net.zno_ua.app.rest.model;
 
-import android.database.Cursor;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
-
-import static net.zno_ua.app.provider.Query.Question.Column;
 /**
  * @author vojkovladimir.
  */
