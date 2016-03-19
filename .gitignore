@@ -16,5 +16,7 @@ gradle.properties
 
 fabric.properties
 
+app/release.jks
+
 # Log Files
 *.log
