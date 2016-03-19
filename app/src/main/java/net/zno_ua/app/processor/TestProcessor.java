@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+import android.util.Log;
 
 import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.ZNOApplication;
@@ -18,7 +19,6 @@ import net.zno_ua.app.rest.model.Objects;
 import net.zno_ua.app.rest.model.Point;
 import net.zno_ua.app.rest.model.Question;
 import net.zno_ua.app.rest.model.TestInfo;
-import net.zno_ua.app.service.APIService;
 
 import java.io.IOException;
 import java.util.List;
@@ -57,6 +57,7 @@ public class TestProcessor extends Processor<TestInfo> {
 
     @WorkerThread
     public void update(long testId) {
+        ZNOApplication.log("--UpdateTest: #" + testId + " " + canBeUpdated(testId));
         if (canBeUpdated(testId)) {
             get(testId, true);
         } else {
@@ -122,6 +123,7 @@ public class TestProcessor extends Processor<TestInfo> {
     }
 
     private void removeFromRequestedUpdates(long testId) {
+        Log.d("Logs", "remove from request " + testId);
         getContentResolver().delete(TestUpdate.URI, TestUpdate.SELECTION, selectionArgs(testId));
     }
 
@@ -284,7 +286,8 @@ public class TestProcessor extends Processor<TestInfo> {
 
     @WorkerThread
     public boolean canBeUpdated(long testId) {
-        return getStatus(testId) == Test.STATUS_IDLE && !isTestPassing(testId);
+        return (getStatus(testId) == Test.STATUS_IDLE || getStatus(testId) == Test.STATUS_UPDATING)
+                && !isTestPassing(testId);
     }
 
     @WorkerThread

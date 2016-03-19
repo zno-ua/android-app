@@ -17,6 +17,7 @@ public class PreferencesHelper {
     private static final String KEY_NAME = "KEY_NAME";
     private static final String KEY_MESSAGE = "KEY_MESSAGE";
     private static final String KEY_LAST_UPDATE = "KEY_LAST_UPDATE";
+    private static final String KEY_NOTIFICATION_SOUND = "KEY_NOTIFICATION_SOUND";
 
     private static volatile PreferencesHelper sInstance = null;
 
@@ -42,6 +43,7 @@ public class PreferencesHelper {
     private String mName;
     private String mMessage;
     private long mLastUpdateTime;
+    private boolean mIsNotificationSoundEnabled;
 
     private PreferencesHelper(Context context) {
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -53,6 +55,7 @@ public class PreferencesHelper {
         mName = mPreferences.getString(KEY_NAME, null);
         mMessage = mPreferences.getString(KEY_MESSAGE, null);
         mLastUpdateTime = mPreferences.getLong(KEY_LAST_UPDATE, 0L);
+        mIsNotificationSoundEnabled = mPreferences.getBoolean(KEY_NOTIFICATION_SOUND, true);
     }
 
     @Nullable
@@ -72,6 +75,10 @@ public class PreferencesHelper {
 
     public long getLastUpdateTime() {
         return mLastUpdateTime;
+    }
+
+    public boolean isNotificationSoundEnabled() {
+        return mIsNotificationSoundEnabled;
     }
 
     public void saveEmail(@Nullable String email) {
@@ -98,6 +105,11 @@ public class PreferencesHelper {
     public void saveLastUpdateTime(long time) {
         mLastUpdateTime = time;
         mPreferences.edit().putLong(KEY_LAST_UPDATE, time).apply();
+    }
+
+    public void saveNotificationSoundEnabled(boolean isEnabled) {
+        mIsNotificationSoundEnabled = isEnabled;
+        mPreferences.edit().putBoolean(KEY_NOTIFICATION_SOUND, isEnabled).apply();
     }
 
     public boolean needUpdate() {

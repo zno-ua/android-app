@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.util.Log;
 
 import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.helper.PreferencesHelper;
