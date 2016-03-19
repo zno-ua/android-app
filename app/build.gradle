@@ -1,4 +1,19 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 
 android {
     compileSdkVersion 23
@@ -18,6 +33,7 @@ android {
             applicationIdSuffix ".debug"
             resValue "string", "BOTTOM_BANNER_UNIT_ID", "ca-app-pub-3940256099942544/6300978111"
             resValue "string", "INTERSTITIAL_UNIT_ID", "ca-app-pub-3940256099942544/1033173712"
+            ext.enableCrashlytics = false
         }
 
         all {
@@ -55,6 +71,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'org.adw.library:discrete-seekbar:1.0.0'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') { transitive = true }
 }
 
 apply plugin: 'com.google.gms.google-services'

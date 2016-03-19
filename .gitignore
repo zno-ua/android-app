@@ -14,5 +14,7 @@ local.properties
 # Gradle build properties
 gradle.properties
 
+fabric.properties
+
 # Log Files
 *.log

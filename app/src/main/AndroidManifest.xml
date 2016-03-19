@@ -140,6 +140,9 @@
         <!-- CustomTabs -->
         <service android:name="org.chromium.customtabsclient.shared.KeepAliveService" />
         <!-- CustomTabs -->
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="dc6deab60a7c1383cf60768b549b40d510f44e1e" />
     </application>
 
 </manifest>
