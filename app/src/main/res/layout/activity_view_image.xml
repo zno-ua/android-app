@@ -20,7 +20,7 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="@dimen/key_line_1"
         android:theme="@style/AppTheme"
-        app:srcCompat="@drawable/ic_close_white_24dp"
+        app:srcCompat="@drawable/svg_close_white_24dp"
         tools:ignore="RtlHardcoded" />
 
 </FrameLayout>

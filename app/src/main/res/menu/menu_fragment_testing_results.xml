@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/clear_all_testing_results"
-        android:icon="@drawable/ic_clear_all_white_24dp"
+        android:icon="@drawable/svg_clear_all_white_24dp"
         android:orderInCategory="200"
         android:title="@string/clear_all_results"
         app:showAsAction="ifRoom" />

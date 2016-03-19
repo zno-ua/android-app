@@ -53,15 +53,15 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
         if (status == ZNOContract.Test.STATUS_IDLE) {
             final int actionResId;
             if (result == ZNOContract.Test.NO_LOADED_DATA) {
-                actionResId = R.drawable.ic_file_download_white_24dp;
+                actionResId = R.drawable.svg_file_download_white_24dp;
                 description += TextUtils.isEmpty(description) ? "" : ", ";
                 description += itemView.getContext().getString(R.string.needed_to_download);
             } else if (result == ZNOContract.Test.TEST_LOADED) {
-                actionResId = R.drawable.ic_delete_white_24dp;
+                actionResId = R.drawable.svg_delete_white_24dp;
                 description += (isEmpty(description) ? "" : ", ");
                 description += buildQuestionsCount(cursor.getInt(Column.QUESTIONS_COUNT));
             } else {
-                actionResId = R.drawable.ic_sync_problem_white_24dp;
+                actionResId = R.drawable.svg_sync_problem_white_24dp;
                 description = itemView.getContext().getString(R.string.downloading_error);
             }
             mIvActionIcon.setImageResource(actionResId);
@@ -70,7 +70,7 @@ public class TestItemVewHolder extends CursorViewHolder implements View.OnClickL
             mIvActionIcon.setVisibility(View.GONE);
             description = itemView.getContext().getString(R.string.deleting);
         } else if (status == ZNOContract.Test.STATUS_UPDATING) {
-            mIvActionIcon.setImageResource(R.drawable.ic_sync_white_24dp);
+            mIvActionIcon.setImageResource(R.drawable.svg_sync_white_24dp);
             mIvActionIcon.setVisibility(View.VISIBLE);
             description = itemView.getContext().getString(R.string.updating);
         } else {
