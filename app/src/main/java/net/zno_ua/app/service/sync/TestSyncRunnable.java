@@ -72,17 +72,7 @@ public class TestSyncRunnable implements Runnable {
                 mMethods.getTestProcessor().delete(mTestId);
                 break;
             case CHECK_UPDATES:
-                final Call<Objects<TestInfo>> testsCall = APIServiceGenerator.getAPIClient()
-                        .getTestsInfo();
-                try {
-                    final Response<Objects<TestInfo>> testsResponse = testsCall.execute();
-                    if (testsResponse.isSuccess()) {
-                        mMethods.getTestProcessor().process(testsResponse.body().get());
-                        PreferencesHelper.getInstance(mMethods.getContext())
-                                .saveLastUpdateTime(System.currentTimeMillis());
-                    }
-                } catch (IOException ignored) {
-                }
+                mMethods.getTestProcessor().checkForUpdates();
                 break;
         }
         final long delay = System.currentTimeMillis() - startTime;

@@ -7,9 +7,12 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.R;
 import net.zno_ua.app.service.APIService;
+import net.zno_ua.app.task.SyncTask;
 import net.zno_ua.app.util.Utils;
 
 /**
@@ -20,11 +23,16 @@ public class SettingsActivity extends BaseActivity
 
     private SwitchCompat mSwSoundNotification;
 
+    private MaterialDialog mProgressDialog;
+    private SyncTask mSyncTask = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         initUi();
+        mProgressDialog = new MaterialDialog.Builder(this).progress(true, 0).cancelable(false).build();
+
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -88,12 +96,42 @@ public class SettingsActivity extends BaseActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.remove_cache:
+                removeCache();
                 break;
             case R.id.sync_now:
+                sync();
                 break;
             case R.id.write_me:
                 Utils.writeMeEmail(this);
                 break;
+        }
+    }
+
+    private void sync() {
+        if (mSyncTask == null) {
+            mSyncTask = new SyncTask(this, new SyncTask.Callback() {
+                @Override
+                public void onFinished() {
+                    mSyncTask = null;
+                    mProgressDialog.dismiss();
+                }
+            });
+            mProgressDialog = mProgressDialog.getBuilder().content(R.string.syncing).show();
+            mSyncTask.execute(SyncTask.SYNC);
+        }
+    }
+
+    private void removeCache() {
+        if (mSyncTask == null) {
+            mSyncTask = new SyncTask(this, new SyncTask.Callback() {
+                @Override
+                public void onFinished() {
+                    mSyncTask = null;
+                    mProgressDialog.dismiss();
+                }
+            });
+            mProgressDialog = mProgressDialog.getBuilder().content(R.string.cleaning_cache).show();
+            mSyncTask.execute(SyncTask.CLEAN_UP);
         }
     }
 }

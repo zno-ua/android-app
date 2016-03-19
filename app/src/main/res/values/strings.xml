@@ -199,5 +199,7 @@
     <string name="app_version_format">Версія додатку %s</string>
     <string name="no_email_clients">На вашому смартфоні е має жодного E-mail клієнту</string>
     <string name="zno_email_subject">ЗНО мобільний додаток</string>
+    <string name="syncing">Синхронізація…</string>
+    <string name="cleaning_cache">Видаляється кеш…</string>
 
 </resources>

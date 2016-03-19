@@ -10,7 +10,9 @@ import android.support.annotation.WorkerThread;
 import android.util.Log;
 
 import net.zno_ua.app.BuildConfig;
+import net.zno_ua.app.FileManager;
 import net.zno_ua.app.ZNOApplication;
+import net.zno_ua.app.helper.PreferencesHelper;
 import net.zno_ua.app.provider.Query;
 import net.zno_ua.app.provider.ZNOContract;
 import net.zno_ua.app.rest.APIClient;
@@ -334,5 +336,53 @@ public class TestProcessor extends Processor<TestInfo> {
             values.put(ZNOContract.TestUpdate.TEST_ID, testId);
             getContentResolver().insert(TestUpdate.URI, values);
         }
+    }
+
+    @WorkerThread
+    public void checkForUpdates() {
+        if (BuildConfig.DEBUG) {
+            ZNOApplication.log("--CheckForUpdates started--");
+        }
+        final Call<Objects<TestInfo>> testsCall = APIServiceGenerator.getAPIClient().getTestsInfo();
+        try {
+            final Response<Objects<TestInfo>> testsResponse = testsCall.execute();
+            if (testsResponse.isSuccess()) {
+                process(testsResponse.body().get());
+                PreferencesHelper.getInstance(getContext()).saveLastUpdateTime(System.currentTimeMillis());
+            } else {
+                if (BuildConfig.DEBUG) {
+                    ZNOApplication.log("--CheckForUpdates request failed --");
+                }
+            }
+        } catch (IOException e) {
+            if (BuildConfig.DEBUG) {
+                ZNOApplication.log("--CheckForUpdates ex: " + e.toString() + " --");
+            }
+        }
+        if (BuildConfig.DEBUG) {
+            ZNOApplication.log("--CheckForUpdates finished--");
+        }
+    }
+
+    @WorkerThread
+    public void cleanUp() {
+        getContentResolver().delete(ZNOContract.Testing.CONTENT_URI, null, null);
+        getContentResolver().delete(ZNOContract.Question.CONTENT_URI, null, null);
+        getContentResolver().delete(ZNOContract.Point.CONTENT_URI, null, null);
+        final ContentValues values = new ContentValues(1);
+        values.put(Test.RESULT, Test.NO_LOADED_DATA);
+        getContentResolver().update(Test.CONTENT_URI, values, null, null);
+        final FileManager fileManager = new FileManager(getContext());
+        final Cursor c = getContentResolver().query(Test.CONTENT_URI, new String[]{Test._ID}, null,
+                null, null);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    fileManager.deleteTestDirectory(c.getLong(0));
+                } while (c.moveToNext());
+            }
+            c.close();
+        }
+
     }
 }
