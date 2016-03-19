@@ -4,18 +4,21 @@ import android.content.Context;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
-import static net.zno_ua.app.provider.ZNOContract.*;
+import net.zno_ua.app.FileManager;
+
+import static net.zno_ua.app.provider.ZNOContract.Answer;
+import static net.zno_ua.app.provider.ZNOContract.Question;
+import static net.zno_ua.app.provider.ZNOContract.Subject;
+import static net.zno_ua.app.provider.ZNOContract.Test;
+import static net.zno_ua.app.provider.ZNOContract.TestingColumns;
 
 /**
  * @author Vojko Vladimir
  */
 public class ZNODatabase extends SQLiteAssetHelper {
 
-    /*
-    * TODO: change DB name after finishing migration.
-    * */
-    private static final String DATABASE_NAME = "zno.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "ZNO.db";
+    private static final int DATABASE_VERSION = 2;
 
     interface Tables {
         String SUBJECT = "subject";
@@ -36,9 +39,8 @@ public class ZNODatabase extends SQLiteAssetHelper {
 
     public ZNODatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        /*
-         * TODO: set version.
-         * */
-        setForcedUpgrade(/* version */);
+        setForcedUpgrade(DATABASE_VERSION);
+        new FileManager(context).cleanOldImagesDir();
     }
+
 }

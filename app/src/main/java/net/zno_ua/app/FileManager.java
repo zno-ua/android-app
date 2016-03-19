@@ -57,6 +57,13 @@ public class FileManager {
         return isFileSaved;
     }
 
+    public void cleanOldImagesDir() {
+        final File dir = new File(FILES_PATH + "/images/");
+        if (dir.exists()) {
+            deleteQuietly(dir);
+        }
+    }
+
     @WorkerThread
     public Bitmap openBitmap(String path) throws FileNotFoundException {
         return BitmapFactory.decodeFile(FILES_PATH + path);
