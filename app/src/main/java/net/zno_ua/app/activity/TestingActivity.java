@@ -20,8 +20,10 @@ import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.analytics.HitBuilders;
 
 import net.zno_ua.app.R;
+import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.fragment.QuestionPagesFragment;
 import net.zno_ua.app.model.TestingInfo;
 import net.zno_ua.app.provider.ZNOContract;
@@ -278,13 +280,6 @@ public class TestingActivity extends BaseActivity
 
     @Override
     public void onViewPagerDataChanged(ViewPager viewPager) {
-        /*
-        * Temporary workaround
-        * TODO: change when fix will be available.
-        * */
-        for (int j = 0; j < 17; j++) {
-            mTabLayout.newTab();
-        }
         mTabLayout.setupWithViewPager(viewPager);
     }
 
@@ -335,6 +330,11 @@ public class TestingActivity extends BaseActivity
         sendIntent.putExtra(Intent.EXTRA_TEXT, shareText);
         sendIntent.setType("text/plain");
         startActivity(sendIntent);
+        ZNOApplication.getInstance().getTracker().send(new HitBuilders.EventBuilder()
+                .setCategory("Share results")
+                .setAction(mTestingInfo.getSubjectName())
+                .setLabel(String.format(Locale.US, "Test point: %d, ZNO point: %.2f", testPoint, ratingPoint))
+                .build());
     }
 
     private void showFinishAlert() {
@@ -390,6 +390,12 @@ public class TestingActivity extends BaseActivity
 
         getContentResolver().update(buildTestingItemUri(mTestingInfo.getTestingId()), values, null,
                 null);
+
+        ZNOApplication.getInstance().getTracker().send(new HitBuilders.EventBuilder()
+                .setCategory("Finish test")
+                .setAction(mTestingInfo.getSubjectName())
+                .setLabel(String.format(Locale.US, "Test point: %d, ZNO point: %.2f", testPoint, ratingPoint))
+                .build());
 
         new MaterialDialog.Builder(this)
                 .title(R.string.test_completed)
