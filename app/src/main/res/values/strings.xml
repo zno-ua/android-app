@@ -184,5 +184,20 @@
     <string name="visit_site">Відвідати сайт</string>
     <string name="settings">Налаштування</string>
     <string name="clear_all_results">Видалити усі результати</string>
+    <string name="sync">Синхронізація</string>
+    <string name="notification">Повідомлення</string>
+    <string name="news_notification">Повідомлення про новини</string>
+    <string name="notification_sound">Звукове сповіщення</string>
+    <string name="data">Дані</string>
+    <string name="remove_cache">Видалити кеш додатку</string>
+    <string name="auto_sync">Автоматична синхронізація</string>
+    <string name="sync_now">Синхронізувати</string>
+    <string name="contacts">Контакти</string>
+    <string name="app_author">Автор додатку</string>
+    <string name="write_me">Написати мені</string>
+    <string name="i_am">Войко Володимир</string>
+    <string name="app_version_format">Версія додатку %s</string>
+    <string name="no_email_clients">На вашому смартфоні е має жодного E-mail клієнту</string>
+    <string name="zno_email_subject">ЗНО мобільний додаток</string>
 
 </resources>

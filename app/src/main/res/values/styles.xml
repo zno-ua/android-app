@@ -1,6 +1,6 @@
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar" />
 
     <style name="AppTheme" parent="AppTheme.Base">
         <item name="colorPrimary">@color/indigo_500</item>
@@ -23,13 +23,18 @@
         <item name="android:listDivider">@drawable/line_divider</item>
     </style>
 
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="AppTheme.Translucent" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowAnimationStyle">@style/Base.Animation.AppCompat.Dialog</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    <style name="AppTheme.TransparentStatus" parent="AppTheme" />
+    <style name="AppTheme.TransparentStatus" parent="AppTheme.NoActionBar" />
 
     <style name="AppCompat.Button.Flat.Common" parent="Base.TextAppearance.AppCompat.Button">
         <item name="android:background">@drawable/btn_flat_selector</item>
@@ -68,6 +73,55 @@
 
     <style name="AppCompat.Button.Raised.White" parent="AppTheme">
         <item name="colorButtonNormal">@color/white</item>
+    </style>
+
+    <style name="Section">
+        <item name="android:textSize">16sp</item>
+        <item name="android:height">@dimen/single_line_item_tile_height</item>
+        <item name="android:maxHeight">@dimen/single_line_item_tile_height</item>
+        <item name="android:textColor">@color/secondary_text_color</item>
+        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingLeft">@dimen/key_line_1</item>
+        <item name="android:paddingRight">@dimen/key_line_1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:background">@drawable/list_item_background</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Subhead</item>
+    </style>
+
+    <style name="Section.Bordered">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Section.Bordered.Accent">
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="Section.Dark">
+        <item name="android:textColor">@color/section_text_color</item>
+    </style>
+
+    <style name="SectionHead">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingLeft">@dimen/key_line_1</item>
+        <item name="android:paddingRight">@dimen/key_line_1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Subhead</item>
+        <item name="android:textColor">@color/section_text_color</item>
+    </style>
+
+    <style name="SectionSubhead" parent="SectionHead">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/section_secondary_text_color</item>
+    </style>
+
+    <style name="SectionLarge">
+        <item name="android:background">@drawable/list_item_background</item>
+        <item name="android:layout_gravity">center_vertical</item>
     </style>
 
 </resources>

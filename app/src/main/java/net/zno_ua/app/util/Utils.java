@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsSession;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -114,5 +115,13 @@ public class Utils {
         } else {
             activity.startActivity(new Intent(Intent.ACTION_VIEW).setData(uri));
         }
+    }
+
+    public static void writeMeEmail(@NonNull Activity activity) {
+        ShareCompat.IntentBuilder.from(activity)
+                .setType("message/rfc822")
+                .addEmailTo(activity.getResources().getStringArray(R.array.emails))
+                .setSubject(activity.getString(R.string.zno_email_subject))
+                .setChooserTitle(activity.getString(R.string.write_me)).startChooser();
     }
 }

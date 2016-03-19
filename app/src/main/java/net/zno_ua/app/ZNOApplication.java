@@ -9,6 +9,8 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 
 import io.fabric.sdk.android.Fabric;
+
+import net.zno_ua.app.helper.PreferencesHelper;
 import net.zno_ua.app.service.APIService;
 
 public class ZNOApplication extends Application {

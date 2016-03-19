@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/Section.Bordered.Accent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sync" />
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/auto_sync_switch"
+            style="@style/Section.Dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/auto_sync" />
+
+        <TextView
+            android:id="@+id/sync_now"
+            style="@style/Section.Dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_now" />
+
+        <include layout="@layout/view_divider" />
+
+        <TextView
+            style="@style/Section.Bordered.Accent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/data" />
+
+        <TextView
+            android:id="@+id/remove_cache"
+            style="@style/Section.Dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/remove_cache" />
+
+        <include layout="@layout/view_divider" />
+
+        <TextView
+            style="@style/Section.Bordered.Accent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:text="@string/notification" />
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/receive_news_notification_switch"
+            style="@style/Section.Dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/news_notification" />
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/play_notification_sound_switch"
+            style="@style/Section.Dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/notification_sound" />
+
+        <include layout="@layout/view_divider" />
+
+        <TextView
+            style="@style/Section.Bordered.Accent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/contacts" />
+
+        <LinearLayout
+            style="@style/SectionLarge"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/two_line_item_tile_height"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SectionHead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/app_author" />
+
+            <TextView
+                style="@style/SectionSubhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/i_am" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/write_me"
+            style="@style/Section.Dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/write_me" />
+
+        <include layout="@layout/view_divider" />
+
+        <TextView
+            android:id="@+id/app_version"
+            style="@style/Section.Dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            tools:text="Версія додатку 1.2" />
+
+    </LinearLayout>
+
+</ScrollView>

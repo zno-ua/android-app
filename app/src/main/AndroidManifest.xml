@@ -20,7 +20,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/zno"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="AllowBackup">
         <provider
             android:name=".provider.ZNOProvider"
@@ -53,6 +53,11 @@
                 <action android:name="net.zno_ua.app.CONTINUE_PASSAGE_TEST" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:theme="@style/AppTheme"
+            android:label="@string/settings" />
 
         <service
             android:name=".service.APIService"
@@ -142,7 +147,11 @@
         <!-- CustomTabs -->
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="dc6deab60a7c1383cf60768b549b40d510f44e1e" />
+            android:value="dc6deab60a7c1383cf60768b549b40d510f44e1e" /><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

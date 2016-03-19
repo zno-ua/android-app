@@ -102,6 +102,7 @@ public class MainActivity extends BaseActivity
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void setUpNavigationDrawerLayout() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(
@@ -181,6 +182,9 @@ public class MainActivity extends BaseActivity
             case R.id.give_review:
                 giveReview();
                 return true;
+            case R.id.settings:
+                openSettings();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -206,6 +210,9 @@ public class MainActivity extends BaseActivity
                 break;
             case R.id.navigation_item_visit_site:
                 Utils.openUriInCustomTabs(this, mCustomTabActivityHelper, Utils.SITE_URI);
+                break;
+            case R.id.navigation_item_settings:
+                openSettings();
                 break;
         }
         setNavigationItemSelected(item, isChecked);
@@ -241,6 +248,11 @@ public class MainActivity extends BaseActivity
         if (!mSendReviewDialogWrapper.isShown()) {
             mSendReviewDialogWrapper.show();
         }
+    }
+
+    private void openSettings() {
+        startActivity(new Intent(this, SettingsActivity.class));
+        overridePendingTransition(R.anim.activity_open_translate_right, R.anim.activity_close_alpha);
     }
 
     @Override

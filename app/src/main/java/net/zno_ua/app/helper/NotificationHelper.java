@@ -1,6 +1,5 @@
 package net.zno_ua.app.helper;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -30,15 +29,16 @@ public class NotificationHelper {
                 .setAutoCancel(true)
                 .setStyle(new NotificationCompat.BigTextStyle().setBigContentTitle(title).bigText(description))
                 .setContentIntent(contentIntent);
-        if (PreferencesHelper.getInstance(context).isNotificationSoundEnabled()) {
-            builder.setSound(Utils.DEFAULT_SOUND_URI);
-        }
-        sendNotification(context, ID_NEWS, builder.build());
+        sendNotification(context, ID_NEWS, builder);
     }
 
-    private static void sendNotification(@NonNull Context context, int id, @NonNull Notification notification) {
+    private static void sendNotification(@NonNull Context context, int id,
+                                         @NonNull NotificationCompat.Builder builder) {
+        if (PreferencesHelper.getInstance(context).playNotificationSound()) {
+            builder.setSound(Utils.DEFAULT_SOUND_URI);
+        }
         final NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(id, notification);
+        notificationManager.notify(id, builder.build());
     }
 }

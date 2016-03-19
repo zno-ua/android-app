@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.helper.NotificationHelper;
+import net.zno_ua.app.helper.PreferencesHelper;
 
 import java.util.Arrays;
 
@@ -54,7 +55,9 @@ public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerSe
         final String description = data.getString(KEY_DESCRIPTION);
         final String link = data.getString(KEY_LINK);
 
-        NotificationHelper.notifyNews(getBaseContext(), title, description, link);
+        if (PreferencesHelper.getInstance(getBaseContext()).receiveNewsNotification()) {
+            NotificationHelper.notifyNews(getBaseContext(), title, description, link);
+        }
 
         if (BuildConfig.DEBUG) {
             ZNOApplication.log("GCM news received: " + title + ": " + description + " " + link);

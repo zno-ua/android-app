@@ -18,6 +18,9 @@ public class PreferencesHelper {
     private static final String KEY_MESSAGE = "KEY_MESSAGE";
     private static final String KEY_LAST_UPDATE = "KEY_LAST_UPDATE";
     private static final String KEY_NOTIFICATION_SOUND = "KEY_NOTIFICATION_SOUND";
+    private static final String KEY_AUTO_SYNC_ENABLED = "KEY_AUTO_SYNC_ENABLED";
+    private static final String KEY_RECEIVE_NEWS_NOTIFICATION = "KEY_RECEIVE_NEWS_NOTIFICATION";
+    private static final long UPDATE_TIMEOUT = 3 * 24 * 60 * 60 * 1000;
 
     private static volatile PreferencesHelper sInstance = null;
 
@@ -43,7 +46,9 @@ public class PreferencesHelper {
     private String mName;
     private String mMessage;
     private long mLastUpdateTime;
+    private boolean mIsAutoSyncEnabled;
     private boolean mIsNotificationSoundEnabled;
+    private boolean mReceiveNewsNotification;
 
     private PreferencesHelper(Context context) {
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -55,7 +60,9 @@ public class PreferencesHelper {
         mName = mPreferences.getString(KEY_NAME, null);
         mMessage = mPreferences.getString(KEY_MESSAGE, null);
         mLastUpdateTime = mPreferences.getLong(KEY_LAST_UPDATE, 0L);
+        mIsAutoSyncEnabled = mPreferences.getBoolean(KEY_AUTO_SYNC_ENABLED, true);
         mIsNotificationSoundEnabled = mPreferences.getBoolean(KEY_NOTIFICATION_SOUND, true);
+        mReceiveNewsNotification = mPreferences.getBoolean(KEY_RECEIVE_NEWS_NOTIFICATION, true);
     }
 
     @Nullable
@@ -77,8 +84,16 @@ public class PreferencesHelper {
         return mLastUpdateTime;
     }
 
-    public boolean isNotificationSoundEnabled() {
+    public boolean isAutoSyncEnabled() {
+        return mIsAutoSyncEnabled;
+    }
+
+    public boolean playNotificationSound() {
         return mIsNotificationSoundEnabled;
+    }
+
+    public boolean receiveNewsNotification() {
+        return mReceiveNewsNotification;
     }
 
     public void saveEmail(@Nullable String email) {
@@ -107,12 +122,23 @@ public class PreferencesHelper {
         mPreferences.edit().putLong(KEY_LAST_UPDATE, time).apply();
     }
 
-    public void saveNotificationSoundEnabled(boolean isEnabled) {
+    public void saveAutoSync(boolean isEnabled) {
+        mIsAutoSyncEnabled = isEnabled;
+        mPreferences.edit().putBoolean(KEY_AUTO_SYNC_ENABLED, isEnabled).apply();
+    }
+
+    public void saveNotificationSound(boolean isEnabled) {
         mIsNotificationSoundEnabled = isEnabled;
         mPreferences.edit().putBoolean(KEY_NOTIFICATION_SOUND, isEnabled).apply();
     }
 
     public boolean needUpdate() {
-        return System.currentTimeMillis() - getLastUpdateTime() > 3 * 24 * 60 * 60 * 1000;
+        return mIsAutoSyncEnabled && System.currentTimeMillis() - getLastUpdateTime() > UPDATE_TIMEOUT;
     }
+
+    public void saveReceiveNewsNotification(boolean isEnabled) {
+        mReceiveNewsNotification = isEnabled;
+        mPreferences.edit().putBoolean(KEY_RECEIVE_NEWS_NOTIFICATION, isEnabled).apply();
+    }
+
 }
