@@ -4,14 +4,12 @@ import android.app.Application;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 
-import io.fabric.sdk.android.Fabric;
-
-import net.zno_ua.app.helper.PreferencesHelper;
 import net.zno_ua.app.service.APIService;
+
+import io.fabric.sdk.android.Fabric;
 
 public class ZNOApplication extends Application {
 
@@ -23,9 +21,9 @@ public class ZNOApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics.Builder()
-                .core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-                .build());
+        if (!BuildConfig.DEBUG) {
+            Fabric.with(this, new Crashlytics());
+        }
         sInstance = this;
         final GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
         analytics.setDryRun(BuildConfig.DEBUG);
