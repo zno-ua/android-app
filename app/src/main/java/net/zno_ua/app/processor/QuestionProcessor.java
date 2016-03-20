@@ -35,8 +35,8 @@ import static net.zno_ua.app.provider.ZNOContract.Question.TEST_ID;
 import static net.zno_ua.app.provider.ZNOContract.Question.TEXT;
 import static net.zno_ua.app.provider.ZNOContract.Question.TYPE;
 import static net.zno_ua.app.provider.ZNOContract.Question._ID;
-
 import static net.zno_ua.app.provider.ZNOContract.Test.IMAGES_LOADED;
+
 /**
  * @author Vojko Vladimir vojkovladimir@gmail.com
  * @since 16.03.16.
@@ -185,7 +185,7 @@ public class QuestionProcessor extends Processor<Question> {
 
         if (!TextUtils.isEmpty(question.getImagesFormulasUrl())) {
             localPath += FORMULAS_PATH;
-            imagesLoaded &= downloadAndSaveImage(localPath, question.getImagesRelativeUrl(), question.getImagesFormulas());
+            imagesLoaded &= downloadAndSaveImage(localPath, question.getImagesFormulasUrl(), question.getImagesFormulas());
         }
 
         return imagesLoaded;
