@@ -18,7 +18,7 @@
             android:layout_height="72dp"
             android:layout_centerHorizontal="true"
             android:tint="@color/grey_410"
-            app:srcCompat="@drawable/svg_school_white_72dp" />
+            app:srcCompat="@drawable/vec_school_white_72dp" />
 
         <LinearLayout
             android:id="@+id/pass_testing_prompt_actions"

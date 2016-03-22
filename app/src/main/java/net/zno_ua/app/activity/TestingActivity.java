@@ -196,9 +196,9 @@ public class TestingActivity extends BaseActivity
 
     private void setUpFloatingActionButton() {
         if (mTestingInfo.isPassed()) {
-            mFab.setImageResource(R.drawable.svg_share_white_24dp);
+            mFab.setImageResource(R.drawable.vec_share_white_24dp);
         } else {
-            mFab.setImageResource(R.drawable.svg_done_white_24dp);
+            mFab.setImageResource(R.drawable.vec_done_white_24dp);
         }
         mFab.setOnClickListener(mOnFabClickListener);
     }

@@ -486,11 +486,11 @@ public class ZNOContract {
 
         @DrawableRes
         private static final int[] SENTIMENT_DRAWABLE_RESOURCES = {
-                R.drawable.svg_sentiment_very_dissatisfied_white_18dp,
-                R.drawable.svg_sentiment_dissatisfied_white_18dp,
-                R.drawable.svg_sentiment_neutral_white_18dp,
-                R.drawable.svg_sentiment_satisfied_white_18dp,
-                R.drawable.svg_sentiment_very_satisfied_white_18dp
+                R.drawable.vec_sentiment_very_dissatisfied_white_18px,
+                R.drawable.vec_sentiment_dissatisfied_white_18px,
+                R.drawable.vec_sentiment_neutral_white_18px,
+                R.drawable.vec_sentiment_satisfied_white_18px,
+                R.drawable.vec_sentiment_very_satisfied_white_18px
         };
 
         @ColorRes
