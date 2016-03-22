@@ -53,6 +53,10 @@ import static net.zno_ua.app.provider.ZNOContract.Testing.buildTestingItemUri;
 public class TestingActivity extends BaseActivity
         implements QuestionPagesFragment.OnViewPagerChangeListener {
     private static final long MINUTE = 60000;
+    private static final String SHARE_RESULTS = "Share results";
+    private static final String FINISH_TEST = "Finish test";
+    private static final String TESTING_RESULT_DESCRIPTION_FORMAT
+            = "Test point: %d, ZNO point: %.2f, time %d";
 
     public interface Action {
         String VIEW_TEST = "net.zno_ua.app.VIEW_TEST";
@@ -352,9 +356,10 @@ public class TestingActivity extends BaseActivity
         sendIntent.setType("text/plain");
         startActivity(sendIntent);
         ZNOApplication.getInstance().getTracker().send(new HitBuilders.EventBuilder()
-                .setCategory("Share results")
+                .setCategory(SHARE_RESULTS)
                 .setAction(mTestingInfo.getSubjectName())
-                .setLabel(String.format(Locale.US, "Test point: %d, ZNO point: %.2f", testPoint, ratingPoint))
+                .setLabel(String.format(Locale.US, TESTING_RESULT_DESCRIPTION_FORMAT,
+                        testPoint, ratingPoint, mTestingInfo.getElapsedTime() / MINUTE))
                 .build());
     }
 
@@ -432,9 +437,10 @@ public class TestingActivity extends BaseActivity
                 null);
 
         ZNOApplication.getInstance().getTracker().send(new HitBuilders.EventBuilder()
-                .setCategory("Finish test")
+                .setCategory(FINISH_TEST)
                 .setAction(mTestingInfo.getSubjectName())
-                .setLabel(String.format(Locale.US, "Test point: %d, ZNO point: %.2f", testPoint, ratingPoint))
+                .setLabel(String.format(Locale.US, TESTING_RESULT_DESCRIPTION_FORMAT,
+                                testPoint, ratingPoint, mTestingInfo.getElapsedTime() / MINUTE))
                 .build());
 
         new MaterialDialog.Builder(this)
