@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -23,6 +24,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import net.zno_ua.app.R;
 import net.zno_ua.app.activity.TestingActivity;
@@ -88,7 +92,7 @@ public class TestingResultFragment extends BaseFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.clear_all_testing_results) {
-            getActivity().getContentResolver().delete(ZNOContract.Testing.CONTENT_URI, null, null);
+            showClearResultsDialog();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -165,6 +169,23 @@ public class TestingResultFragment extends BaseFragment
                 mRecyclerView.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+
+    private void showClearResultsDialog() {
+        new MaterialDialog.Builder(getActivity())
+                .title(R.string.remove_testing_results)
+                .content(R.string.remove_testing_results_description)
+                .positiveText(R.string.delete)
+                .negativeText(R.string.cancel)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog md, @NonNull DialogAction da) {
+                        getActivity().getContentResolver()
+                                .delete(ZNOContract.Testing.CONTENT_URI, null, null);
+                    }
+                })
+                .show();
     }
 
     @Override
