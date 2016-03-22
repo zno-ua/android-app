@@ -9,8 +9,8 @@ android {
         applicationId "net.zno_ua.app"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 200
-        versionName "2.0"
+        versionCode 201
+        versionName "2.0.1"
         vectorDrawables.useSupportLibrary = true
     }
 
