@@ -130,10 +130,12 @@ public class QuestionPagesFragment extends Fragment
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         final MenuItem item = menu.findItem(R.id.action_view);
-        if (mView == VIEW_CAROUSEL) {
-            item.setIcon(R.drawable.vec_view_comfy_white_24dp);
-        } else {
-            item.setIcon(R.drawable.vec_view_carousel_white_24dp);
+        if (item != null) {
+            if (mView == VIEW_CAROUSEL) {
+                item.setIcon(R.drawable.vec_view_comfy_white_24dp);
+            } else {
+                item.setIcon(R.drawable.vec_view_carousel_white_24dp);
+            }
         }
     }
 
