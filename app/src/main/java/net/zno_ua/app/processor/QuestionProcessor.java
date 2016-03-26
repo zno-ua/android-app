@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import net.zno_ua.app.BuildConfig;
-import net.zno_ua.app.FileManager;
+import net.zno_ua.app.util.IOUtils;
 import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.activity.ViewImageActivity;
 import net.zno_ua.app.provider.Query;
@@ -58,12 +58,10 @@ public class QuestionProcessor extends Processor<Question> {
     private boolean mIsImagesDownloadsSuccessfully = false;
     private final long mTestId;
     private final APIClient mApiClient;
-    private final FileManager mFileManager;
 
     public QuestionProcessor(@NonNull Context context, long testId) {
         super(context);
         mApiClient = APIServiceGenerator.getAPIClient();
-        mFileManager = new FileManager(context);
         mTestId = testId;
     }
 
@@ -197,11 +195,11 @@ public class QuestionProcessor extends Processor<Question> {
         Response<ResponseBody> imageResponse;
         InputStream inputStream;
         for (String name : images) {
-            if (!mFileManager.isFileExists(localPath, name)) {
+            if (!IOUtils.isFileExists(localPath, name)) {
                 imageResponse = mApiClient.getImage(relativeUrl, name).execute();
                 if (imageResponse.isSuccess()) {
                     inputStream = imageResponse.body().byteStream();
-                    imagesLoaded &= mFileManager.saveFile(localPath, name, inputStream);
+                    imagesLoaded &= IOUtils.saveFile(localPath, name, inputStream);
                 }
             }
         }
@@ -210,7 +208,7 @@ public class QuestionProcessor extends Processor<Question> {
 
     public void delete(long testId) {
         getContentResolver().delete(CONTENT_URI, TEST_ID + "=?", new String[]{valueOf(testId)});
-        mFileManager.deleteTestDirectory(testId);
+        IOUtils.deleteTestDirectory(testId);
     }
 
     @Override

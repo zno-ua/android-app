@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
-import net.zno_ua.app.FileManager;
+import net.zno_ua.app.util.IOUtils;
 
 import static net.zno_ua.app.provider.ZNOContract.Answer;
 import static net.zno_ua.app.provider.ZNOContract.Question;
@@ -40,7 +40,7 @@ public class ZNODatabase extends SQLiteAssetHelper {
     public ZNODatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         setForcedUpgrade(DATABASE_VERSION);
-        new FileManager(context).cleanOldImagesDir();
+        IOUtils.cleanOldImagesDir(context);
     }
 
 }

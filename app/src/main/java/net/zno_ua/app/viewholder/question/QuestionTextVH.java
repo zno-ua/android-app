@@ -27,7 +27,7 @@ import static android.text.Html.fromHtml;
  */
 public class QuestionTextVH extends QuestionItemVH<QuestionText>
         implements ViewStub.OnInflateListener {
-    private static final String TEXT_REGEX = "(.*?)<table.*?<td.*?>(.*?)</td>.*?<td.*?>(.*?)</td>.*?";
+    private static final String TEXT_REGEX = "(.*?)<table.*?<td.*?>(.*?)</td>.*?<td.*?>(.*?)</td>.*?(<td.*?>(.*?)</td>.*?<td.*?>(.*?)</td>.*)*?";
     private static final Pattern PATTERN = Pattern.compile(TEXT_REGEX, Pattern.DOTALL);
     private final TextView mTvText;
     private final TextView mTvText1;
@@ -67,7 +67,7 @@ public class QuestionTextVH extends QuestionItemVH<QuestionText>
         }
     }
 
-    public void bind(QuestionText item) {
+    public void bind(final QuestionText item) {
         final Matcher matcher = PATTERN.matcher(item.getText());
         if (matcher.matches()) {
             final String text = matcher.group(1);
@@ -79,6 +79,10 @@ public class QuestionTextVH extends QuestionItemVH<QuestionText>
             }
             mTvText1.setText(fromHtml(matcher.group(2), new ImageGetter(mTvText), null));
             mTvText2.setText(fromHtml(matcher.group(3), new ImageGetter(mTvText), null));
+            if (matcher.group(4) != null) {
+                mTvText1.append(fromHtml(matcher.group(5), new ImageGetter(mTvText), null));
+                mTvText2.append(fromHtml(matcher.group(6), new ImageGetter(mTvText), null));
+            }
             mTable.setVisibility(View.VISIBLE);
         } else {
             mTable.setVisibility(View.GONE);
@@ -100,8 +104,9 @@ public class QuestionTextVH extends QuestionItemVH<QuestionText>
                     .title(textForReadingResId)
                     .positiveText(closeResId)
                     .build();
-            ImageGetter imageGetter = new ImageGetter(mDialog.getContentView());
-            Spanned content = Html.fromHtml(item.getAdditionalText(), imageGetter, null);
+            //noinspection ConstantConditions
+            final ImageGetter imageGetter = new ImageGetter(mDialog.getContentView());
+            final Spanned content = Html.fromHtml(item.getAdditionalText(), imageGetter, null);
             mDialog = mDialog.getBuilder().content(content).build();
         }
     }

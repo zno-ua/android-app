@@ -1,9 +1,10 @@
-package net.zno_ua.app;
+package net.zno_ua.app.util;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
+
+import net.zno_ua.app.ZNOApplication;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,19 +13,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class FileManager {
-
-    private final String FILES_PATH;
-
-    public FileManager(Context context) {
-        FILES_PATH = context.getFilesDir().getAbsolutePath();
-    }
+public class IOUtils {
 
     @WorkerThread
-    public boolean saveFile(String path, String name, InputStream fileInputStream)
+    public static boolean saveFile(String path, String name, InputStream fileInputStream)
             throws IOException {
         boolean isFileSaved = false;
-        final File dir = new File(FILES_PATH + path);
+        final File dir = new File(ZNOApplication.getInstance().getFilesDir(), path);
         final File file = new File(dir, name);
         final boolean isFileCreated = dir.exists() || dir.mkdirs() || file.exists()
                 || file.createNewFile();
@@ -57,20 +52,15 @@ public class FileManager {
         return isFileSaved;
     }
 
-    public void cleanOldImagesDir() {
-        final File dir = new File(FILES_PATH + "/images/");
+    public static void cleanOldImagesDir(@NonNull Context context) {
+        final File dir = new File(context.getFilesDir(), "images");
         if (dir.exists()) {
             deleteQuietly(dir);
         }
     }
 
-    @WorkerThread
-    public Bitmap openBitmap(String path) throws FileNotFoundException {
-        return BitmapFactory.decodeFile(FILES_PATH + path);
-    }
-
-    public boolean isFileExists(String path, String name) {
-        return new File(FILES_PATH + path, name).exists();
+    public static boolean isFileExists(String path, String name) {
+        return new File(ZNOApplication.getInstance().getFilesDir() + path, name).exists();
     }
 
     public static boolean deleteQuietly(File file) {
@@ -157,7 +147,7 @@ public class FileManager {
         return !fileInCanonicalDir.getCanonicalFile().equals(fileInCanonicalDir.getAbsoluteFile());
     }
 
-    public boolean deleteTestDirectory(long testId) {
-        return deleteQuietly(new File(FILES_PATH + "/" + testId));
+    public static boolean deleteTestDirectory(long testId) {
+        return deleteQuietly(new File(ZNOApplication.getInstance().getFilesDir(), "" + testId));
     }
 }

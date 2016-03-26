@@ -10,7 +10,7 @@ import android.support.annotation.WorkerThread;
 import android.util.Log;
 
 import net.zno_ua.app.BuildConfig;
-import net.zno_ua.app.FileManager;
+import net.zno_ua.app.util.IOUtils;
 import net.zno_ua.app.ZNOApplication;
 import net.zno_ua.app.helper.PreferencesHelper;
 import net.zno_ua.app.provider.Query;
@@ -372,13 +372,12 @@ public class TestProcessor extends Processor<TestInfo> {
         final ContentValues values = new ContentValues(1);
         values.put(Test.RESULT, Test.NO_LOADED_DATA);
         getContentResolver().update(Test.CONTENT_URI, values, null, null);
-        final FileManager fileManager = new FileManager(getContext());
         final Cursor c = getContentResolver().query(Test.CONTENT_URI, new String[]{Test._ID}, null,
                 null, null);
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
-                    fileManager.deleteTestDirectory(c.getLong(0));
+                    IOUtils.deleteTestDirectory(c.getLong(0));
                 } while (c.moveToNext());
             }
             c.close();

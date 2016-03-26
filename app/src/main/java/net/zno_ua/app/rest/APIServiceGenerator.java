@@ -3,7 +3,6 @@ package net.zno_ua.app.rest;
 import net.zno_ua.app.BuildConfig;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -28,7 +27,7 @@ public class APIServiceGenerator {
         sHttpClient = new OkHttpClient.Builder();
         if (BuildConfig.DEBUG) {
             final HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(Level.BASIC);
+            logging.setLevel(Level.BODY);
             sHttpClient.addInterceptor(logging);
         }
         sBuilder = new Retrofit.Builder()

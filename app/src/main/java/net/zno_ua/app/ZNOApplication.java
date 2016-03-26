@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
-import io.fabric.sdk.android.Fabric;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 
@@ -23,18 +22,21 @@ public class ZNOApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics(), new Answers());
         sInstance = this;
+
+        Fabric.with(this, new Crashlytics(), new Answers());
+
         final GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
         analytics.setDryRun(BuildConfig.DEBUG);
         mTracker = analytics.newTracker(R.xml.global_tracker);
         mTracker.enableAdvertisingIdCollection(true);
         mTracker.enableAutoActivityTracking(true);
         mTracker.enableExceptionReporting(true);
+
         APIService.restartPendingRequests(this);
     }
 
-    public static synchronized ZNOApplication getInstance() {
+    public static ZNOApplication getInstance() {
         return sInstance;
     }
 
