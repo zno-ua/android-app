@@ -1,10 +1,10 @@
 package net.zno_ua.app.viewholder.question;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,23 +25,15 @@ import static net.zno_ua.app.provider.ZNOContract.Question;
 public class EditableAnswerVH extends QuestionItemVH<EditableAnswer> {
     private final TextView mTvInputDescription;
     private final TextView mTvInput;
-    @Nullable
-    private final OnAnswerChangeListener mOnAnswerChangeListener;
+    private final OnAnswerChangeListener mListener;
+
+    private EditableAnswer mEditableAnswer;
 
     public EditableAnswerVH(LayoutInflater layoutInflater, ViewGroup parent,
-                            @Nullable OnAnswerChangeListener listener) {
+                            @NonNull OnAnswerChangeListener listener) {
         super(layoutInflater.inflate(R.layout.view_editable_answer_item, parent, false));
         mTvInputDescription = (TextView) itemView.findViewById(R.id.input_description);
         mTvInput = (TextView) itemView.findViewById(R.id.input);
-        mTvInput.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (mOnAnswerChangeListener != null) {
-                    mOnAnswerChangeListener.onAnswerChanged(getAdapterPosition(), s.toString());
-
-                }
-            }
-        });
         mTvInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
@@ -50,10 +42,12 @@ public class EditableAnswerVH extends QuestionItemVH<EditableAnswer> {
                 }
             }
         });
-        mOnAnswerChangeListener = listener;
+        mListener = listener;
     }
 
     public void bind(@NonNull EditableAnswer item) {
+        mEditableAnswer = item;
+        mTvInput.removeTextChangedListener(mTextWatcher);
         if (item.getType() == Question.TYPE_4) {
             mTvInputDescription.setText(R.string.answer_three_correct);
             mTvInput.setFilters(new InputFilter[]{new InputFilter.LengthFilter(3)});
@@ -68,6 +62,21 @@ public class EditableAnswerVH extends QuestionItemVH<EditableAnswer> {
         if (!TextUtils.isEmpty(item.getAnswer())) {
             mTvInput.setText(item.getAnswer());
         }
+        mTvInput.addTextChangedListener(mTextWatcher);
     }
+
+    private final TextWatcher mTextWatcher = new SimpleTextWatcher() {
+        @Override
+        public void afterTextChanged(Editable s) {
+            String answer = s.toString();
+            if (mEditableAnswer.getType() == Question.TYPE_5 && !TextUtils.isEmpty(answer)) {
+                try {
+                    answer = String.valueOf(Float.parseFloat(answer));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            mListener.onAnswerChanged(getAdapterPosition(), answer);
+        }
+    };
 
 }
