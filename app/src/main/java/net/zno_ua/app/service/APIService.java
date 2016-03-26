@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 
 import net.zno_ua.app.BuildConfig;
 import net.zno_ua.app.helper.PreferencesHelper;
@@ -35,25 +34,27 @@ public class APIService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        switch (intent.getAction()) {
-            case ACTION_GET_TEST:
-                mSyncManager.getTest(intent.getLongExtra(KEY_TEST_ID, -1));
-                break;
-            case ACTION_DELETE_TEST:
-                mSyncManager.deleteTest(intent.getLongExtra(KEY_TEST_ID, -1));
-                break;
-            case ACTION_UPDATE_TEST:
-                final long[] testsId = intent.getLongArrayExtra(KEY_TEST_ID);
-                for (long testId : testsId) {
-                    mSyncManager.updateTest(testId);
-                }
-                break;
-            case ACTION_CHECK_FOR_UPDATES:
-                mSyncManager.updateTests();
-                break;
-            case ACTION_RESTART_PENDING_REQUESTS:
-                restartPendingRequests();
-                break;
+        if (intent != null) {
+            switch (intent.getAction()) {
+                case ACTION_GET_TEST:
+                    mSyncManager.getTest(intent.getLongExtra(KEY_TEST_ID, -1));
+                    break;
+                case ACTION_DELETE_TEST:
+                    mSyncManager.deleteTest(intent.getLongExtra(KEY_TEST_ID, -1));
+                    break;
+                case ACTION_UPDATE_TEST:
+                    final long[] testsId = intent.getLongArrayExtra(KEY_TEST_ID);
+                    for (long testId : testsId) {
+                        mSyncManager.updateTest(testId);
+                    }
+                    break;
+                case ACTION_CHECK_FOR_UPDATES:
+                    mSyncManager.updateTests();
+                    break;
+                case ACTION_RESTART_PENDING_REQUESTS:
+                    restartPendingRequests();
+                    break;
+            }
         }
     }
 
