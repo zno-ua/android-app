@@ -56,7 +56,7 @@ public class TestingActivity extends BaseActivity
     private static final String SHARE_RESULTS = "Share results";
     private static final String FINISH_TEST = "Finish test";
     private static final String TESTING_RESULT_DESCRIPTION_FORMAT
-            = "Test point: %d, ZNO point: %.2f, time %d";
+            = "Test #%d point: %d, ZNO point: %.2f, time %d";
 
     public interface Action {
         String VIEW_TEST = "net.zno_ua.app.VIEW_TEST";
@@ -355,11 +355,13 @@ public class TestingActivity extends BaseActivity
         sendIntent.putExtra(Intent.EXTRA_TEXT, shareText);
         sendIntent.setType("text/plain");
         startActivity(sendIntent);
+        final int elapsedMinutes = (int) (mTestingInfo.getElapsedTime() / MINUTE);
         ZNOApplication.getInstance().getTracker().send(new HitBuilders.EventBuilder()
                 .setCategory(SHARE_RESULTS)
                 .setAction(mTestingInfo.getSubjectName())
                 .setLabel(String.format(Locale.US, TESTING_RESULT_DESCRIPTION_FORMAT,
-                        testPoint, ratingPoint, mTestingInfo.getElapsedTime() / MINUTE))
+                        mTestingInfo.getTestId(), testPoint, ratingPoint, elapsedMinutes))
+                .setValue(mTestingInfo.getTestId())
                 .build());
     }
 
@@ -423,8 +425,8 @@ public class TestingActivity extends BaseActivity
         if (mTestingInfo.withTimer() && mTimer != null) {
             mTimer.cancel();
         }
-        int testPoint = calculateUserPoints();
-        double ratingPoint = getRatingPoint(testPoint);
+        final int testPoint = calculateUserPoints();
+        final double ratingPoint = getRatingPoint(testPoint);
 
         ContentValues values = new ContentValues();
         values.put(Testing.ELAPSED_TIME, mTestingInfo.getElapsedTime());
@@ -436,11 +438,13 @@ public class TestingActivity extends BaseActivity
         getContentResolver().update(buildTestingItemUri(mTestingInfo.getTestingId()), values, null,
                 null);
 
+        final int elapsedMinutes = (int) (mTestingInfo.getElapsedTime() / MINUTE);
         ZNOApplication.getInstance().getTracker().send(new HitBuilders.EventBuilder()
                 .setCategory(FINISH_TEST)
                 .setAction(mTestingInfo.getSubjectName())
                 .setLabel(String.format(Locale.US, TESTING_RESULT_DESCRIPTION_FORMAT,
-                                testPoint, ratingPoint, mTestingInfo.getElapsedTime() / MINUTE))
+                        mTestingInfo.getTestId(), testPoint, ratingPoint, elapsedMinutes))
+                .setValue(mTestingInfo.getTestId())
                 .build());
 
         new MaterialDialog.Builder(this)
