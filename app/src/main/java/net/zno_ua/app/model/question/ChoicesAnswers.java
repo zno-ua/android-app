@@ -1,5 +1,7 @@
 package net.zno_ua.app.model.question;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 /**
@@ -14,9 +16,9 @@ public class ChoicesAnswers implements QuestionItem {
     private String mAnswer;
     private boolean mIsAnswered;
 
-    public ChoicesAnswers(int numbersCount, int lettersCount, String correctAnswer, String answer,
-                          char firstLetter, boolean editable) {
-        mNumbersCount = numbersCount;
+    public ChoicesAnswers(int numbersCount, int lettersCount, @NonNull String correctAnswer,
+                          @Nullable String answer, char firstLetter, boolean editable) {
+        mNumbersCount = Math.min(numbersCount, correctAnswer.length());
         mLettersCount = lettersCount;
         mCorrectAnswer = correctAnswer;
         setAnswer(TextUtils.isEmpty(answer) ? emptyAnswer(numbersCount) : answer);

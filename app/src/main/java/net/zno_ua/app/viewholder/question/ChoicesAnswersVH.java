@@ -48,9 +48,7 @@ public class ChoicesAnswersVH extends QuestionItemVH<ChoicesAnswers>
     }
 
     public void bind(@NonNull ChoicesAnswers item) {
-        if (mTableLayout.getChildCount() == 0) {
-            generateAnswersTable(item);
-        }
+        generateAnswersTable(item);
         int answer;
         int correct;
         for (int number = 0; number < item.getCorrectAnswer().length(); number++) {
@@ -65,6 +63,7 @@ public class ChoicesAnswersVH extends QuestionItemVH<ChoicesAnswers>
     }
 
     private void generateAnswersTable(@NonNull ChoicesAnswers item) {
+        mTableLayout.removeAllViews();
         final Context context = itemView.getContext();
         final LayoutInflater layoutInflater = LayoutInflater.from(context);
 
