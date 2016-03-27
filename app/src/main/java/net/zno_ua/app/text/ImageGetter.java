@@ -17,17 +17,18 @@ import java.io.File;
  */
 public class ImageGetter implements Html.ImageGetter {
 
-    private final BitmapDrawablePlaceHolder mDrawable;
+    private final TextView mTextView;
 
     public ImageGetter(@NonNull TextView textView) {
-        mDrawable = new BitmapDrawablePlaceHolder(textView);
+        mTextView = textView;
     }
 
     @Override
     public Drawable getDrawable(String source) {
         final Context context = ZNOApplication.getInstance();
-        Picasso.with(context).load(new File(context.getFilesDir(), source)).into(mDrawable);
-        return mDrawable;
+        final BitmapDrawablePlaceHolder drawable = new BitmapDrawablePlaceHolder(mTextView);
+        Picasso.with(context).load(new File(context.getFilesDir(), source)).into(drawable);
+        return drawable;
     }
 
 }
