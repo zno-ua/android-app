@@ -1,6 +1,7 @@
 package net.zno_ua.app.service;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -27,13 +28,15 @@ public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerSe
      */
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        if (from.startsWith(GcmRegistrationService.TOPICS)) {
+        if (from != null && from.startsWith(GcmRegistrationService.TOPICS)) {
             final String topic = from.replace(GcmRegistrationService.TOPICS, "");
-            onTopicReceived(topic, data);
+            if (data != null) {
+                onTopicReceived(topic, data);
+            }
         }
     }
 
-    private void onTopicReceived(String topic, Bundle data) {
+    private void onTopicReceived(@NonNull String topic, @NonNull Bundle data) {
         switch (topic) {
             case GcmRegistrationService.GLOBAL_NEWS:
             case GcmRegistrationService.NEWS:
@@ -46,7 +49,7 @@ public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerSe
         }
     }
 
-    private void onNewsReceived(Bundle data) {
+    private void onNewsReceived(@NonNull Bundle data) {
         if (!(data.containsKey(KEY_TITLE) || data.containsKey(KEY_DESCRIPTION)
                 || data.containsKey(KEY_LINK))) {
             return;
